@@ -1,0 +1,123 @@
+<?php
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+include_once(__DIR__ . '/../config.php');
+include_once(__DIR__ . '/../db.php');
+include_once(__DIR__ . '/../handlers/mailer.php'); // assumes the mailer function is here
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name            = $_POST['name']            ?? null;
+    $email           = $_POST['email']           ?? null;
+    $phone           = $_POST['phone']           ?? null;
+    $city            = $_POST['city'] ?? null;
+    $age             = isset($_POST['age']) ? (int)$_POST['age'] : null;
+    $password        = $_POST['password']        ?? null;
+    
+    // Address-related data from hidden inputs
+    $line_1          = $_POST['line_1'] ?? '';
+    $line_2          = $_POST['line_2'] ?? '';
+    $line_3          = $_POST['line_3'] ?? '';
+    $town_or_city    = $_POST['town_or_city'] ?? '';
+    $county          = $_POST['county'] ?? '';
+    $postcode        = $_POST['postcode-final'] ?? '';
+    $formatted_address = $_POST['formatted_address'] ?? '';
+    
+    // Interests (if applicable)
+    $interestsRaw = $_POST['interests'] ?? '';
+    $interests = is_array($interestsRaw) ? $interestsRaw : explode(',', $interestsRaw);
+
+    // Basic validation
+    if (!$email || !$phone || !$password) {
+        header('Location: ' . BASE_URL . '/public/register.php?error=missing_fields');
+        exit;
+    }
+
+    try {
+        // Check if the email already exists
+        $stmt = $conn->prepare("SELECT id, verified FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            if ($user['verified'] == 0) {
+                // Fetch the latest verification code for the email
+                $stmt = $conn->prepare("SELECT code FROM email_verification_codes WHERE email = ? ORDER BY created_at DESC LIMIT 1");
+                $stmt->execute([$email]);
+                $row = $stmt->fetch();
+
+                if ($row) {
+                    // Send email with verification code
+                    $subject = 'Your TableTalk verification code';
+                    $body    = "Your verification code is: <strong>" . $row['code'] . "</strong>";
+                    sendEmail($email, $subject, $body);
+                    
+                    // Redirect to verification page
+                    header('Location: ' . BASE_URL . '/public/verify_email.php?email=' . urlencode($email));
+                    exit;
+                }
+            } else {
+                header('Location: ' . BASE_URL . '/public/register.php?error=duplicate');
+                exit;
+            }
+        }
+
+        // Hash the password and generate a verification token
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $token = bin2hex(random_bytes(16));
+
+        // Insert the new user with address data
+        $stmt = $conn->prepare("
+            INSERT INTO users (name, email, phone, age, city, password_hash, verification_token, verified, line_1, line_2, line_3, town_or_city, county, postcode,   formatted_address)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt->execute([
+            $name,
+            $email,
+            $phone,
+            $age,
+            $city,
+            $passwordHash,
+            $token,
+            $line_1,
+            $line_2,
+            $line_3,
+            $town_or_city,
+            $county,
+            $postcode,
+            $formatted_address
+        ]);
+        $userId = $conn->lastInsertId();
+
+        // Add interests if provided
+        if (!empty($interests)) {
+            $stmt = $conn->prepare("INSERT INTO user_interests (user_id, interest_id) VALUES (?, ?)");
+            foreach ($interests as $interestId) {
+                if (is_numeric($interestId)) {
+                    $stmt->execute([$userId, (int)$interestId]);
+                }
+            }
+        }
+
+        // Generate a new verification code and save it to the DB
+        $code = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $stmt = $conn->prepare("INSERT INTO email_verification_codes (email, code) VALUES (?, ?)");
+        $stmt->execute([$email, $code]);
+
+        // Send the verification code email using sendEmail
+        $subject = 'Your TableTalk verification code';
+        $body    = "Your verification code is: <strong>$code</strong>";
+        sendEmail($email, $subject, $body);
+
+        // Redirect to the verification page
+        header('Location: ' . BASE_URL . '/public/verify_email.php?email=' . urlencode($email));
+        exit;
+
+    } catch (PDOException $e) {
+        error_log("Registration error: " . $e->getMessage());
+        header('Location: ' . BASE_URL . '/public/register.php?error=server');
+        exit;
+    }
+}
