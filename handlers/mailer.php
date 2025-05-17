@@ -17,15 +17,25 @@ function sendEmail($email, $subject, $body) {
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
+        // Bypass SSL certificate validation (dev only)
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ],
+        ];
+
         $mail->setFrom('unable.to.reply.to.this@gmail.com', 'TableTalk');
-        $mail->addAddress($email); // recipient email
+        $mail->addAddress($email);
 
-        $mail->isHTML(true); // Set email format to HTML
-        $mail->Subject = $subject; // Subject of the email
-        $mail->Body    = $body; // Body of the email
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
 
-        $mail->send(); // Send the email
+        $mail->send();
     } catch (Exception $e) {
         error_log("Email send failed: " . $mail->ErrorInfo);
+        file_put_contents(__DIR__ . '/email_debug.log', "Error: " . $mail->ErrorInfo . "\n", FILE_APPEND);
     }
 }
