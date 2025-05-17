@@ -1,0 +1,60 @@
+
+
+
+##################################################################
+
+/tabletalk/
+│
+├── DONE db.php                         ← DB connection
+├── DONE config.php                     ← Constants (e.g. Vonage API keys, base URL)
+│
+├── /public/                       ← Public-facing pages (user-facing)
+│   ├── index.php                  ← Homepage / splash
+│   ├── DONE register.php               ← Registration form
+│   ├── DONE login.php                  ← User login
+│   ├── DONE dashboard.php              ← After login: show profile, matches
+│   ├── DONE ocean_test.php                   ← The OCEAN Personlaity test
+│   ├── chat.php                   ← Chat interface
+│   └── DONE logout.php
+│
+├── /admin/                        ← Admin-only views
+│   ├── REMOVED login.php          All logins handled from the /public/login.php and the login_handler.php differentiats between roles user and admin
+│   ├── DONE dashboard.php              ← Admin dashboard: view/approve matches
+│   ├── DONE users.php                  ← View user profiles
+│   ├── DONE edit_user.php                  edit user profiles
+│   ├── DONE matches.php                Shows a list of all the created matches and a button to create_match.php
+│   ├── DONE create_match.php                creates a match
+│   ├── DONE edit_match.php                edits the match and allows you to add or remove users from the match.
+│   └── chat.php                   ← Admin-user chat
+│
+├── /handlers/                    ← Backend POST handlers
+│   ├── DONE register_handler.php
+│   ├── DONE login_handler.php
+│   ├── DONE availability_handler.php - Updates availability from the dashboard.php
+│   ├── DONE delete_account_handler.php - deletes the user account from the db (irriversable)
+│   ├── DONE ocean_test_handler.php - handles the ocean_test.php submission and lands it in the db
+│   ├── DONE price_point_handler.php - updates the users price point preference (£, ££, £££) in the user table
+│   ├── DONE update_profile_handler.php - updates the users details, name, email, phone, age and city
+│   ├── DONE admin_update_user_handler.php - allows the admin to update the user
+│   ├── DONE admin_delete_user.php - allows the admin to delete the user
+│   ├── DONE update_match_users.php
+│   ├── DONE edit_match_handler.php
+│   ├── DONE create_match_handler.php
+│   ├── chat_handler.php
+│   └── password_reset_handler.php
+│
+├── /partials/                    ← Reusable UI bits
+│   ├── DONE header.php
+│   ├── DONE footer.php
+│   └── REMOVED, ALREADY IN HEADER.PHP nav.php
+│
+├── /assets/                      ← Bootstrap, custom CSS, images, JS
+│   ├── css/
+│   ├── js/
+│   └── img/
+│
+├── /cron/                        ← Optional: cronjob.org pings
+│   ├── send_sms_reminders.php
+│   └── expire_reset_codes.php
+│
+└── README.md
