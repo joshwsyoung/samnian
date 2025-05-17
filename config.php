@@ -51,5 +51,9 @@ if (!function_exists('session_info')) {
 
 // Define BASE_URL only if not already defined
 if (!defined('BASE_URL')) {
-    define('BASE_URL', 'https://dev.queensgatecreative.com/tabletalk3');
+    if (APP_DEBUG) {
+        define('BASE_URL', 'http://localhost/talktable4');
+    } else {
+        define('BASE_URL', 'https://dev.queensgatecreative.com/tabletalk3');
+    }
 }

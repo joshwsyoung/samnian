@@ -117,7 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } catch (PDOException $e) {
         error_log("Registration error: " . $e->getMessage());
-        header('Location: ' . BASE_URL . '/public/register.php?error=server');
+        echo "Error: " . $e->getMessage(); // for debugging only; remove in prod
+        // header('Location: ' . BASE_URL . '/public/register.php?error=server');
         exit;
     }
 }
