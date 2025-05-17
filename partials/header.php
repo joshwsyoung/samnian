@@ -16,11 +16,11 @@ if (session_status() === PHP_SESSION_NONE) session_start();
     <title>TalkTable</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Pre-load image -->
-    <link rel="preload" href="/tabletalk3/public/assets/logo.png" as="image">
+    <link rel="preload" href="<?= BASE_URL ?>/public/assets/logo.png" as="image">
     
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/tabletalk3/assets/css/styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     
@@ -32,13 +32,6 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fw-light">
   <div class="container-fluid">
-  <!-- 
-    <a class="navbar-brand" href="<?= BASE_URL ?>/public/index.php">
-      <img src="/tabletalk3/assets/images/logo.png" alt="TalkTable Logo" height="40" class="d-inline-block align-text-top">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button> -->
 
         <!-- Toggler on the left -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
