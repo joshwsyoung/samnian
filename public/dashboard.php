@@ -405,7 +405,7 @@ if (!$scores) {
                 <hr>
                 <!-- Delete Account Button -->
                 <form action="../handlers/delete_account_handler.php" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger  style="background-color:rgb(255, 100, 100) !important;"">Delete Account</button>
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete Account</button>
                 </form>
             </div>
         </div>

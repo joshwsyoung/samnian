@@ -82,7 +82,7 @@ if (Notification && Notification.permission === 'default') {
             <?php
             // Handle error messages
             if ($_GET['error'] == 'invalid_credentials') {
-                echo 'Invalid email or password.';
+                echo 'Invalid email or password. <a href="reset_request.php">Forgot your password?</a>';
             } elseif ($_GET['error'] == 'user_not_found') {
                 echo 'No user found with this email.';
             } elseif ($_GET['error'] == 'unknown') {
