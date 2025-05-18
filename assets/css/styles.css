@@ -1,18 +1,4 @@
-@charset "UTF-8";
-/*!
- * Bootswatch v5.3.5 (https://bootswatch.com)
- * Theme: morph
- * Copyright 2012-2025 Thomas Park
- * Licensed under MIT
- * Based on Bootstrap
-*/
-/*!
- * Bootstrap  v5.3.5 (https://getbootstrap.com/)
- * Copyright 2011-2025 The Bootstrap Authors
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- */
- 
-/* KALEN STYLES */
+
 html{
     margin:0px;
     padding:0px;
@@ -24,7 +10,7 @@ html{
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bs-body-bg); 
+    background: var(--bs-body-bg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -94,7 +80,7 @@ body.fade-out {
     font-family: 'Rustic Printed', sans-serif;
     letter-spacing:0.5rem;
     color: var(--bs-heading-color);
-    margin-top: -2rem;
+    margin-top: -1.5rem;
 }
 
 .lead{
@@ -145,25 +131,24 @@ body.fade-out {
  .progress-bar{
      background-color:var(--bs-body-color);
  }
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
 
 @font-face {
   font-family: 'Laries';
-  src: url('/tabletalk3/assets/fonts/Laries-Regular.woff2') format('woff2'),
-       url('/tabletalk3/assets/fonts/Laries-Regular.woff') format('woff');
+  src: url('../../assets/fonts/Laries-Regular.woff2') format('woff2'),
+       url('../../assets/fonts/Laries-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Rustic Printed';
-  src: url('/tabletalk3/assets/fonts/Rustic-Printed.woff') format('woff');
+  src: url('../../assets/fonts/Rustic-Printed.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Poppins';
-  src: url('/tabletalk3/assets/fonts/Poppins-Light.woff') format('woff');
+  src: url('../../assets/fonts/Poppins-Light.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
