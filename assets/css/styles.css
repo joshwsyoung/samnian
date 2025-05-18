@@ -1,20 +1,4 @@
-@charset "UTF-8";
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
 
-/*!
- * Bootswatch v5.3.5 (https://bootswatch.com)
- * Theme: morph
- * Copyright 2012-2025 Thomas Park
- * Licensed under MIT
- * Based on Bootstrap
-*/
-/*!
- * Bootstrap  v5.3.5 (https://getbootstrap.com/)
- * Copyright 2011-2025 The Bootstrap Authors
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- */
- 
-/* KALEN STYLES */
 html{
     margin:0px;
     padding:0px;
@@ -150,21 +134,21 @@ body.fade-out {
 
 @font-face {
   font-family: 'Laries';
-  src: url('/assets/fonts/Laries-Regular.woff2') format('woff2'),
-       url('/assets/fonts/Laries-Regular.woff') format('woff');
+  src: url('../../assets/fonts/Laries-Regular.woff2') format('woff2'),
+       url('../../assets/fonts/Laries-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Rustic Printed';
-  src: url('/assets/fonts/Rustic-Printed.woff') format('woff');
+  src: url('../../assets/fonts/Rustic-Printed.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Poppins';
-  src: url('/assets/fonts/Poppins-Light.woff') format('woff');
+  src: url('../../assets/fonts/Poppins-Light.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
