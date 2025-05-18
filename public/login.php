@@ -91,7 +91,15 @@ if (Notification && Notification.permission === 'default') {
             ?>
         </div>
     <?php elseif (isset($_GET['success'])): ?>
-        <div class="alert alert-success">Registration successful! Please log in.</div>
+        <div class="alert alert-success">
+            <?php
+            if ($_GET['success'] === 'registered') {
+                echo 'Registration successful! You can now log in.';
+            } elseif ($_GET['success'] === 'password_reset') {
+                echo 'Password reset successful! You can now log in.';
+            }
+            ?>
+        </div>
     <?php endif; ?>
 
     <form action="../handlers/login_handler.php" method="POST" class="mt-4">
