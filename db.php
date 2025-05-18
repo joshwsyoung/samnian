@@ -1,8 +1,10 @@
 <?php
-// Toggle this manually when switching between local and prod
-$isDev = true;
+// Use APP_DEBUG from config.php to determine environment
+if (!defined('APP_DEBUG')) {
+    die('APP_DEBUG not defined. Make sure config.php is loaded before db.php.');
+}
 
-if ($isDev) {
+if (APP_DEBUG) {
     define('DB_HOST', '127.0.0.1');
     define('DB_NAME', 'tabletalk');
     define('DB_USER', 'root');
@@ -21,7 +23,12 @@ $options = [
 ];
 
 try {
-    $conn = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, $options);
+    $conn = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+        DB_USER,
+        DB_PASS,
+        $options
+    );
 } catch (PDOException $e) {
     error_log("Database connection failed: " . $e->getMessage());
     die("Database connection error. Please try again later.");

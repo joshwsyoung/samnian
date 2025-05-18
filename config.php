@@ -1,16 +1,10 @@
 <?php
-// Load DB connection settings and $conn object
-require_once __DIR__ . '/db.php';
-
-// API Keys and global constants (still define here when ready)
-// define('VONAGE_API_KEY', 'your-key-here');
-// define('VONAGE_API_SECRET', 'your-secret-here');
-
 // Error Debug Toggle — switch this during development/production
 if (!defined('APP_DEBUG')) {
-    define('APP_DEBUG', true);
+    define('APP_DEBUG', true); // Set to false in production
 }
 
+// Set up error reporting based on debug mode
 if (APP_DEBUG) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -19,6 +13,9 @@ if (APP_DEBUG) {
     ini_set('display_errors', 0);
     error_reporting(0);
 }
+
+// Load DB connection settings and $conn object
+require_once __DIR__ . '/db.php';
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
@@ -49,12 +46,7 @@ if (!function_exists('session_info')) {
     }
 }
 
-// Define BASE_URL only if not already defined
+// Define BASE_URL
 if (!defined('BASE_URL')) {
-    if (APP_DEBUG) {
-        define('BASE_URL', 'http://localhost/talktable4');
-    } else {
-        define('BASE_URL', 'https://dev.queensgatecreative.com/tabletalk3');
-    }
+    define('BASE_URL', APP_DEBUG ? 'http://localhost/talktable4' : 'https://dev.queensgatecreative.com/tabletalk3');
 }
-
