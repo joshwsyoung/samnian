@@ -50,7 +50,7 @@
     </div>
 
 <div class="container text-center py-5">
-    <h1 class="title mb-3">TalkTable</h1>
+    <h1 class="title mb-3">FindFolk</h1>
    <p class="subtitle mb-4">GET SOCIAL</p>
     <p class="lead">A small team helping connect everyone for a great dinner!</p> 
     <div class="d-grid gap-3 col-10 col-sm-6 mx-auto my-4">
