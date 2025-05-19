@@ -50,8 +50,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $row = $stmt->fetch();
 
                 if ($row) {
-                    $subject = 'Your TableTalk verification code';
-                    $body    = "Your verification code is: <strong>" . $row['code'] . "</strong>";
+                    $code = $row['code'];
+
+                    $subject = 'Your TableTalk Verification Code';
+                    $body = "
+                        <div style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto;'>
+                            <h2 style='color: #234654;'>Verify Your Email</h2>
+                            <p style='font-size: 16px; color: #333;'>Hi there! 👋</p>
+                            <p style='font-size: 16px; color: #333;'>Your TableTalk verification code is:</p>
+                            <p style='font-size: 32px; font-weight: bold; color: #234654; margin: 20px 0;'>$code</p>
+                            <p style='font-size: 14px; color: #666;'>Please enter this code on the website to complete your registration.</p>
+                            <hr style='margin: 30px 0;'>
+                            <p style='font-size: 12px; color: #aaa;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+                        </div>
+                    ";
+
                     sendEmail($email, $subject, $body);
 
                     header('Location: ' . BASE_URL . '/public/verify_email.php?email=' . urlencode($email));
@@ -86,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $postcode,
             $formatted_address
         ]);
+
         $userId = $conn->lastInsertId();
 
         if (!empty($interests)) {
@@ -101,8 +115,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("INSERT INTO email_verification_codes (email, code) VALUES (?, ?)");
         $stmt->execute([$email, $code]);
 
-        $subject = 'Your TableTalk verification code';
-        $body    = "Your verification code is: <strong>$code</strong>";
+        $subject = 'Your TableTalk Verification Code';
+        $body = "
+            <div style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto;'>
+                <h2 style='color: #234654;'>Verify Your Email</h2>
+                <p style='font-size: 16px; color: #333;'>Hi there! 👋</p>
+                <p style='font-size: 16px; color: #333;'>Your TableTalk verification code is:</p>
+                <p style='font-size: 32px; font-weight: bold; color: #234654; margin: 20px 0;'>$code</p>
+                <p style='font-size: 14px; color: #666;'>Please enter this code on the website to complete your registration.</p>
+                <hr style='margin: 30px 0;'>
+                <p style='font-size: 12px; color: #aaa;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+            </div>
+        ";
+
         sendEmail($email, $subject, $body);
 
         header('Location: ' . BASE_URL . '/public/verify_email.php?email=' . urlencode($email));

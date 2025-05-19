@@ -82,7 +82,7 @@ if (Notification && Notification.permission === 'default') {
             <?php
             // Handle error messages
             if ($_GET['error'] == 'invalid_credentials') {
-                echo 'Invalid email or password.';
+                echo 'Invalid email or password. <a href="reset_request.php">Forgot your password?</a>';
             } elseif ($_GET['error'] == 'user_not_found') {
                 echo 'No user found with this email.';
             } elseif ($_GET['error'] == 'unknown') {
@@ -91,7 +91,15 @@ if (Notification && Notification.permission === 'default') {
             ?>
         </div>
     <?php elseif (isset($_GET['success'])): ?>
-        <div class="alert alert-success">Registration successful! Please log in.</div>
+        <div class="alert alert-success">
+            <?php
+            if ($_GET['success'] === 'registered') {
+                echo 'Registration successful! You can now log in.';
+            } elseif ($_GET['success'] === 'password_reset') {
+                echo 'Password reset successful! You can now log in.';
+            }
+            ?>
+        </div>
     <?php endif; ?>
 
     <form action="../handlers/login_handler.php" method="POST" class="mt-4">
