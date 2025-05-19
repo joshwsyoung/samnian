@@ -2,6 +2,7 @@
 session_start(); // Ensure the session is started
 
 // Include database connection
+require_once '../config.php';
 require_once '../db.php';
 
 // Check if the user is logged in
