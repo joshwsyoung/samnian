@@ -4875,7 +4875,7 @@ textarea.form-control-lg {
     --bs-card-border-width: var(--bs-border-width);
     --bs-card-border-color: var(--bs-border-color-translucent);
     --bs-card-border-radius: var(--bs-border-radius);
-    --bs-card-box-shadow: ;
+    --bs-card-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4) !important; 
     --bs-card-inner-border-radius: calc(var(--bs-border-radius) - (var(--bs-border-width)));
     --bs-card-cap-padding-y: 0.75rem;
     --bs-card-cap-padding-x: 1.5rem;
@@ -14313,10 +14313,6 @@ textarea.form-control-lg {
 .progress-bar:last-child {
     border-top-right-radius: 50rem;
     border-bottom-right-radius: 50rem
-}
-
-.card {
-    box-shadow: inset 2px 2px 6px rgba(109, 114, 121, .2), inset -3px -2px 4px rgba(255, 255, 255, .2)
 }
 
 .card-primary {

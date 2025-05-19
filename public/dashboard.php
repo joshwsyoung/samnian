@@ -78,16 +78,17 @@ if (!$scores) {
 ?>
 
 <style>
- p {
-     margin-bottom: 0px;
-     font-size: 13px;
- }
+    p {
+        margin-bottom: 0px;
+        font-size: 13px;
+    }
 </style>
 
 <div class="container mt-3">
     <h2 class="display-6 mb-3">
-  Welcome<?php if (!empty($user['name'])) echo ', ' . htmlspecialchars($user['name']); ?>!
-</h2>
+        Welcome<?php if (!empty($user['name']))
+            echo ', ' . htmlspecialchars($user['name']); ?>!
+    </h2>
 
 
     <!-- Display Session Messages -->
@@ -159,10 +160,11 @@ if (!$scores) {
                                 }
                             });
                         </script>
-                        <button class="btn btn-sm mt-3 mt-3" data-bs-toggle="modal" data-bs-target="#personalSummaryModal">Personality summary</button>
+                        <button class="btn mt-3 mt-3" data-bs-toggle="modal"
+                            data-bs-target="#personalSummaryModal">Personality summary</button>
                     <?php else: ?>
                         <p>Personality scores not available. Please take the test.</p>
-                        <a class="btn btn-sm mt-3" href="ocean_test.php">Take the test!</a>
+                        <a class="btn mt-3" href="ocean_test.php">Take the test!</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -177,84 +179,88 @@ if (!$scores) {
                     <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
                     <p><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone']); ?></p>
                     <p><strong>City:</strong> <?php echo htmlspecialchars($user['city']); ?></p>
-                    <button class="btn btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">Complete Your Profile</button>
+                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">Complete Your
+                        Profile</button>
                 </div>
             </div>
         </div>
 
-    <!-- Interests Card -->
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body fw-lighter fs-6">
-                <div>
-                    <h5 class="card-title">My Interests</h5>
-                    <?php if (!empty($user_selected_interests)): ?>
-                        <ul class="list-unstyled mb-0 small">
-                            <?php
-                            $max_interests = 4;
-                            $interests_to_show = array_slice($user_selected_interests, 0, $max_interests);
-                            $more_count = count($user_selected_interests) - $max_interests;
-                            foreach ($interests_to_show as $interest): ?>
-                                <li>• <?= htmlspecialchars($interest) ?></li>
-                            <?php endforeach; ?>
-                            <?php if ($more_count > 0): ?>
-                                <li class="text-muted">+ <?= $more_count ?> more</li>
-                            <?php endif; ?>
-                        </ul>
-                    <?php else: ?>
-                        <p class="text-muted">You haven't selected any interests yet.</p>
-                    <?php endif; ?>
+        <!-- Interests Card -->
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body fw-lighter fs-6">
+                    <div>
+                        <h5 class="card-title">My Interests</h5>
+                        <?php if (!empty($user_selected_interests)): ?>
+                            <ul class="list-unstyled mb-0 small">
+                                <?php
+                                $max_interests = 4;
+                                $interests_to_show = array_slice($user_selected_interests, 0, $max_interests);
+                                $more_count = count($user_selected_interests) - $max_interests;
+                                foreach ($interests_to_show as $interest): ?>
+                                    <li>• <?= htmlspecialchars($interest) ?></li>
+                                <?php endforeach; ?>
+                                <?php if ($more_count > 0): ?>
+                                    <li class="text-muted">+ <?= $more_count ?> more</li>
+                                <?php endif; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="text-muted">You haven't selected any interests yet.</p>
+                        <?php endif; ?>
+                    </div>
+                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">
+                        Edit Preferences
+                    </button>
                 </div>
-                <button class="btn btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">
-                    Edit Preferences
-                </button>
             </div>
         </div>
     </div>
-</div>
 
 
-<!-- interests Card 
+    <!-- interests Card 
 <div class="col-md-4  mb-3">
 <div class="card">
     <div class="card-body fw-lighter fs-6">
     <h5 class="card-title fw-lighter">My interests</h5>
         <p>Update your interests.</p>
-        <button class="btn btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">Edit Preferences</button>
+        <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">Edit Preferences</button>
     </div>
 </div>
 </div>
 
 
 <!-- Preferences Card -->
-<div class="col-md-4  mb-3">
-<div class="card">
-    <div class="card-body fw-lighter fs-6">
-    <h5 class="card-title">Dinner options</h5>
-        <p>Update your availability and price preference based on existing upcoming matches.</p>
-        <button class="btn btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#preferencesModal">Edit Preferences</button>
+    <div class="col-md-4  mb-3">
+        <div class="card">
+            <div class="card-body fw-lighter fs-6">
+                <h5 class="card-title">Dinner options</h5>
+                <p>Update your availability and price preference based on existing upcoming matches.</p>
+                <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#preferencesModal">Edit
+                    Preferences</button>
+            </div>
+        </div>
     </div>
-</div>
-</div>
 
-<!-- Matched Card -->
+    <!-- Matched Card -->
 
-<div class="col-md-12 mb-3">
-    <div class="card">
-        <div class="card-body fw-lighter fs-6">
-            <h5 class="card-title">Your Match</h5>
-            <?php if ($match): ?>
-                <p><strong>Matched Table:</strong> Event on <?php echo htmlspecialchars($match['event_date']); ?> at <?php echo htmlspecialchars($match['slot']); ?>.</p>
-            <?php else: ?>
-                <p>No matches yet.</p>
-            <?php endif; ?>
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-body fw-lighter fs-6">
+                <h5 class="card-title">Your Match</h5>
+                <?php if ($match): ?>
+                    <p><strong>Matched Table:</strong> Event on <?php echo htmlspecialchars($match['event_date']); ?> at
+                        <?php echo htmlspecialchars($match['slot']); ?>.
+                    </p>
+                <?php else: ?>
+                    <p>No matches yet.</p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>
-</div>
 
 
-        <!-- Availability Card 
+<!-- Availability Card 
         <div class="col-md-4 mb-3">
             <div class="card">
                 <div class="card-body fw-lighter fs-6">
@@ -264,7 +270,7 @@ if (!$scores) {
                     <?php else: ?>
                         <p>No availability set yet.</p>
                     <?php endif; ?>
-                    <button class="btn btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#updateAvailabilityModal">Update Availability</button>
+                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateAvailabilityModal">Update Availability</button>
                 </div>
             </div>
         </div>
@@ -275,7 +281,7 @@ if (!$scores) {
                 <div class="card-body fw-lighter fs-6">
                     <h5 class="card-title fw-lighter">Your Price Point</h5>
                     <p><strong>Current Price Point:</strong> <?php echo htmlspecialchars($price_point ?: 'Not set'); ?></p>
-                    <button class="btn btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#updatePricePointModal">Update Price Point</button>
+                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updatePricePointModal">Update Price Point</button>
                 </div>
             </div>
         </div>
@@ -314,7 +320,7 @@ if (!$scores) {
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <button type="submit" class="btn btn-sm btn-outline-primary mt-3">Save Changes</button>
+                    <button type="submit" class="btn btn-outline-primary mt-3">Save Changes</button>
                 </form>
             </div>
         </div>
@@ -326,7 +332,8 @@ if (!$scores) {
 
 <!-- KK TEST -->
 <!-- Interests modal -->
-<div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content fw-lighter">
             <div class="modal-header">
@@ -336,17 +343,19 @@ if (!$scores) {
             <div class="modal-body">
                 <form action="../handlers/update_interests_handler.php" method="POST">
                     <div id="interest-cards">
-                        <?php foreach ($all_interests as $interest): 
+                        <?php foreach ($all_interests as $interest):
                             $isSelected = in_array($interest['name'], $user_selected_interests); ?>
-                            <div class="card-option <?= $isSelected ? 'selected' : '' ?>" data-value="<?= htmlspecialchars($interest['name']) ?>">
+                            <div class="card-option <?= $isSelected ? 'selected' : '' ?>"
+                                data-value="<?= htmlspecialchars($interest['name']) ?>">
                                 <?= htmlspecialchars($interest['name']) ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
-                    <input type="hidden" name="selected_interests" id="selectedInterests" value="<?= implode(',', $user_selected_interests) ?>">
+                    <input type="hidden" name="selected_interests" id="selectedInterests"
+                        value="<?= implode(',', $user_selected_interests) ?>">
 
-                    <button type="submit" class="btn btn-sm mt-3">Save Changes</button>
+                    <button type="submit" class="btn mt-3">Save Changes</button>
                 </form>
             </div>
         </div>
@@ -363,7 +372,8 @@ if (!$scores) {
 
 
 <!-- Update profile modal -->
-<div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content fw-lighter">
             <div class="modal-header">
@@ -374,19 +384,23 @@ if (!$scores) {
                 <form action="../handlers/update_profile_handler.php" method="POST">
                     <div class="mb-3">
                         <label for="name">Name</label>
-                        <input type="text" name="name" class="form-control" value="<?php echo isset($user['name']) ? htmlspecialchars($user['name']) : ''; ?>">
+                        <input type="text" name="name" class="form-control"
+                            value="<?php echo isset($user['name']) ? htmlspecialchars($user['name']) : ''; ?>">
                     </div>
                     <div class="mb-3">
                         <label for="email">Email</label>
-                        <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+                        <input type="email" class="form-control" name="email"
+                            value="<?= htmlspecialchars($user['email']) ?>" required>
                     </div>
                     <div class="mb-3">
                         <label for="phone">Phone</label>
-                        <input type="text" class="form-control" name="phone" value="<?= htmlspecialchars($user['phone']) ?>" required>
+                        <input type="text" class="form-control" name="phone"
+                            value="<?= htmlspecialchars($user['phone']) ?>" required>
                     </div>
                     <div class="mb-3">
                         <label for="age">Age</label>
-                        <input type="number" class="form-control" name="age" value="<?= htmlspecialchars($user['age']) ?>" required>
+                        <input type="number" class="form-control" name="age"
+                            value="<?= htmlspecialchars($user['age']) ?>" required>
                     </div>
                     <div class="mb-3">
                         <label for="city">City</label>
@@ -400,12 +414,13 @@ if (!$scores) {
                             ?>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-sm mt-3">Save Changes</button>
+                    <button type="submit" class="btn mt-3">Save Changes</button>
                 </form>
                 <hr>
                 <!-- Delete Account Button -->
-                <form action="../handlers/delete_account_handler.php" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete Account</button>
+                <form action="../handlers/delete_account_handler.php" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
+                    <button type="submit" class="btn btn-outline-danger">Delete Account</button>
                 </form>
             </div>
         </div>
@@ -416,46 +431,48 @@ if (!$scores) {
 
 <!-- Preferences Modal -->
 <div class="modal fade" id="preferencesModal" tabindex="-1" aria-labelledby="preferencesModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form action="../handlers/update_preferences_handler.php" method="POST" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="preferencesModalLabel">Edit Preferences</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <?php
-        require_once '../db.php';
-        $stmt = $conn->prepare("SELECT m.id, m.event_date, m.slot, m.price_point
+    <div class="modal-dialog">
+        <form action="../handlers/update_preferences_handler.php" method="POST" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="preferencesModalLabel">Edit Preferences</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <?php
+                require_once '../db.php';
+                $stmt = $conn->prepare("SELECT m.id, m.event_date, m.slot, m.price_point
                                 FROM matches m
                                 WHERE m.event_date >= CURDATE() AND m.approved = 1
                                 ORDER BY m.event_date, FIELD(m.slot, '12:00', '13:00', '14:00', '18:00', '19:00', '20:00')");
-        $stmt->execute();
-        $matches = $stmt->fetchAll();
+                $stmt->execute();
+                $matches = $stmt->fetchAll();
 
-        if ($matches): ?>
-            <div class="mb-3">
-              <label for="match_id" class="form-label">Choose your preferred session</label>
-              <select name="match_id" id="match_id" class="form-select" required>
-                <?php foreach ($matches as $match): ?>
-                    <option value="<?= $match['id'] ?>">
-                      <?= htmlspecialchars($match['event_date']) ?> at <?= htmlspecialchars($match['slot']) ?> (£<?= htmlspecialchars($match['price_point']) ?>)
-                    </option>
-                <?php endforeach; ?>
-              </select>
+                if ($matches): ?>
+                    <div class="mb-3">
+                        <label for="match_id" class="form-label">Choose your preferred session</label>
+                        <select name="match_id" id="match_id" class="form-select" required>
+                            <?php foreach ($matches as $match): ?>
+                                <option value="<?= $match['id'] ?>">
+                                    <?= htmlspecialchars($match['event_date']) ?> at <?= htmlspecialchars($match['slot']) ?>
+                                    (£<?= htmlspecialchars($match['price_point']) ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php else: ?>
+                    <p class="text-muted">No upcoming sessions available yet. Please check back later.</p>
+                <?php endif; ?>
             </div>
-        <?php else: ?>
-            <p class="text-muted">No upcoming sessions available yet. Please check back later.</p>
-        <?php endif; ?>
-      </div>
-      <div class="modal-footer d-flex justify-content-start">
-    <button type="submit" class="btn btn-sm" <?= empty($matches) ? 'disabled' : '' ?>>Save Changes</button>
-</div>
-    </form>
-  </div>
+            <div class="modal-footer d-flex justify-content-start">
+                <button type="submit" class="btn" <?= empty($matches) ? 'disabled' : '' ?>>Save Changes</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Modal: Update Availability -->
-<div class="modal fade" id="updateAvailabilityModal" tabindex="-1" aria-labelledby="updateAvailabilityModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateAvailabilityModal" tabindex="-1" aria-labelledby="updateAvailabilityModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content fw-lighter">
             <div class="modal-header">
@@ -479,7 +496,7 @@ if (!$scores) {
                             <option value="20:00">20:00</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-sm mt-3">Save Availability</button>
+                    <button type="submit" class="btn mt-3">Save Availability</button>
                 </form>
             </div>
         </div>
@@ -487,7 +504,8 @@ if (!$scores) {
 </div>
 
 <!-- Modal: Update Price Point -->
-<div class="modal fade" id="updatePricePointModal" tabindex="-1" aria-labelledby="updatePricePointModalLabel" aria-hidden="true">
+<div class="modal fade" id="updatePricePointModal" tabindex="-1" aria-labelledby="updatePricePointModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content fw-lighter">
             <div class="modal-header">
@@ -504,7 +522,7 @@ if (!$scores) {
                             <option value="£££" <?php echo $price_point === '£££' ? 'selected' : ''; ?>>£££</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-sm mt-3">Save Price Point</button>
+                    <button type="submit" class="btn mt-3">Save Price Point</button>
                 </form>
             </div>
         </div>
@@ -512,23 +530,33 @@ if (!$scores) {
 </div>
 
 <!-- Modal -->
-            <div class="modal fade" id="personalSummaryModal" tabindex="-1" aria-labelledby="personalSummaryModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content fw-lighter">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="personalSummaryModalLabel">Your Personality Summary</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p><strong>Openness:</strong><br><em>High:</em> Curious, imaginative, open to new experiences, enjoys art and ideas.<br><em>Low:</em> Practical, prefers routine, conservative in views, uncomfortable with change.</p>
-                            <p><strong>Conscientiousness:</strong><br><em>High:</em> Organized, responsible, reliable, goal-oriented, plans ahead.<br><em>Low:</em> Spontaneous, careless with details, disorganized, struggles with follow-through.</p>
-                            <p><strong>Extraversion:</strong><br><em>High:</em> Outgoing, energetic, talkative, enjoys social settings, assertive.<br><em>Low:</em> Reserved, reflective, prefers solitude, quiet, finds socializing draining.</p>
-                            <p><strong>Agreeableness:</strong><br><em>High:</em> Compassionate, cooperative, trusting, empathetic, values getting along.<br><em>Low:</em> Competitive, skeptical, blunt, more focused on self-interest.</p>
-                            <p><strong>Neuroticism:</strong><br><em>High:</em> Emotionally reactive, anxious, prone to stress, mood swings.<br><em>Low:</em> Calm, emotionally stable, resilient, handles stress well.</p>
-                            <p class="text-muted">Use the radar chart to interpret your scores: <br>0 = Low, 5 = High.</p>
-                        </div>
-                    </div>
-                </div>
+<div class="modal fade" id="personalSummaryModal" tabindex="-1" aria-labelledby="personalSummaryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content fw-lighter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="personalSummaryModalLabel">Your Personality Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <p><strong>Openness:</strong><br><em>High:</em> Curious, imaginative, open to new experiences, enjoys
+                    art and ideas.<br><em>Low:</em> Practical, prefers routine, conservative in views, uncomfortable
+                    with change.</p>
+                <p><strong>Conscientiousness:</strong><br><em>High:</em> Organized, responsible, reliable,
+                    goal-oriented, plans ahead.<br><em>Low:</em> Spontaneous, careless with details, disorganized,
+                    struggles with follow-through.</p>
+                <p><strong>Extraversion:</strong><br><em>High:</em> Outgoing, energetic, talkative, enjoys social
+                    settings, assertive.<br><em>Low:</em> Reserved, reflective, prefers solitude, quiet, finds
+                    socializing draining.</p>
+                <p><strong>Agreeableness:</strong><br><em>High:</em> Compassionate, cooperative, trusting, empathetic,
+                    values getting along.<br><em>Low:</em> Competitive, skeptical, blunt, more focused on self-interest.
+                </p>
+                <p><strong>Neuroticism:</strong><br><em>High:</em> Emotionally reactive, anxious, prone to stress, mood
+                    swings.<br><em>Low:</em> Calm, emotionally stable, resilient, handles stress well.</p>
+                <p class="text-muted">Use the radar chart to interpret your scores: <br>0 = Low, 5 = High.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include_once('../partials/footer.php'); ?>
