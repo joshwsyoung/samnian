@@ -14,7 +14,29 @@ $stmt->execute([$token]);
 $entry = $stmt->fetch();
 
 if (!$entry) {
-    die("This password reset link is invalid or has expired.");
+    $error_message = '
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card border-danger">
+                    <div class="card-header">
+                        <h4 class="mb-0">Link Expired</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-exclamation-circle text-danger" style="font-size: 48px;"></i>
+                        <h5 class="mt-3">This password reset link is invalid or has expired</h5>
+                        <p class="mb-4">The link you\'re trying to use is no longer active.</p>
+                        <a href="reset_request.php" class="btn btn-primary">Request New Reset Link</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>';
+
+    require_once __DIR__ . '/../partials/header.php';
+    echo $error_message;
+    require_once __DIR__ . '/../partials/footer.php';
+    exit();
 }
 ?>
 
