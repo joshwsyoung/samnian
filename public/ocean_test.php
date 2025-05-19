@@ -28,21 +28,24 @@ if (empty($questions)) {
         <!-- Progress Bar -->
         <div id="progressBarContainer" class="mb-4">
             <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                    style="width: 0%;"></div>
             </div>
         </div>
 
         <form id="oceanForm" action="../handlers/ocean_test_handler.php" method="POST">
             <?php foreach ($questions as $index => $question): ?>
-                <div class="question-block mb-5" style="<?= $index === 0 ? '' : 'display:none;' ?>" data-index="<?= $index ?>">
+                <div class="question-block mb-5" style="<?= $index === 0 ? '' : 'display:none;' ?>"
+                    data-index="<?= $index ?>">
                     <p class="lead fw-lighter text-center mb-3"><?= htmlspecialchars($question['question']) ?></p>
 
                     <?php $options = json_decode($question['options'], true); ?>
                     <div class="btn-group d-flex justify-content-center" role="group" aria-label="Options">
                         <?php foreach ($options as $option):
                             $inputId = 'q' . $question['id'] . '_' . $option['value'];
-                        ?>
-                            <input type="radio" class="btn-check" name="question_<?= $question['id'] ?>" id="<?= $inputId ?>" value="<?= $option['value'] ?>" required>
+                            ?>
+                            <input type="radio" class="btn-check" name="question_<?= $question['id'] ?>" id="<?= $inputId ?>"
+                                value="<?= $option['value'] ?>" required>
                             <label class="btn" for="<?= $inputId ?>">
                                 <?= htmlspecialchars($option['label']) ?>
                             </label>

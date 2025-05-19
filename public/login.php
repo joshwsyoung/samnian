@@ -1,79 +1,7 @@
 <?php
 include_once('../partials/header.php');
 include '../config.php';
-
-
-//NEW NOTIFICATION FLOW ADDED
-
-
- if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-<script>
-
-if (typeof Notification !== 'undefined') {
-    console.log('Notification API available');
-} else {
-    console.log('Notification API not available');
-}
-
-Notification.requestPermission().then(permission => {
-    console.log('Permission result:', permission);
-    // The rest of your logic here
-}).catch(error => {
-    console.error('Error requesting notification permission:', error);
-});
-
-console.log('Checking notification permissions...');
-if (Notification && Notification.permission === 'default') {
-    Notification.requestPermission().then(permission => {
-        console.log('Permission result:', permission);
-
-        fetch('../handlers/save_notification_pref.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ permission })
-        });
-
-        if (permission === 'granted') {
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-success text-center';
-            alert.textContent = 'Thanks! You’ll now receive TableTalk notifications.';
-            document.body.prepend(alert);
-
-            setTimeout(() => alert.remove(), 5000);
-        }
-    });
-}
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (Notification && Notification.permission === 'default') {
-            Notification.requestPermission().then(permission => {
-                fetch('../handlers/save_notification_pref.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ permission })
-                });
-
-                if (permission === 'granted') {
-                    const alert = document.createElement('div');
-                    alert.className = 'alert alert-success text-center';
-                    alert.textContent = 'Thanks! You’ll now receive TableTalk notifications.';
-                    document.body.prepend(alert);
-
-                    setTimeout(() => alert.remove(), 5000);
-                }
-            });
-        }
-    });
-</script>
-<?php endif; 
-
-
-// NOTIFICATION FLOW ENDS
 ?>
-
-
-
-
 <div class="container mt-5 mb-4">
     <h2 class="display-6 mb-3">User Login</h2>
 
