@@ -32,7 +32,7 @@ include '../config.php';
 
     <form action="../handlers/login_handler.php" method="POST" class="mt-4">
         <div class="mb-3">
-            <label>Email</label>
+            <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" required>
         </div>
 
