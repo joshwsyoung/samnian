@@ -1185,3 +1185,75 @@ QID 69 (E): Raw Answer = 3 → Processed = 3
 QID 70 (A): Raw Answer = 3 → Processed = 3
 QID 71 (N): Raw Answer = 3 → Processed = 3
 Final Scores: O=2.5 C=2.5 E=3.5 A=3 N=2.5
+===== NEW SUBMISSION =====
+QID 2 (A): Raw Answer =  → Skipped / Invalid
+QID 3 (N): Raw Answer =  → Skipped / Invalid
+QID 4 (C): Raw Answer =  → Skipped / Invalid
+QID 5 (O): Raw Answer =  → Skipped / Invalid
+QID 6 (E): Raw Answer =  → Skipped / Invalid
+QID 7 (A): Raw Answer =  → Skipped / Invalid
+QID 8 (N): Raw Answer =  → Skipped / Invalid
+QID 9 (C): Raw Answer =  → Skipped / Invalid
+QID 10 (O): Raw Answer =  → Skipped / Invalid
+QID 11 (E): Raw Answer =  → Skipped / Invalid
+QID 12 (A): Raw Answer =  → Skipped / Invalid
+QID 13 (N): Raw Answer =  → Skipped / Invalid
+QID 14 (C): Raw Answer =  → Skipped / Invalid
+QID 15 (O): Raw Answer =  → Skipped / Invalid
+QID 16 (E): Raw Answer =  → Skipped / Invalid
+QID 17 (A): Raw Answer =  → Skipped / Invalid
+QID 18 (N): Raw Answer =  → Skipped / Invalid
+QID 19 (C): Raw Answer =  → Skipped / Invalid
+QID 20 (O): Raw Answer =  → Skipped / Invalid
+QID 21 (E): Raw Answer =  → Skipped / Invalid
+QID 22 (A): Raw Answer =  → Skipped / Invalid
+QID 23 (N): Raw Answer =  → Skipped / Invalid
+QID 24 (C): Raw Answer =  → Skipped / Invalid
+QID 25 (O): Raw Answer =  → Skipped / Invalid
+QID 26 (E): Raw Answer =  → Skipped / Invalid
+QID 27 (A): Raw Answer =  → Skipped / Invalid
+QID 28 (N): Raw Answer =  → Skipped / Invalid
+QID 29 (C): Raw Answer =  → Skipped / Invalid
+QID 30 (O): Raw Answer =  → Skipped / Invalid
+QID 31 (E): Raw Answer =  → Skipped / Invalid
+QID 32 (A): Raw Answer =  → Skipped / Invalid
+QID 33 (N): Raw Answer =  → Skipped / Invalid
+QID 34 (C): Raw Answer =  → Skipped / Invalid
+QID 35 (O): Raw Answer =  → Skipped / Invalid
+QID 36 (E): Raw Answer =  → Skipped / Invalid
+QID 37 (A): Raw Answer =  → Skipped / Invalid
+QID 38 (N): Raw Answer =  → Skipped / Invalid
+QID 39 (C): Raw Answer =  → Skipped / Invalid
+QID 40 (O): Raw Answer =  → Skipped / Invalid
+QID 41 (E): Raw Answer =  → Skipped / Invalid
+QID 42 (A): Raw Answer =  → Skipped / Invalid
+QID 43 (N): Raw Answer =  → Skipped / Invalid
+QID 44 (C): Raw Answer =  → Skipped / Invalid
+QID 45 (O): Raw Answer =  → Skipped / Invalid
+QID 46 (E): Raw Answer =  → Skipped / Invalid
+QID 47 (A): Raw Answer =  → Skipped / Invalid
+QID 48 (N): Raw Answer =  → Skipped / Invalid
+QID 49 (C): Raw Answer =  → Skipped / Invalid
+QID 50 (O): Raw Answer =  → Skipped / Invalid
+QID 51 (C): Raw Answer =  → Skipped / Invalid
+QID 52 (O): Raw Answer = 3 → Processed = 3
+QID 53 (O): Raw Answer = 3 → Processed = 3
+QID 54 (C): Raw Answer = 3 → Processed = 3
+QID 55 (C): Raw Answer = 3 → Processed = 3
+QID 56 (E): Raw Answer = 3 → Processed = 3
+QID 57 (E): Raw Answer = 3 → Processed = 3
+QID 58 (A): Raw Answer = 3 → Processed = 3
+QID 59 (A): Raw Answer = 3 → Processed = 3
+QID 60 (N): Raw Answer = 3 → Processed = 3
+QID 61 (N): Raw Answer = 3 → Processed = 3
+QID 62 (O): Raw Answer = 3 → Processed = 3
+QID 63 (C): Raw Answer = 3 → Processed = 3
+QID 64 (E): Raw Answer = 3 → Processed = 3
+QID 65 (A): Raw Answer = 3 → Processed = 3
+QID 66 (N): Raw Answer = 3 → Processed = 3
+QID 67 (O): Raw Answer = 3 → Processed = 3
+QID 68 (C): Raw Answer = 3 → Processed = 3
+QID 69 (E): Raw Answer = 3 → Processed = 3
+QID 70 (A): Raw Answer = 3 → Processed = 3
+QID 71 (N): Raw Answer = 3 → Processed = 3
+Final Scores: O=3 C=3 E=3 A=3 N=3
