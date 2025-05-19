@@ -84,7 +84,6 @@ if (empty($questions)) {
 
                 const percent = Math.round((current / total) * 100);
                 progressBar.style.width = percent + '%';
-                progressBar.textContent = percent + '%';
             });
         });
     });
