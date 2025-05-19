@@ -24,7 +24,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Session info - Debugging session status
 if (!function_exists('session_info')) {
-    function session_info() {
+    function session_info()
+    {
         if (isset($_SESSION['user_id'])) {
             $status = 'Logged in';
             $user_id = $_SESSION['user_id'];
@@ -48,5 +49,5 @@ if (!function_exists('session_info')) {
 
 // Define BASE_URL
 if (!defined('BASE_URL')) {
-    define('BASE_URL', APP_DEBUG ? 'http://localhost/talktable4' : 'https://dev.queensgatecreative.com/tabletalk3');
+    define('BASE_URL', APP_DEBUG ? 'http://localhost/talktable4' : 'https://dev.queensgatecreative.com/talktable4');
 }
