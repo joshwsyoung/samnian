@@ -53,6 +53,8 @@ if ($user) {
 
     <p style='font-size: 14px;'>If you didn’t request this, just ignore this email — no changes will be made.</p>
 
+    <p style='font-size: 14px; margin-top: 20px;'>This link will expire in 1 hour for your security.</p>
+
     <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
 
     <p style='font-size: 12px; color: #777;'>If the button doesn't work, copy and paste this link into your browser:</p>

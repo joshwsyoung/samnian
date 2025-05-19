@@ -32,12 +32,12 @@ include '../config.php';
 
     <form action="../handlers/login_handler.php" method="POST" class="mt-4">
         <div class="mb-3">
-            <label>Email</label>
+            <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">New Password</label>
+            <label for="password" class="form-label">Password</label>
             <div class="input-group">
                 <input type="password" id="password" name="password" class="form-control"
                     pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
