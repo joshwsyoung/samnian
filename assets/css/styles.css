@@ -36,6 +36,25 @@ body.fade-out {
   opacity: 0;
 }
 
+.toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0 0.75rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-btn:focus,
+.toggle-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+.toggle-btn:hover {
+  color: #343a40;
+}
+
 /* INDEX.PHP */
 
 #how-it-works{
