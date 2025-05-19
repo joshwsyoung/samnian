@@ -86,4 +86,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 5000);
         }
     }
-
+    // Toggle password visibility
+    function togglePassword(fieldId, button) {
+                    const input = document.getElementById(fieldId);
+                    const icon = button.querySelector('i');
+                    const isHidden = input.type === 'password';
+                    input.type = isHidden ? 'text' : 'password';
+                    icon.classList.toggle('bi-eye', isHidden);
+                    icon.classList.toggle('bi-eye-slash', !isHidden);
+                }

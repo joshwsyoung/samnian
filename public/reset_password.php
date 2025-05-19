@@ -54,18 +54,25 @@ if (!$entry) {
 
         <div class="mb-3">
             <label for="password" class="form-label">New Password</label>
-            <input type="password"
-                   class="form-control"
-                   name="password"
-                   pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
-                   title="Password must be at least 8 characters long, with at least one uppercase letter and one number"
-                   required
-            >
+            <div class="input-group">
+                <input type="password" id="password" name="password" class="form-control"
+                    pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                    title="Password must be at least 8 characters long, with at least one uppercase letter and one number"
+                    required>
+                <button class="toggle-btn" type="button" onclick="togglePassword('password', this)">
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+            </div>
         </div>
 
         <div class="mb-3">
             <label for="confirm_password" class="form-label">Confirm New Password</label>
-            <input type="password" name="confirm_password" class="form-control" required>
+            <div class="input-group">
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                <button class="toggle-btn" type="button" onclick="togglePassword('confirm_password', this)">
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+            </div>
         </div>
 
         <button type="submit" class="btn">Reset Password</button>

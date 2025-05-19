@@ -37,8 +37,16 @@ include '../config.php';
         </div>
 
         <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
+            <label for="password" class="form-label">New Password</label>
+            <div class="input-group">
+                <input type="password" id="password" name="password" class="form-control"
+                    pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                    title="Password must be at least 8 characters long, with at least one uppercase letter and one number"
+                    required>
+                <button class="toggle-btn" type="button" onclick="togglePassword('password', this)">
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+            </div>
         </div>
 
         <button type="submit" class="btn">Log In</button>
