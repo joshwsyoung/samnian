@@ -1,19 +1,35 @@
 <?php
-require_once 'config.php';
-$diff = [];
+require_once '../config.php';
 
+// Normalize column definitions
+function normalizeColumn($col) {
+    return [
+        'Type'    => strtolower(trim($col['Type'] ?? '')),
+        'Null'    => strtoupper(trim($col['Null'] ?? '')),
+        'Key'     => strtoupper(trim($col['Key'] ?? '')),
+        'Default' => $col['Default'] === null ? null : (string)$col['Default'],
+        'Extra'   => strtolower(trim($col['Extra'] ?? ''))
+    ];
+}
+
+// Get schema from current DB
 function getCurrentSchema($conn) {
     $tables = $conn->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
     $schema = [];
 
     foreach ($tables as $table) {
         $columns = $conn->query("DESCRIBE `$table`")->fetchAll();
-        $schema[$table] = array_column($columns, null, 'Field');
+        $schema[$table] = [];
+        foreach ($columns as $col) {
+            $schema[$table][$col['Field']] = normalizeColumn($col); // <- Normalize here
+        }
     }
 
     return $schema;
 }
 
+
+// Compare schemas
 function compareSchemas($current, $input) {
     $changes = [];
 
@@ -25,11 +41,11 @@ function compareSchemas($current, $input) {
     $sharedTables = array_intersect($inputTables, $currentTables);
 
     foreach ($addedTables as $t) {
-        $changes[] = ['type' => 'table-added', 'table' => $t];
+        $changes[] = ['type' => 'table-added', 'table' => $t, 'sql' => "/* Manual creation required for table '$t' */"];
     }
 
     foreach ($removedTables as $t) {
-        $changes[] = ['type' => 'table-removed', 'table' => $t];
+        $changes[] = ['type' => 'table-removed', 'table' => $t, 'sql' => "DROP TABLE `$t`;"];
     }
 
     foreach ($sharedTables as $table) {
@@ -44,25 +60,36 @@ function compareSchemas($current, $input) {
         $common = array_intersect($inputFields, $currentFields);
 
         foreach ($added as $field) {
-            $changes[] = ['type' => 'column-added', 'table' => $table, 'column' => $field];
+            $col = $inputCols[$field];
+            $sql = "ALTER TABLE `$table` ADD COLUMN `$field` {$col['Type']} " .
+                   ($col['Null'] === 'NO' ? 'NOT NULL' : 'NULL') .
+                   (isset($col['Default']) ? " DEFAULT " . ($col['Default'] === null ? "NULL" : "'{$col['Default']}'") : '') .
+                   (!empty($col['Extra']) ? " {$col['Extra']}" : '') . ";";
+            $changes[] = ['type' => 'column-added', 'table' => $table, 'column' => $field, 'to' => $col, 'sql' => $sql];
         }
 
         foreach ($removed as $field) {
-            $changes[] = ['type' => 'column-removed', 'table' => $table, 'column' => $field];
+            $sql = "ALTER TABLE `$table` DROP COLUMN `$field`;";
+            $changes[] = ['type' => 'column-removed', 'table' => $table, 'column' => $field, 'sql' => $sql];
         }
 
         foreach ($common as $field) {
             $inputCol = $inputCols[$field];
             $currentCol = $currentCols[$field];
 
-            if (
-                $inputCol['Type']    !== $currentCol['Type'] ||
-                $inputCol['Null']    !== $currentCol['Null'] ||
-                $inputCol['Key']     !== $currentCol['Key'] ||
-                $inputCol['Default'] !== $currentCol['Default'] ||
-                $inputCol['Extra']   !== $currentCol['Extra']
-            ) {
-                $changes[] = ['type' => 'column-modified', 'table' => $table, 'column' => $field, 'from' => $currentCol, 'to' => $inputCol];
+            if ($inputCol !== $currentCol) {
+                $sql = "ALTER TABLE `$table` MODIFY COLUMN `$field` {$inputCol['Type']} " .
+                       ($inputCol['Null'] === 'NO' ? 'NOT NULL' : 'NULL') .
+                       (isset($inputCol['Default']) ? " DEFAULT " . ($inputCol['Default'] === null ? "NULL" : "'{$inputCol['Default']}'") : '') .
+                       (!empty($inputCol['Extra']) ? " {$inputCol['Extra']}" : '') . ";";
+                $changes[] = [
+                    'type' => 'column-modified',
+                    'table' => $table,
+                    'column' => $field,
+                    'from' => $currentCol,
+                    'to' => $inputCol,
+                    'sql' => $sql
+                ];
             }
         }
     }
@@ -70,6 +97,7 @@ function compareSchemas($current, $input) {
     return $changes;
 }
 
+// Main logic
 $currentSchema = getCurrentSchema($conn);
 $results = [];
 
@@ -92,9 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['json_schema'])) {
     <title>Compare DB Schema</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .diff-added { background-color: #d1e7dd; }
-        .diff-removed { background-color: #f8d7da; }
+        .diff-added    { background-color: #d1e7dd; }
+        .diff-removed  { background-color: #f8d7da; }
         .diff-modified { background-color: #fff3cd; }
+        pre.code-block { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; white-space: pre-wrap; }
     </style>
 </head>
 <body class="p-4">
@@ -108,31 +137,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['json_schema'])) {
             <button type="submit" class="btn btn-primary">Compare</button>
         </form>
 
-        <?php if ($results): ?>
+        <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
             <hr>
             <h4 class="mt-4">Changes:</h4>
-            <ul class="list-group mt-3">
-                <?php foreach ($results as $r): ?>
-                    <?php if ($r['type'] === 'table-added'): ?>
-                        <li class="list-group-item diff-added">+ Table added: <strong><?= $r['table'] ?></strong></li>
-                    <?php elseif ($r['type'] === 'table-removed'): ?>
-                        <li class="list-group-item diff-removed">− Table removed: <strong><?= $r['table'] ?></strong></li>
-                    <?php elseif ($r['type'] === 'column-added'): ?>
-                        <li class="list-group-item diff-added">+ Column added in <strong><?= $r['table'] ?></strong>: <code><?= $r['column'] ?></code></li>
-                    <?php elseif ($r['type'] === 'column-removed'): ?>
-                        <li class="list-group-item diff-removed">− Column removed from <strong><?= $r['table'] ?></strong>: <code><?= $r['column'] ?></code></li>
-                    <?php elseif ($r['type'] === 'column-modified'): ?>
-                        <li class="list-group-item diff-modified">
-                            ∆ Column changed in <strong><?= $r['table'] ?></strong>: <code><?= $r['column'] ?></code><br>
-                            <small><strong>From:</strong> <?= json_encode($r['from']) ?> <br>
-                            <strong>To:</strong> <?= json_encode($r['to']) ?></small>
+
+            <?php if (empty($results)): ?>
+                <div class="alert alert-success mt-3">✅ No differences found. Schemas match.</div>
+            <?php else: ?>
+                <ul class="list-group mt-3">
+                    <?php foreach ($results as $r): ?>
+                        <li class="list-group-item
+                            <?php
+                                if ($r['type'] === 'column-added' || $r['type'] === 'table-added') echo 'diff-added';
+                                elseif ($r['type'] === 'column-removed' || $r['type'] === 'table-removed') echo 'diff-removed';
+                                elseif ($r['type'] === 'column-modified') echo 'diff-modified';
+                            ?>">
+                            <strong><?= ucfirst(str_replace('-', ' ', $r['type'])) ?></strong>
+                            in table <code><?= $r['table'] ?></code>
+                            <?= isset($r['column']) ? " → column <code>{$r['column']}</code>" : '' ?>
+                            <pre class="code-block mt-2 mb-0"><?= $r['sql'] ?></pre>
                         </li>
-                    <?php elseif ($r['type'] === 'error'): ?>
-                        <li class="list-group-item text-danger"><?= htmlspecialchars($r['message']) ?></li>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </ul>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         <?php endif; ?>
+
     </div>
 </body>
 </html>
