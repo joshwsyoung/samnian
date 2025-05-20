@@ -41,7 +41,12 @@ body {
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
     font-family: 'Poppins';
-    padding-bottom: 40px;
+}
+
+@media (max-width: 767.98px) {
+    body {
+        padding-bottom: 70px
+    }
 }
 
 body.fade-in {
@@ -166,6 +171,10 @@ body.fade-out {
 .modal-body {
     background-color: var(--bs-tertiary-bg);
     color: var(--bs-heading-color);
+}
+
+.mb-custom {
+    margin-bottom: 15.8px !important;
 }
 
 /* CODE INPUT */

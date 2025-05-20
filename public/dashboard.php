@@ -111,16 +111,16 @@ if (!$scores) {
                         $scores['agreeableness'] !== 'Not available' &&
                         $scores['neuroticism'] !== 'Not available'
                     ): ?>
-                        <canvas id="oceanChart" width="300" height="300"></canvas>
+                        <canvas id="oceanBarChart" width="400" height="300"></canvas>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                         <script>
-                            const ctx = document.getElementById('oceanChart').getContext('2d');
-                            const oceanChart = new Chart(ctx, {
-                                type: 'radar',
+                            const ctx = document.getElementById('oceanBarChart').getContext('2d');
+                            new Chart(ctx, {
+                                type: 'bar',
                                 data: {
-                                    labels: ['O', 'C', 'E', 'A', 'N'],
+                                    labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
                                     datasets: [{
-                                        label: 'Your Scores (0–5)',
+                                        label: 'Score (0–5)',
                                         data: [
                                             <?= $scores['openness'] ?>,
                                             <?= $scores['conscientiousness'] ?>,
@@ -128,32 +128,51 @@ if (!$scores) {
                                             <?= $scores['agreeableness'] ?>,
                                             <?= $scores['neuroticism'] ?>
                                         ],
-                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                        borderColor: 'rgb(54, 162, 235)',
-                                        borderWidth: 2
+                                        backgroundColor: [
+                                            '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f'
+                                        ],
+                                        borderRadius: 4,
+                                        barThickness: 25
                                     }]
                                 },
                                 options: {
+                                    indexAxis: 'y',
+                                    responsive: true,
                                     scales: {
-                                        r: {
+                                        x: {
                                             min: 0,
                                             max: 5,
                                             ticks: {
-                                                stepSize: 1,
-                                                backdropColor: 'transparent' // This removes the white background
+                                                stepSize: 1
                                             },
-                                            pointLabels: {
-                                                color: '#000' // Customize label color if needed
-                                            },
-                                            grid: {
-                                                color: 'rgba(0,0,0,0.1)' // Optional: make grid lines lighter
+                                            title: {
+                                                display: true,
+                                                text: 'Score'
+                                            }
+                                        },
+                                        y: {
+                                            title: {
+                                                display: true,
+                                                text: 'Traits'
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (context) {
+                                                    return ` ${context.label}: ${context.raw}/5`;
+                                                }
                                             }
                                         }
                                     }
                                 }
                             });
                         </script>
-                        <button class="btn btn-secondary mt-3 mt-3" data-bs-toggle="modal"
+                        <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
                             data-bs-target="#personalSummaryModal">Personality summary</button>
                     <?php else: ?>
                         <p>Personality scores not available. Please take the test.</p>
@@ -168,10 +187,10 @@ if (!$scores) {
             <div class="card">
                 <div class="card-body fw-lighter fs-6">
                     <h5 class="card-title">Your Profile</h5>
-                    <p><strong>Name:</strong> <?php echo htmlspecialchars($user['name']); ?></p>
-                    <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
-                    <p><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone']); ?></p>
-                    <p><strong>City:</strong> <?php echo htmlspecialchars($user['city']); ?></p>
+                    <p class="mb-custom"><strong>Name:</strong> <?php echo htmlspecialchars($user['name']); ?></p>
+                    <p class="mb-custom"><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+                    <p class="mb-custom"><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone']); ?></p>
+                    <p class="mb-custom"><strong>City:</strong> <?php echo htmlspecialchars($user['city']); ?></p>
                     <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
                         data-bs-target="#updateProfileModal">Complete Your
                         Profile</button>
@@ -188,7 +207,7 @@ if (!$scores) {
                         <?php if (!empty($user_selected_interests)): ?>
                             <ul class="list-unstyled mb-0 small">
                                 <?php
-                                $max_interests = 4;
+                                $max_interests = 7;
                                 $interests_to_show = array_slice($user_selected_interests, 0, $max_interests);
                                 $more_count = count($user_selected_interests) - $max_interests;
                                 foreach ($interests_to_show as $interest): ?>
