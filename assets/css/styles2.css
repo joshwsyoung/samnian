@@ -41,7 +41,12 @@ body {
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
     font-family: 'Poppins';
-    padding-bottom: 40px;
+}
+
+@media (max-width: 767.98px) {
+    body {
+        padding-bottom: 70px
+    }
 }
 
 body.fade-in {
