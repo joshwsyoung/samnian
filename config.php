@@ -1,7 +1,7 @@
 <?php
 // Error Debug Toggle — switch this during development/production
 if (!defined('APP_DEBUG')) {
-    define('APP_DEBUG', true); // Set to false in production
+    define('APP_DEBUG', TRUE); // Set to false in production
 }
 
 // Set up error reporting based on debug mode
