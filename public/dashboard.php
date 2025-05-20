@@ -76,13 +76,16 @@ if (!$scores) {
 }
 
 ?>
+<?php
+include '../partials/greetings.php';
+$name = !empty($user['name']) ? htmlspecialchars($user['name']) : 'friend';
+$greeting = getGreeting() . $name . '.';
+?>
 
 <div class="container mt-3">
-    <h2 class="display-6 mb-3">
-        Welcome<?php if (!empty($user['name']))
-            echo ', ' . htmlspecialchars($user['name']); ?>!
+    <h2 class="display-6 mb-3 mt-3">
+        <?php echo $greeting; ?>
     </h2>
-
 
     <!-- Display Session Messages -->
     <?php if (isset($_SESSION['success'])): ?>
@@ -232,18 +235,18 @@ if (!$scores) {
 
 
     <!-- interests Card 
-<div class="col-md-4  mb-3">
-<div class="card">
-    <div class="card-body fw-lighter fs-6">
-    <h5 class="card-title fw-lighter">My interests</h5>
-        <p>Update your interests.</p>
-        <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">Edit Preferences</button>
+    <div class="col-md-4  mb-3">
+    <div class="card">
+        <div class="card-body fw-lighter fs-6">
+        <h5 class="card-title fw-lighter">My interests</h5>
+            <p>Update your interests.</p>
+            <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">Edit Preferences</button>
+        </div>
     </div>
-</div>
-</div>
+    </div>
 
 
-<!-- Preferences Card -->
+    <!-- Preferences Card -->
     <div class="col-md-4  mb-3">
         <div class="card">
             <div class="card-body fw-lighter fs-6">
@@ -275,31 +278,31 @@ if (!$scores) {
 
 
 <!-- Availability Card 
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title fw-lighter">Your Availability</h5>
-                    <?php if ($availability): ?>
-                        <p><strong>Available for:</strong> <?php echo htmlspecialchars($availability[0]['event_date']); ?> at <?php echo htmlspecialchars($availability[0]['slot']); ?></p>
-                    <?php else: ?>
-                        <p>No availability set yet.</p>
-                    <?php endif; ?>
-                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateAvailabilityModal">Update Availability</button>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body fw-lighter fs-6">
+                        <h5 class="card-title fw-lighter">Your Availability</h5>
+                        <?php if ($availability): ?>
+                            <p><strong>Available for:</strong> <?php echo htmlspecialchars($availability[0]['event_date']); ?> at <?php echo htmlspecialchars($availability[0]['slot']); ?></p>
+                        <?php else: ?>
+                            <p>No availability set yet.</p>
+                        <?php endif; ?>
+                        <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateAvailabilityModal">Update Availability</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Price Point Card 
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title fw-lighter">Your Price Point</h5>
-                    <p><strong>Current Price Point:</strong> <?php echo htmlspecialchars($price_point ?: 'Not set'); ?></p>
-                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updatePricePointModal">Update Price Point</button>
+            <!-- Price Point Card 
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body fw-lighter fs-6">
+                        <h5 class="card-title fw-lighter">Your Price Point</h5>
+                        <p><strong>Current Price Point:</strong> <?php echo htmlspecialchars($price_point ?: 'Not set'); ?></p>
+                        <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updatePricePointModal">Update Price Point</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div> -->
+        </div> -->
 
 
 
@@ -312,39 +315,39 @@ if (!$scores) {
 
 
 <!-- Update interests modal 
-<div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content fw-lighter">
-            <div class="modal-header">
-                <h5 class="modal-title fw-lighter" id="updateInterestsModalLabel">Update Your Interests</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="../handlers/update_interests_handler.php" method="POST">
-                    <div class="row">
-                        <?php foreach ($all_interests as $interest): ?>
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input interest" type="checkbox" name="selected_interests[]" value="<?= htmlspecialchars($interest['name']) ?>"
-                                        <?= in_array($interest['name'], $user_selected_interests) ? 'checked' : ''; ?>>
-                                    <label class="form-check-label" for="interest_<?= htmlspecialchars($interest['id']) ?>">
-                                        <?= htmlspecialchars($interest['name']) ?>
-                                    </label>
+    <div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content fw-lighter">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-lighter" id="updateInterestsModalLabel">Update Your Interests</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="../handlers/update_interests_handler.php" method="POST">
+                        <div class="row">
+                            <?php foreach ($all_interests as $interest): ?>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input interest" type="checkbox" name="selected_interests[]" value="<?= htmlspecialchars($interest['name']) ?>"
+                                            <?= in_array($interest['name'], $user_selected_interests) ? 'checked' : ''; ?>>
+                                        <label class="form-check-label" for="interest_<?= htmlspecialchars($interest['id']) ?>">
+                                            <?= htmlspecialchars($interest['name']) ?>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <button type="submit" class="btn btn-outline-primary mt-3">Save Changes</button>
-                </form>
+                            <?php endforeach; ?>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary mt-3">Save Changes</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 
 
-<!-- KK TEST -->
+    <!-- KK TEST -->
 <!-- Interests modal -->
 <div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel"
     aria-hidden="true">
@@ -455,9 +458,9 @@ if (!$scores) {
                 <?php
                 require_once '../db.php';
                 $stmt = $conn->prepare("SELECT m.id, m.event_date, m.slot, m.price_point
-                                FROM matches m
-                                WHERE m.event_date >= CURDATE() AND m.approved = 1
-                                ORDER BY m.event_date, FIELD(m.slot, '12:00', '13:00', '14:00', '18:00', '19:00', '20:00')");
+                                    FROM matches m
+                                    WHERE m.event_date >= CURDATE() AND m.approved = 1
+                                    ORDER BY m.event_date, FIELD(m.slot, '12:00', '13:00', '14:00', '18:00', '19:00', '20:00')");
                 $stmt->execute();
                 $matches = $stmt->fetchAll();
 
