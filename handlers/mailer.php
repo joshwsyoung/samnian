@@ -6,22 +6,23 @@ require_once(__DIR__ . '/../assets/phpmailer/PHPMailer.php');
 require_once(__DIR__ . '/../assets/phpmailer/SMTP.php');
 require_once(__DIR__ . '/../assets/phpmailer/Exception.php');
 
-function sendEmail($email, $subject, $body) {
+function sendEmail($email, $subject, $body)
+{
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'unable.to.reply.to.this@gmail.com';
-        $mail->Password   = 'mbpz dkwt zopz ftzt';
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'unable.to.reply.to.this@gmail.com';
+        $mail->Password = 'mbpz dkwt zopz ftzt';
         $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
+        $mail->Port = 587;
 
         // Bypass SSL certificate validation (dev only)
         $mail->SMTPOptions = [
             'ssl' => [
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
+                'verify_peer' => false,
+                'verify_peer_name' => false,
                 'allow_self_signed' => true,
             ],
         ];
@@ -31,7 +32,7 @@ function sendEmail($email, $subject, $body) {
 
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body    = $body;
+        $mail->Body = $body;
 
         $mail->send();
     } catch (Exception $e) {

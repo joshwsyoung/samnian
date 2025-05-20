@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once('../db.php');
 require_once('../config.php');
+require_once('../db.php');
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     $_SESSION['error'] = 'Unauthorized access.';
@@ -11,8 +11,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $match_id = $_POST['match_id'];
-    $user_id  = $_POST['user_id'];
-    $action   = $_POST['action']; // 'add' or 'remove'
+    $user_id = $_POST['user_id'];
+    $action = $_POST['action']; // 'add' or 'remove'
 
     try {
         // Check if match exists

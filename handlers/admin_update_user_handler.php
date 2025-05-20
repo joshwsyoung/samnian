@@ -9,13 +9,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id    = $_POST['id'];
-    $name  = $_POST['name'];
+    $id = $_POST['id'];
+    $name = $_POST['name'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
-    $age   = $_POST['age'];
-    $city  = $_POST['city'];
-    $role  = $_POST['role'];
+    $age = $_POST['age'];
+    $city = $_POST['city'];
+    $role = $_POST['role'];
 
     try {
         $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, age = ?, city = ?, role = ? WHERE id = ?");

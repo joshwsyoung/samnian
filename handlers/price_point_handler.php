@@ -1,7 +1,8 @@
 <?php
 session_start();
-include_once('../db.php');
+
 include_once('../config.php');
+include_once('../db.php');
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
