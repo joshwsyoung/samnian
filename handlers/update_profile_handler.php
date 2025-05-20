@@ -1,7 +1,8 @@
 <?php
 session_start();
-include_once('../db.php');
 include_once('../config.php');
+include_once('../db.php');
+
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: ' . BASE_URL . '/login.php');
@@ -18,11 +19,16 @@ $city = isset($_POST['city']) ? trim($_POST['city']) : '';
 
 $errors = [];
 
-if (empty($name)) $errors[] = 'Name is required.';
-if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Valid email is required.';
-if (empty($phone)) $errors[] = 'Phone number is required.';
-if (empty($age) || !is_numeric($age) || $age < 16 || $age > 100) $errors[] = 'Valid age is required.';
-if (empty($city)) $errors[] = 'City is required.';
+if (empty($name))
+    $errors[] = 'Name is required.';
+if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL))
+    $errors[] = 'Valid email is required.';
+if (empty($phone))
+    $errors[] = 'Phone number is required.';
+if (empty($age) || !is_numeric($age) || $age < 16 || $age > 100)
+    $errors[] = 'Valid age is required.';
+if (empty($city))
+    $errors[] = 'City is required.';
 
 if (!empty($errors)) {
     $_SESSION['error'] = implode(' ', $errors);

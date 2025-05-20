@@ -1,7 +1,8 @@
 <?php
 session_start();
-include_once('../db.php');
 include_once('../config.php');
+include_once('../db.php');
+
 
 // Logging (optional)
 $debug_log_file = __DIR__ . '/../debug/ocean_test_log.txt';

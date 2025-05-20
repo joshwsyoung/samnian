@@ -15,23 +15,23 @@ include_once(__DIR__ . '/../db.php');
 include_once(__DIR__ . '/../handlers/mailer.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name            = $_POST['name']            ?? null;
-    $email           = $_POST['email']           ?? null;
-    $phone           = $_POST['phone']           ?? null;
-    $city            = $_POST['city']            ?? null;
-    $age             = isset($_POST['age']) ? (int)$_POST['age'] : null;
-    $password        = $_POST['password']        ?? null;
+    $name = $_POST['name'] ?? null;
+    $email = $_POST['email'] ?? null;
+    $phone = $_POST['phone'] ?? null;
+    $city = $_POST['city'] ?? null;
+    $age = isset($_POST['age']) ? (int) $_POST['age'] : null;
+    $password = $_POST['password'] ?? null;
 
-    $line_1          = $_POST['line_1']          ?? '';
-    $line_2          = $_POST['line_2']          ?? '';
-    $line_3          = $_POST['line_3']          ?? '';
-    $town_or_city    = $_POST['town_or_city']    ?? '';
-    $county          = $_POST['county']          ?? '';
-    $postcode        = $_POST['postcode-final']  ?? '';
+    $line_1 = $_POST['line_1'] ?? '';
+    $line_2 = $_POST['line_2'] ?? '';
+    $line_3 = $_POST['line_3'] ?? '';
+    $town_or_city = $_POST['town_or_city'] ?? '';
+    $county = $_POST['county'] ?? '';
+    $postcode = $_POST['postcode-final'] ?? '';
     $formatted_address = $_POST['formatted_address'] ?? '';
 
-    $interestsRaw    = $_POST['interests'] ?? '';
-    $interests       = is_array($interestsRaw) ? $interestsRaw : explode(',', $interestsRaw);
+    $interestsRaw = $_POST['interests'] ?? '';
+    $interests = is_array($interestsRaw) ? $interestsRaw : explode(',', $interestsRaw);
 
     if (!$email || !$phone || !$password) {
         header('Location: ' . BASE_URL . '/public/register.php?error=missing_fields');
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit;
                 }
             } else {
-                header('Location: ' . BASE_URL . '/public/register.php?error=duplicate');
+                header('Location: ' . BASE_URL . '/public/register.php?error=already_registered');
                 exit;
             }
         }
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO user_interests (user_id, interest_id) VALUES (?, ?)");
             foreach ($interests as $interestId) {
                 if (is_numeric($interestId)) {
-                    $stmt->execute([$userId, (int)$interestId]);
+                    $stmt->execute([$userId, (int) $interestId]);
                 }
             }
         }

@@ -53,4 +53,4 @@ include '../config.php';
     </form>
 </div>
 
-<?php include_once('../partials/footer.php'); ?>
+<?php include_once('../partials/footer_no_nav.php'); ?>
