@@ -71,10 +71,6 @@ body.fade-out {
     box-shadow: none;
 }
 
-.toggle-btn:hover {
-    color: var(--bs-secondary-bg);
-}
-
 .password-toggle {
     cursor: pointer;
 }
