@@ -25,7 +25,7 @@
   </svg>
 </div>
 
-<div class="container text-center py-5">
+<div class="container mt-5 text-center py-5">
   <h1 class="title mb-3">FindFolk</h1>
   <p class="subtitle mb-4">GET SOCIAL</p>
   <p class="lead">A small team helping connect everyone for a great dinner!</p>
