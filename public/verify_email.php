@@ -50,17 +50,26 @@ if (isset($_GET['resend']) && $_GET['resend'] === '1') {
         <div class="alert alert-success">Verification code resent to <strong><?= htmlspecialchars($email) ?></strong>.</div>
     <?php endif; ?>
 
-    <p>A 4-digit code has been sent to <strong><?= htmlspecialchars($email) ?></strong>. Please enter it below to verify your account.</p>
+    <p>A 4-digit code has been sent to <strong><?= htmlspecialchars($email) ?></strong>. Please enter it below to verify
+        your account.</p>
 
-    <form method="POST" action="../handlers/verify_email_handler.php" class="mt-3">
+    <form method="POST" action="../handlers/verify_email_handler.php" class="mt-3" id="codeForm">
         <input type="hidden" name="email" value="<?= htmlspecialchars($email) ?>">
+        <input type="hidden" name="code" id="fullCode" value="">
+
         <div class="mb-3">
             <label for="code" class="form-label">Verification Code</label>
-            <input type="text" name="code" id="code" class="form-control" maxlength="4" pattern="\d{4}" required>
+            <div class="d-flex gap-2">
+                <input type="text" maxlength="1" class="form-control text-center code-input" required>
+                <input type="text" maxlength="1" class="form-control text-center code-input" required>
+                <input type="text" maxlength="1" class="form-control text-center code-input" required>
+                <input type="text" maxlength="1" class="form-control text-center code-input" required>
+            </div>
         </div>
+
         <button type="submit" class="btn">Verify</button>
         <a href="verify_email.php?email=<?= urlencode($email) ?>&resend=1" class="btn btn-link">Resend Code</a>
     </form>
 </div>
 
-<?php include '../partials/footer.php'; ?>
+<?php include '../partials/footer_no_nav.php'; ?>

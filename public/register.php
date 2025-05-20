@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
 session_start();
 
@@ -12,9 +10,13 @@ if (!defined('BASE_URL')) {
 }
 ?>
 
-
 <div class="container mt-5">
   <h2>Register</h2>
+  <?php
+  if (isset($_GET['error']) && $_GET['error'] === 'already_registered') {
+    echo '<div class="alert alert-danger">That email is already registered. Please<a href="login.php"> log in</a>.</div>';
+  }
+  ?>
   <form action="<?php echo BASE_URL; ?>/handlers/register_handler.php" method="POST">
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
@@ -63,7 +65,7 @@ if (!defined('BASE_URL')) {
           title="Password must be at least 8 characters long, with at least one uppercase letter and one number"
           required>
         <button class="toggle-btn" type="button" onclick="togglePassword('password', this)">
-          <i class="bi bi-eye-slash"></i>
+          <i class="bi bi-eye-slash password-toggle"></i>
         </button>
       </div>
     </div>
@@ -72,4 +74,4 @@ if (!defined('BASE_URL')) {
   </form>
 </div>
 
-<?php include '../partials/footer.php'; ?>
+<?php include '../partials/footer_no_nav.php'; ?>

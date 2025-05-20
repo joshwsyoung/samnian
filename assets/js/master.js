@@ -95,3 +95,33 @@ document.addEventListener("DOMContentLoaded", function () {
                     icon.classList.toggle('bi-eye', isHidden);
                     icon.classList.toggle('bi-eye-slash', !isHidden);
                 }
+        // Handle the code input for the verification page
+        const inputs = document.querySelectorAll('.code-input');
+        const hiddenInput = document.getElementById('fullCode');
+        const form = document.getElementById('codeForm');
+
+        inputs[0].focus();
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            const code = Array.from(inputs).map(input => input.value).join('');
+            hiddenInput.value = code;
+
+            if (code.length < 4) {
+                e.preventDefault();
+                alert("Please enter all 4 digits of the code.");
+            }
+        });

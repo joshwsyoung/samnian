@@ -89,4 +89,4 @@ if (empty($questions)) {
     });
 </script>
 
-<?php include_once('../partials/footer.php'); ?>
+<?php include_once('../partials/footer_no_nav.php'); ?>

@@ -77,13 +77,6 @@ if (!$scores) {
 
 ?>
 
-<style>
-    p {
-        margin-bottom: 0px;
-        font-size: 13px;
-    }
-</style>
-
 <div class="container mt-3">
     <h2 class="display-6 mb-3">
         Welcome<?php if (!empty($user['name']))
@@ -160,11 +153,11 @@ if (!$scores) {
                                 }
                             });
                         </script>
-                        <button class="btn mt-3 mt-3" data-bs-toggle="modal"
+                        <button class="btn btn-secondary mt-3 mt-3" data-bs-toggle="modal"
                             data-bs-target="#personalSummaryModal">Personality summary</button>
                     <?php else: ?>
                         <p>Personality scores not available. Please take the test.</p>
-                        <a class="btn mt-3" href="ocean_test.php">Take the test!</a>
+                        <a class="btn btn-secondary mt-3" href="ocean_test.php">Take the test!</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -179,7 +172,8 @@ if (!$scores) {
                     <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
                     <p><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone']); ?></p>
                     <p><strong>City:</strong> <?php echo htmlspecialchars($user['city']); ?></p>
-                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">Complete Your
+                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
+                        data-bs-target="#updateProfileModal">Complete Your
                         Profile</button>
                 </div>
             </div>
@@ -208,7 +202,8 @@ if (!$scores) {
                             <p class="text-muted">You haven't selected any interests yet.</p>
                         <?php endif; ?>
                     </div>
-                    <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">
+                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
+                        data-bs-target="#updateInterestsModal">
                         Edit Preferences
                     </button>
                 </div>
@@ -235,7 +230,7 @@ if (!$scores) {
             <div class="card-body fw-lighter fs-6">
                 <h5 class="card-title">Dinner options</h5>
                 <p>Update your availability and price preference based on existing upcoming matches.</p>
-                <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#preferencesModal">Edit
+                <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#preferencesModal">Edit
                     Preferences</button>
             </div>
         </div>
@@ -355,7 +350,7 @@ if (!$scores) {
                     <input type="hidden" name="selected_interests" id="selectedInterests"
                         value="<?= implode(',', $user_selected_interests) ?>">
 
-                    <button type="submit" class="btn mt-3">Save Changes</button>
+                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                 </form>
             </div>
         </div>
