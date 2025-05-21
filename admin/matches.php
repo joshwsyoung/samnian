@@ -4,8 +4,8 @@ require_once('../db.php');
 require_once('../config.php');
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ' . BASE_URL . '/admin/login.php');
-    exit;
+header('Location: ' . BASE_URL . '/admin/login.php');
+exit;
 }
 
 include_once('../partials/header.php');
@@ -13,43 +13,43 @@ include_once('../partials/header.php');
 
 <!--
 <div class="container mt-4">
-    <h2>Matches</h2>
+<h2>Matches</h2>
 
-    <!-- Add Match Button 
-    <a href="create_match.php" class="btn btn-success mb-3">Add Match</a>
+<!-- Add Match Button 
+<a href="create_match.php" class="btn btn-success mb-3">Add Match</a>
 
-    <table class="table table-bordered mt-3">
-        <thead class="thead-light">
-            <tr>
-                <th>Date</th>
-                <th>Time Slot</th>
-                <th>Price Point</th>
-                <th># Users</th>
-                <th>Approved</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $stmt = $conn->query("SELECT m.*, 
-                (SELECT COUNT(*) FROM match_users WHERE match_id = m.id) as user_count 
-                FROM matches m ORDER BY m.event_date DESC, FIELD(slot, '12:00','13:00','14:00','18:00','19:00','20:00')");
-            
-            while ($match = $stmt->fetch()):
-            ?>
-                <tr>
-                    <td><?= htmlspecialchars($match['event_date']) ?></td>
-                    <td><?= htmlspecialchars($match['slot']) ?></td>
-                    <td><?= htmlspecialchars($match['price_point']) ?></td>
-                    <td><?= $match['user_count'] ?></td>
-                    <td><?= $match['approved'] ? '✅' : '❌' ?></td>
-                    <td>
-                        <a href="edit_match.php?id=<?= $match['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+<table class="table table-bordered mt-3">
+   <thead class="thead-light">
+       <tr>
+           <th>Date</th>
+           <th>Time Slot</th>
+           <th>Price Point</th>
+           <th># Users</th>
+           <th>Approved</th>
+           <th>Actions</th>
+       </tr>
+   </thead>
+   <tbody>
+       <?php
+       $stmt = $conn->query("SELECT m.*, 
+           (SELECT COUNT(*) FROM match_users WHERE match_id = m.id) as user_count 
+           FROM matches m ORDER BY m.event_date DESC, FIELD(slot, '12:00','13:00','14:00','18:00','19:00','20:00')");
+       
+       while ($match = $stmt->fetch()):
+       ?>
+           <tr>
+               <td><?= htmlspecialchars($match['event_date']) ?></td>
+               <td><?= htmlspecialchars($match['slot']) ?></td>
+               <td><?= htmlspecialchars($match['price_point']) ?></td>
+               <td><?= $match['user_count'] ?></td>
+               <td><?= $match['approved'] ? '✅' : '❌' ?></td>
+               <td>
+                   <a href="edit_match.php?id=<?= $match['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+               </td>
+           </tr>
+       <?php endwhile; ?>
+   </tbody>
+</table>
 </div>
 
 <?php include_once('../partials/footer.php'); ?> */
@@ -61,8 +61,8 @@ include_once('../partials/header.php');
 
 
 session_start();
-require_once('../db.php');
 require_once('../config.php');
+require_once('../db.php');
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: ' . BASE_URL . '/admin/login.php');
@@ -94,10 +94,10 @@ include_once('../partials/header.php');
             $stmt = $conn->query("SELECT m.*, 
                 (SELECT COUNT(*) FROM match_users WHERE match_id = m.id) as user_count 
                 FROM matches m ORDER BY m.event_date DESC, FIELD(slot, '12:00','13:00','14:00','18:00','19:00','20:00')");
-            
+
             while ($match = $stmt->fetch()):
                 $match_id = $match['id'];
-                
+
                 // Get the users associated with the current match
                 $user_stmt = $conn->prepare("SELECT u.id, u.name FROM users u
                     JOIN match_users mu ON u.id = mu.user_id
@@ -117,7 +117,7 @@ include_once('../partials/header.php');
                 } else {
                     $conversation_link = null;
                 }
-            ?>
+                ?>
                 <tr>
                     <td><?= htmlspecialchars($match['event_date']) ?></td>
                     <td><?= htmlspecialchars($match['slot']) ?></td>
