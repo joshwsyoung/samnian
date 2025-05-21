@@ -34,7 +34,7 @@
                     </li>
                 <?php endif; ?>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <a class="nav-link" href="<?= BASE_URL ?>/public/profile.php">
                         <i class="bi bi-person"></i><br>Profile</a>
                 </li>
                 <li class="nav-item">

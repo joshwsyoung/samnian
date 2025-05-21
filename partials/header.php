@@ -96,7 +96,7 @@ if (session_status() === PHP_SESSION_NONE)
               <a class="nav-link" href="<?= BASE_URL ?>/public/logout.php">Logout</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">Profile</a>
+              <a class="nav-link" href="<?= BASE_URL ?>/public/profile.php">Profile</a>
             </li>
           <?php else: ?>
             <!-- Guest options -->
