@@ -1,7 +1,9 @@
 <?php
 session_start();
-include_once('../config.php');
-include_once('../db.php');
+
+require_once('../config.php');
+require_once('../db.php');
+
 
 // Check if the user is logged in and if they are an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -17,7 +19,7 @@ $user_name = $_SESSION['user_name'];
 
 <div class="container mt-5">
     <h2>Welcome, Admin <?= htmlspecialchars($user_name) ?>!</h2>
-    
+
     <div class="row mt-4">
         <!-- User Management Section -->
         <div class="col-md-4">
@@ -58,4 +60,3 @@ $user_name = $_SESSION['user_name'];
 </div>
 
 <?php include_once('../partials/footer.php'); ?>
-
