@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once('../config.php');
 require_once('../db.php');
@@ -9,8 +10,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $event_date  = $_POST['event_date'];
-    $slot        = $_POST['slot'];
+    $event_date = $_POST['event_date'];
+    $slot = $_POST['slot'];
     $price_point = $_POST['price_point'];
 
     try {

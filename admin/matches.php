@@ -34,10 +34,10 @@ include_once('../partials/header.php');
             $stmt = $conn->query("SELECT m.*, 
                 (SELECT COUNT(*) FROM match_users WHERE match_id = m.id) as user_count 
                 FROM matches m ORDER BY m.event_date DESC, FIELD(slot, '12:00','13:00','14:00','18:00','19:00','20:00')");
-            
+
             while ($match = $stmt->fetch()):
                 $match_id = $match['id'];
-                
+
                 // Get the users associated with the current match
                 $user_stmt = $conn->prepare("SELECT u.id, u.name FROM users u
                     JOIN match_users mu ON u.id = mu.user_id
@@ -57,7 +57,7 @@ include_once('../partials/header.php');
                 } else {
                     $conversation_link = null;
                 }
-            ?>
+                ?>
                 <tr>
                     <td><?= htmlspecialchars($match['event_date']) ?></td>
                     <td><?= htmlspecialchars($match['slot']) ?></td>

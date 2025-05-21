@@ -11,8 +11,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $match_id = $_POST['match_id'];
-    $user_id  = $_POST['user_id'];
-    $action   = $_POST['action']; // 'add' or 'remove'
+    $user_id = $_POST['user_id'];
+    $action = $_POST['action']; // 'add' or 'remove'
 
     try {
         // Check if match exists

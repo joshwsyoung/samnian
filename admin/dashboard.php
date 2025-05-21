@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once('../config.php');
 require_once('../db.php');
@@ -18,7 +19,7 @@ $user_name = $_SESSION['user_name'];
 
 <div class="container mt-5">
     <h2>Welcome, Admin <?= htmlspecialchars($user_name) ?>!</h2>
-    
+
     <div class="row mt-4">
         <!-- User Management Section -->
         <div class="col-md-4">
@@ -59,4 +60,3 @@ $user_name = $_SESSION['user_name'];
 </div>
 
 <?php include_once('../partials/footer.php'); ?>
-

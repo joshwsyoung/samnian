@@ -34,6 +34,10 @@
                     </li>
                 <?php endif; ?>
                 <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>/public/profile.php">
+                        <i class="bi bi-person"></i><br>Profile</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link text-center" href="<?= BASE_URL ?>/public/logout.php">
                         <i class="bi bi-box-arrow-right"></i><br>Logout
                     </a>

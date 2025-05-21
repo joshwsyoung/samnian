@@ -14,10 +14,10 @@ header('Content-Type: application/json');
 if ($action === 'autocomplete' && $postcode) {
     // Build the URL for the 'find' endpoint
     $url = "https://api.getaddress.io/autocomplete/" . urlencode($postcode) . "?api-key=$apiKey";
-    
+
     // Make the API request
     $response = file_get_contents($url);
-    
+
     // Check if the API request was successful
     if ($response === false) {
         echo json_encode(['error' => 'API request failed']);
@@ -37,10 +37,10 @@ if ($action === 'autocomplete' && $postcode) {
 if ($action === 'get' && $addressId) {
     // Use the ID for the 'get' endpoint
     $url = "https://api.getaddress.io/get/" . urlencode($addressId) . "?api-key=$apiKey";
-    
+
     // Make the API request
     $response = file_get_contents($url);
-    
+
     // Check if the API request was successful
     if ($response === false) {
         echo json_encode(['error' => 'API request failed']);

@@ -31,7 +31,7 @@ include_once('../partials/header.php');
     <h2>Edit Match</h2>
     <form action="<?= BASE_URL ?>/handlers/edit_match_handler.php" method="POST">
         <input type="hidden" name="id" value="<?= htmlspecialchars($match['id']) ?>">
-        
+
         <div class="form-group">
             <label for="event_date">Event Date</label>
             <input type="date" class="form-control" name="event_date" value="<?= $match['event_date'] ?>" required>
@@ -41,9 +41,9 @@ include_once('../partials/header.php');
             <label for="slot">Time Slot</label>
             <select class="form-control" name="slot" required>
                 <?php
-                $slots = ['12:00','13:00','14:00','18:00','19:00','20:00'];
+                $slots = ['12:00', '13:00', '14:00', '18:00', '19:00', '20:00'];
                 foreach ($slots as $s) {
-                    echo "<option value=\"$s\"".($match['slot'] === $s ? ' selected' : '').">$s</option>";
+                    echo "<option value=\"$s\"" . ($match['slot'] === $s ? ' selected' : '') . ">$s</option>";
                 }
                 ?>
             </select>
@@ -53,9 +53,9 @@ include_once('../partials/header.php');
             <label for="price_point">Price Point</label>
             <select class="form-control" name="price_point" required>
                 <?php
-                $points = ['£','££','£££'];
+                $points = ['£', '££', '£££'];
                 foreach ($points as $p) {
-                    echo "<option value=\"$p\"".($match['price_point'] === $p ? ' selected' : '').">$p</option>";
+                    echo "<option value=\"$p\"" . ($match['price_point'] === $p ? ' selected' : '') . ">$p</option>";
                 }
                 ?>
             </select>
@@ -92,8 +92,8 @@ include_once('../partials/header.php');
             </tr>
         </thead>
         <tbody>
-        <?php
-        $assigned = $conn->prepare("SELECT u.id, u.name, u.age, u.city, a.event_date, a.slot, m.price_point, 
+            <?php
+            $assigned = $conn->prepare("SELECT u.id, u.name, u.age, u.city, a.event_date, a.slot, m.price_point, 
                                            ps.openness, ps.conscientiousness, ps.extraversion, ps.agreeableness, ps.neuroticism
                                     FROM users u
                                     JOIN match_users mu ON u.id = mu.user_id
@@ -106,30 +106,30 @@ include_once('../partials/header.php');
                                     AND m.price_point IS NOT NULL
                                     AND u.city IS NOT NULL 
                                     AND ps.user_id IS NOT NULL");
-        $assigned->execute([$match_id]);
-        foreach ($assigned as $user): ?>
-            <tr>
-                <td><?= htmlspecialchars($user['id']) ?></td>
-                <td><?= htmlspecialchars($user['name']) ?></td>
-                <td><?= htmlspecialchars($user['age']) ?></td>
-                <td><?= htmlspecialchars($user['city']) ?></td>
-                <td><?= htmlspecialchars($user['event_date']) ?> at <?= htmlspecialchars($user['slot']) ?></td>
-                <td><?= htmlspecialchars($user['price_point']) ?></td>
-                <td><?= htmlspecialchars($user['openness']) ?></td>
-                <td><?= htmlspecialchars($user['conscientiousness']) ?></td>
-                <td><?= htmlspecialchars($user['extraversion']) ?></td>
-                <td><?= htmlspecialchars($user['agreeableness']) ?></td>
-                <td><?= htmlspecialchars($user['neuroticism']) ?></td>
-                <td>
-                    <form action="<?= BASE_URL ?>/handlers/update_match_users.php" method="POST" class="m-0">
-                        <input type="hidden" name="action" value="remove">
-                        <input type="hidden" name="match_id" value="<?= $match_id ?>">
-                        <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                        <button class="btn btn-sm btn-danger">Remove</button>
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; ?>
+            $assigned->execute([$match_id]);
+            foreach ($assigned as $user): ?>
+                <tr>
+                    <td><?= htmlspecialchars($user['id']) ?></td>
+                    <td><?= htmlspecialchars($user['name']) ?></td>
+                    <td><?= htmlspecialchars($user['age']) ?></td>
+                    <td><?= htmlspecialchars($user['city']) ?></td>
+                    <td><?= htmlspecialchars($user['event_date']) ?> at <?= htmlspecialchars($user['slot']) ?></td>
+                    <td><?= htmlspecialchars($user['price_point']) ?></td>
+                    <td><?= htmlspecialchars($user['openness']) ?></td>
+                    <td><?= htmlspecialchars($user['conscientiousness']) ?></td>
+                    <td><?= htmlspecialchars($user['extraversion']) ?></td>
+                    <td><?= htmlspecialchars($user['agreeableness']) ?></td>
+                    <td><?= htmlspecialchars($user['neuroticism']) ?></td>
+                    <td>
+                        <form action="<?= BASE_URL ?>/handlers/update_match_users.php" method="POST" class="m-0">
+                            <input type="hidden" name="action" value="remove">
+                            <input type="hidden" name="match_id" value="<?= $match_id ?>">
+                            <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                            <button class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 
@@ -153,8 +153,8 @@ include_once('../partials/header.php');
             </tr>
         </thead>
         <tbody>
-        <?php
-        $unassigned = $conn->prepare("
+            <?php
+            $unassigned = $conn->prepare("
             SELECT u.id, u.name, u.age, u.city, a.event_date, a.slot, m.price_point,
                    ps.openness, ps.conscientiousness, ps.extraversion, ps.agreeableness, ps.neuroticism
             FROM users u
@@ -168,30 +168,30 @@ include_once('../partials/header.php');
             AND u.city IS NOT NULL 
             AND ps.user_id IS NOT NULL
         ");
-        $unassigned->execute([$match_id, $match_id]);
-        foreach ($unassigned as $user): ?>
-            <tr>
-                <td><?= htmlspecialchars($user['id']) ?></td>
-                <td><?= htmlspecialchars($user['name']) ?></td>
-                <td><?= htmlspecialchars($user['age']) ?></td>
-                <td><?= htmlspecialchars($user['city']) ?></td>
-                <td><?= htmlspecialchars($user['event_date']) ?> at <?= htmlspecialchars($user['slot']) ?></td>
-                <td><?= htmlspecialchars($user['price_point']) ?></td>
-                <td><?= htmlspecialchars($user['openness']) ?></td>
-                <td><?= htmlspecialchars($user['conscientiousness']) ?></td>
-                <td><?= htmlspecialchars($user['extraversion']) ?></td>
-                <td><?= htmlspecialchars($user['agreeableness']) ?></td>
-                <td><?= htmlspecialchars($user['neuroticism']) ?></td>
-                <td>
-                    <form action="<?= BASE_URL ?>/handlers/update_match_users.php" method="POST" class="m-0">
-                        <input type="hidden" name="action" value="add">
-                        <input type="hidden" name="match_id" value="<?= $match_id ?>">
-                        <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                        <button class="btn btn-sm btn-success">Add</button>
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; ?>
+            $unassigned->execute([$match_id, $match_id]);
+            foreach ($unassigned as $user): ?>
+                <tr>
+                    <td><?= htmlspecialchars($user['id']) ?></td>
+                    <td><?= htmlspecialchars($user['name']) ?></td>
+                    <td><?= htmlspecialchars($user['age']) ?></td>
+                    <td><?= htmlspecialchars($user['city']) ?></td>
+                    <td><?= htmlspecialchars($user['event_date']) ?> at <?= htmlspecialchars($user['slot']) ?></td>
+                    <td><?= htmlspecialchars($user['price_point']) ?></td>
+                    <td><?= htmlspecialchars($user['openness']) ?></td>
+                    <td><?= htmlspecialchars($user['conscientiousness']) ?></td>
+                    <td><?= htmlspecialchars($user['extraversion']) ?></td>
+                    <td><?= htmlspecialchars($user['agreeableness']) ?></td>
+                    <td><?= htmlspecialchars($user['neuroticism']) ?></td>
+                    <td>
+                        <form action="<?= BASE_URL ?>/handlers/update_match_users.php" method="POST" class="m-0">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="match_id" value="<?= $match_id ?>">
+                            <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                            <button class="btn btn-sm btn-success">Add</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 
