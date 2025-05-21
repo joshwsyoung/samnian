@@ -1,7 +1,8 @@
 <?php
 session_start();
-include_once('../config.php');
-include_once('../db.php');
+require_once('../config.php');
+require_once('../db.php');
+
 
 // Check if the user is logged in and if they are an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
