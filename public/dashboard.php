@@ -185,22 +185,6 @@ $greeting = getGreeting() . $name . '.';
             </div>
         </div>
 
-        <!-- Profile Card -->
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title">Your Profile</h5>
-                    <p class="mb-custom"><strong>Name:</strong> <?php echo htmlspecialchars($user['name']); ?></p>
-                    <p class="mb-custom"><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
-                    <p class="mb-custom"><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone']); ?></p>
-                    <p class="mb-custom"><strong>City:</strong> <?php echo htmlspecialchars($user['city']); ?></p>
-                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
-                        data-bs-target="#updateProfileModal">Complete Your
-                        Profile</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Interests Card -->
         <div class="col-md-4 mb-3">
             <div class="card">
@@ -231,35 +215,21 @@ $greeting = getGreeting() . $name . '.';
                 </div>
             </div>
         </div>
-    </div>
-
-
-    <!-- interests Card 
-    <div class="col-md-4  mb-3">
-    <div class="card">
-        <div class="card-body fw-lighter fs-6">
-        <h5 class="card-title fw-lighter">My interests</h5>
-            <p>Update your interests.</p>
-            <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">Edit Preferences</button>
-        </div>
-    </div>
-    </div>
-
-
-    <!-- Preferences Card -->
-    <div class="col-md-4  mb-3">
-        <div class="card">
-            <div class="card-body fw-lighter fs-6">
-                <h5 class="card-title">Dinner options</h5>
-                <p>Update your availability and price preference based on existing upcoming matches.</p>
-                <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#preferencesModal">Edit
-                    Preferences</button>
+        <!-- Preferences Card -->
+        <div class="col-md-4  mb-3">
+            <div class="card">
+                <div class="card-body fw-lighter fs-6">
+                    <h5 class="card-title">Dinner options</h5>
+                    <p>Update your availability and price preference based on existing upcoming matches.</p>
+                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
+                        data-bs-target="#preferencesModal">Edit
+                        Preferences</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Matched Card -->
-
     <div class="col-md-12 mb-3">
         <div class="card">
             <div class="card-body fw-lighter fs-6">
@@ -378,15 +348,35 @@ $greeting = getGreeting() . $name . '.';
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel">Your Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body fw-lighter fs-6">
+                        <p><strong>Name:</strong>
+                            <?php echo htmlspecialchars($user['name']); ?></p>
+                        <p><strong>Email:</strong>
+                            <?php echo htmlspecialchars($user['email']); ?></p>
+                        <p><strong>Phone:</strong>
+                            <?php echo htmlspecialchars($user['phone']); ?></p>
+                        <p><strong>City:</strong>
+                            <?php echo htmlspecialchars($user['city']); ?></p>
+                        <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
+                            data-bs-target="#updateProfileModal">
+                            Complete Your Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Update profile modal -->
 <div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel"
