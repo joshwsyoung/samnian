@@ -41,6 +41,6 @@ $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, age = ?
 $stmt->execute([$name, $email, $phone, $age, $city, $user_id]);
 
 $_SESSION['success'] = 'Profile updated successfully!';
-header('Location: ' . BASE_URL . '/public/dashboard.php');
+header('Location: ' . BASE_URL . '/public/profile.php');
 exit;
 ?>

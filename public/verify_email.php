@@ -23,16 +23,32 @@ if (isset($_GET['resend']) && $_GET['resend'] === '1') {
         $code = $row['code'];
         $subject = 'Your TableTalk Verification Code';
         $body = "
-            <div style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto;'>
-                <h2 style='color: #234654;'>Verify Your Email</h2>
-                <p style='font-size: 16px; color: #333;'>Hi there! 👋</p>
-                <p style='font-size: 16px; color: #333;'>Your TableTalk verification code is:</p>
-                <p style='font-size: 32px; font-weight: bold; color: #234654; margin: 20px 0;'>$code</p>
-                <p style='font-size: 14px; color: #666;'>Please enter this code on the website to complete your registration.</p>
-                <hr style='margin: 30px 0;'>
-                <p style='font-size: 12px; color: #aaa;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+            <div style='font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; color: #000000;'>
+                <h2 style='color: #000000;'>Verify Your Email</h2>
+                <p style='font-size: 16px;'>Hi there! 👋</p>
+                <p style='font-size: 16px;'>Your TableTalk verification code is:</p>
+                
+                <div style='
+                    background-color: #a2e435;
+                    color: #000000;
+                    border: 2px solid #000000;
+                    padding: 16px;
+                    text-align: center;
+                    font-size: 32px;
+                    font-weight: bold;
+                    border-radius: 8px;
+                    margin: 20px auto;
+                    max-width: 150px;
+                '>
+                    $code
+                </div>
+
+                <p style='font-size: 14px;'>Please enter this code on the website to complete your registration.</p>
+                <hr style='margin: 30px 0; border: none; border-top: 1px solid #ddd;'>
+                <p style='font-size: 12px; color: #555;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
             </div>
-        ";
+            ";
+
 
         // Send the email
         sendEmail($email, $subject, $body);

@@ -25,17 +25,31 @@ if (!$user) {
         <h1>Your Profile</h1>
         <p class="text-muted">Here’s what we’ve got on file for you.</p>
     </div>
+    <!-- Display Session Messages -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success">
+            <?php echo htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger">
+            <?php echo htmlspecialchars($_SESSION['error']); ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <div class="card shadow-sm mx-auto" style="max-width: 500px;">
         <div class="card-body fw-light fs-6">
-            <p><strong>Name:</strong> <?= htmlspecialchars($user['name']) ?></p>
-            <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
-            <p><strong>Phone:</strong> <?= htmlspecialchars($user['phone']) ?></p>
-            <p><strong>Age:</strong> <?= htmlspecialchars($user['age']) ?></p>
-            <p><strong>City:</strong> <?= htmlspecialchars($user['city']) ?></p>
+            <p><strong>Name:</strong> <?= htmlspecialchars($user['name'] ?? '') ?></p>
+            <p><strong>Email:</strong> <?= htmlspecialchars($user['email'] ?? '') ?></p>
+            <p><strong>Phone:</strong> <?= htmlspecialchars($user['phone'] ?? '') ?></p>
+            <p><strong>Age:</strong> <?= htmlspecialchars($user['age'] ?? '') ?></p>
+            <p><strong>City:</strong> <?= htmlspecialchars($user['city'] ?? '') ?></p>
+
 
             <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
-                Edit Profile
+                Complete Your Profile
             </button>
         </div>
     </div>
