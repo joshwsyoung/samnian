@@ -41,28 +41,28 @@
     <div class="row g-4">
       <div class="col-12 col-md-6 col-lg-3">
         <div class="p-4 rounded shadow-sm h-100 step-card"
-          style="background: url('https://images.pexels.com/photos/775091/pexels-photo-775091.jpeg') center/cover no-repeat;">
+          style="background: url('../assets/images/Friends-1.jpg') center/cover no-repeat;"> <!-- Old background https://images.pexels.com/photos/775091/pexels-photo-775091.jpeg -->
           <h3 class="fs-4 mb-2">Take the Test</h3>
           <p class="small">Complete our quick personality quiz (OCEAN model) to help us understand you.</p>
         </div>
       </div>
       <div class="col-12 col-md-6 col-lg-3">
         <div class="p-4 rounded shadow-sm h-100 step-card"
-          style="background: url('https://images.pexels.com/photos/1558691/pexels-photo-1558691.jpeg') center/cover no-repeat;">
+          style="background: url('../assets/images/Friends-2.jpg') center/cover no-repeat;"> <!-- Old background https://images.pexels.com/photos/1558691/pexels-photo-1558691.jpeg -->
           <h3 class="fs-4 mb-2">Set Availability</h3>
           <p class="small ">Choose the Wednesdays you’re free and your preferences like city and budget.</p>
         </div>
       </div>
       <div class="col-12 col-md-6 col-lg-3">
         <div class="p-4 rounded shadow-sm h-100 step-card"
-          style="background: url('https://images.pexels.com/photos/6517284/pexels-photo-6517284.jpeg') center/cover no-repeat;">
+          style="background: url('../assets/images/Friends-3.jpg') center/cover no-repeat;"> <!-- Old background https://images.pexels.com/photos/6517284/pexels-photo-6517284.jpeg -->
           <h3 class="fs-4 mb-2">Get Matched</h3>
           <p class="small ">We’ll match you with a small group for a great shared meal.</p>
         </div>
       </div>
       <div class="col-12 col-md-6 col-lg-3">
         <div class="p-4 rounded shadow-sm h-100 step-card"
-          style="background: url('https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg') center/cover no-repeat;">
+          style="background: url('../assets/images/Friends-1.jpg') center/cover no-repeat;"> <!-- Old background https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg -->
           <h3 class="fs-4 mb-2">Enjoy Dinner</h3>
           <p class="small ">Meet new people and enjoy good food and great conversation.</p>
         </div>

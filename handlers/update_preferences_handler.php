@@ -1,8 +1,8 @@
 <?php
-session_start();
 
-require_once '../config.php';
-require_once '../db.php';
+session_start();
+require_once('../config.php');
+require_once('../db.php');
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: /public/login.php');

@@ -22,10 +22,6 @@ $stmt = $conn->prepare("SELECT price_point FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $price_point = $stmt->fetchColumn();
 
-
-
-
-
 // Fetch all interests
 $stmt = $conn->prepare("SELECT * FROM interests");
 $stmt->execute();
@@ -209,6 +205,7 @@ $greeting = getGreeting() . $name . '.';
                 </div>
             </div>
         </div>
+
         <!-- Preferences Card -->
         <div class="col-md-4  mb-3">
             <div class="card">
@@ -241,73 +238,7 @@ $greeting = getGreeting() . $name . '.';
 </div>
 
 
-<!-- Availability Card 
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body fw-lighter fs-6">
-                        <h5 class="card-title fw-lighter">Your Availability</h5>
-                        <?php if ($availability): ?>
-                            <p><strong>Available for:</strong> <?php echo htmlspecialchars($availability[0]['event_date']); ?> at <?php echo htmlspecialchars($availability[0]['slot']); ?></p>
-                        <?php else: ?>
-                            <p>No availability set yet.</p>
-                        <?php endif; ?>
-                        <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updateAvailabilityModal">Update Availability</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Price Point Card 
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body fw-lighter fs-6">
-                        <h5 class="card-title fw-lighter">Your Price Point</h5>
-                        <p><strong>Current Price Point:</strong> <?php echo htmlspecialchars($price_point ?: 'Not set'); ?></p>
-                        <button class="btn mt-3" data-bs-toggle="modal" data-bs-target="#updatePricePointModal">Update Price Point</button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-
-
-
 <!-- Modals -->
-
-
-
-
-
-
-<!-- Update interests modal 
-    <div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content fw-lighter">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-lighter" id="updateInterestsModalLabel">Update Your Interests</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="../handlers/update_interests_handler.php" method="POST">
-                        <div class="row">
-                            <?php foreach ($all_interests as $interest): ?>
-                                <div class="col-md-3 mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input interest" type="checkbox" name="selected_interests[]" value="<?= htmlspecialchars($interest['name']) ?>"
-                                            <?= in_array($interest['name'], $user_selected_interests) ? 'checked' : ''; ?>>
-                                        <label class="form-check-label" for="interest_<?= htmlspecialchars($interest['id']) ?>">
-                                            <?= htmlspecialchars($interest['name']) ?>
-                                        </label>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary mt-3">Save Changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
 <!-- Interests modal -->
 <div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel"
     aria-hidden="true">

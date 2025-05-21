@@ -1,7 +1,7 @@
 <?php
 
-include_once(__DIR__ . '/../config.php');
-include_once(__DIR__ . '/../db.php');
+require_once('../config.php');
+require_once('../db.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
