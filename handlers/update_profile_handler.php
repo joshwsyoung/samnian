@@ -40,8 +40,11 @@ if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPL
     $imageName = basename($_FILES['profile_image']['name']);
     $imageExtension = strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $maxFileSize = 2 * 1024 * 1024; // 2MB
 
-    if (!in_array($imageExtension, $allowedExtensions)) {
+    if ($_FILES['profile_image']['size'] > $maxFileSize) {
+        $errors[] = 'Image file size must be less than 2MB.';
+    } elseif (!in_array($imageExtension, $allowedExtensions)) {
         $errors[] = 'Only JPG, PNG, GIF, or WEBP images are allowed.';
     } else {
         $newFileName = uniqid('profile_', true) . '.' . $imageExtension;
