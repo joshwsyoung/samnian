@@ -26,7 +26,7 @@ include '../partials/header.php';
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <button class="btn" data-bs-toggle="offcanvas" data-bs-target="#chatList">Chats</button>
+        <button class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#chatList">Chats</button>
         <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
             data-bs-target="#conversationInfoModal">
             <i class="bi bi-info-circle"></i>

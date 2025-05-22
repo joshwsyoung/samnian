@@ -18,6 +18,16 @@ if (!$user) {
     include_once('../partials/footer.php');
     exit;
 }
+
+// List all required fields
+$required_fields = ['name', 'email', 'phone', 'age', 'city', 'price_point', 'profile_image'];
+$profile_complete = true;
+foreach ($required_fields as $field) {
+    if (empty($user[$field])) {
+        $profile_complete = false;
+        break;
+    }
+}
 ?>
 
 <div class="container py-5">
@@ -45,11 +55,24 @@ if (!$user) {
             <div class="card shadow-sm p-3">
                 <?php if (!empty($user['profile_image'])): ?>
                     <img src="../uploads/<?= htmlspecialchars($user['profile_image']) ?>"
-                        class="rounded-circle mb-3 d-block mx-auto"
-                        style="border: 2px solid black; width: 120px; height: 120px; object-fit: cover;"
-                        alt="Profile Image">
+                        class="rounded-circle mb-3 d-block mx-auto profile-image" alt="Profile Image">
                 <?php endif; ?>
-                <h5 class="fw-semibold"><?= htmlspecialchars($user['name'] ?? '') ?></h5>
+                <h5 class="fw-semibold fs-3"><?= htmlspecialchars($user['name'] ?? '') ?></h5>
+                <div class="row">
+                    <div class="col-6">
+                        <a class="btn btn-secondary mt-3 w-100" href="messages.php">
+                            <i class="bi bi-chat"></i>
+                            Chats
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a class="btn btn-secondary mt-3 w-100" data-bs-toggle="modal"
+                            data-bs-target="#updateProfileModal">
+                            <i class="bi bi-pencil-square"></i>
+                            Edit Profile
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -62,9 +85,14 @@ if (!$user) {
                 <p><strong>City:</strong> <?= htmlspecialchars($user['city'] ?? '') ?></p>
                 <p><strong>Price Point:</strong> <?= htmlspecialchars($user['price_point'] ?? '') ?></p>
 
-                <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
-                    Complete Your Profile
-                </button>
+                <?php if (!$profile_complete): ?>
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-secondary mt-3 w-auto" data-bs-toggle="modal"
+                            data-bs-target="#updateProfileModal">
+                            Complete Your Profile
+                        </button>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -134,7 +162,7 @@ if (!$user) {
                                 class="img-thumbnail mt-2" style="max-width: 100px;">
                         <?php endif; ?>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    <button type="submit" class="btn btn-secondary mt-3">Save Changes</button>
                 </form>
 
                 <hr>

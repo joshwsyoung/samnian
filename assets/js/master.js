@@ -125,3 +125,4 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Please enter all 4 digits of the code.");
             }
         });
+        
