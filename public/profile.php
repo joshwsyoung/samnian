@@ -26,20 +26,50 @@ if (!$user) {
         <p class="text-muted">Here’s what we’ve got on file for you.</p>
     </div>
 
-    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
-        <div class="card-body fw-light fs-6">
-            <p><strong>Name:</strong> <?= htmlspecialchars($user['name']) ?></p>
-            <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
-            <p><strong>Phone:</strong> <?= htmlspecialchars($user['phone']) ?></p>
-            <p><strong>Age:</strong> <?= htmlspecialchars($user['age']) ?></p>
-            <p><strong>City:</strong> <?= htmlspecialchars($user['city']) ?></p>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success">
+            <?= htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger">
+            <?= htmlspecialchars($_SESSION['error']); ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
-            <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
-                Edit Profile
-            </button>
+    <div class="row justify-content-center">
+        <!-- Left Column: Profile Image + Name -->
+        <div class="col-md-4 text-center mb-4">
+            <div class="card shadow-sm p-3">
+                <?php if (!empty($user['profile_image'])): ?>
+                    <img src="../uploads/<?= htmlspecialchars($user['profile_image']) ?>"
+                        class="rounded-circle mb-3 d-block mx-auto"
+                        style="border: 2px solid black; width: 120px; height: 120px; object-fit: cover;"
+                        alt="Profile Image">
+                <?php endif; ?>
+                <h5 class="fw-semibold"><?= htmlspecialchars($user['name'] ?? '') ?></h5>
+            </div>
+        </div>
+
+        <!-- Right Column: Full Profile Info -->
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+                <p><strong>Email:</strong> <?= htmlspecialchars($user['email'] ?? '') ?></p>
+                <p><strong>Phone:</strong> <?= htmlspecialchars($user['phone'] ?? '') ?></p>
+                <p><strong>Age:</strong> <?= htmlspecialchars($user['age'] ?? '') ?></p>
+                <p><strong>City:</strong> <?= htmlspecialchars($user['city'] ?? '') ?></p>
+                <p><strong>Price Point:</strong> <?= htmlspecialchars($user['price_point'] ?? '') ?></p>
+
+                <button class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
+                    Complete Your Profile
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
 
 <!-- Update Profile Modal -->
 <div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel"
@@ -51,7 +81,7 @@ if (!$user) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="../handlers/update_profile_handler.php" method="POST">
+                <form action="../handlers/update_profile_handler.php" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="name">Name</label>
                         <input type="text" name="name" class="form-control"
@@ -83,6 +113,26 @@ if (!$user) {
                             }
                             ?>
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price_point">Preferred Price Point</label>
+                        <select class="form-select" name="price_point" required>
+                            <?php
+                            $levels = ['£', '££', '£££'];
+                            foreach ($levels as $level) {
+                                $selected = ($user['price_point'] === $level) ? 'selected' : '';
+                                echo "<option value=\"$level\" $selected>$level</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile_image">Profile Image</label>
+                        <input type="file" name="profile_image" class="form-control" accept="image/*">
+                        <?php if (!empty($user['profile_image'])): ?>
+                            <img src="../uploads/<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Image"
+                                class="img-thumbnail mt-2" style="max-width: 100px;">
+                        <?php endif; ?>
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                 </form>

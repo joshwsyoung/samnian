@@ -54,16 +54,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $subject = 'Your TableTalk Verification Code';
                     $body = "
-                        <div style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto;'>
-                            <h2 style='color: #234654;'>Verify Your Email</h2>
-                            <p style='font-size: 16px; color: #333;'>Hi there! 👋</p>
-                            <p style='font-size: 16px; color: #333;'>Your TableTalk verification code is:</p>
-                            <p style='font-size: 32px; font-weight: bold; color: #234654; margin: 20px 0;'>$code</p>
-                            <p style='font-size: 14px; color: #666;'>Please enter this code on the website to complete your registration.</p>
-                            <hr style='margin: 30px 0;'>
-                            <p style='font-size: 12px; color: #aaa;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+                        <div style='font-family: Arial, sans-serif; background-color: #a2e435; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; color: #000000;'>
+                            <h2 style='color: #000000;'>Verify Your Email</h2>
+                            <p style='font-size: 16px;'>Hi there! 👋</p>
+                            <p style='font-size: 16px;'>Your TableTalk verification code is:</p>
+                            
+                            <p style='text-align: center; margin: 30px 0;'>
+                                <span style='
+                                    display: inline-block;
+                                    padding: 14px 24px;
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    color: #000000;
+                                    background-color: #ffffff;
+                                    text-decoration: none;
+                                    border-radius: 6px;
+                                    border: 2px solid #000000;
+                                    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                                '>
+                                    $code
+                                </span>
+                            </p>
+                            <p style='font-size: 14px;'>Please enter this code on the website to complete your registration.</p>
+                            <hr style='margin: 30px 0; border: none; border-top: 1px solid #000;'>
+                            <p style='font-size: 12px; color: #555;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+                            <p style='font-size: 14px; margin-top: 40px;'>Thanks,<br>The TableTalk Team</p>
                         </div>
-                    ";
+                        ";
+
 
                     sendEmail($email, $subject, $body);
 
@@ -117,16 +135,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $subject = 'Your TableTalk Verification Code';
         $body = "
-            <div style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto;'>
-                <h2 style='color: #234654;'>Verify Your Email</h2>
-                <p style='font-size: 16px; color: #333;'>Hi there! 👋</p>
-                <p style='font-size: 16px; color: #333;'>Your TableTalk verification code is:</p>
-                <p style='font-size: 32px; font-weight: bold; color: #234654; margin: 20px 0;'>$code</p>
-                <p style='font-size: 14px; color: #666;'>Please enter this code on the website to complete your registration.</p>
-                <hr style='margin: 30px 0;'>
-                <p style='font-size: 12px; color: #aaa;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+            <div style='font-family: Arial, sans-serif; background-color: #a2e435; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; color: #000000;'>
+                <h2 style='color: #000000;'>Verify Your Email</h2>
+                <p style='font-size: 16px;'>Hi there! 👋</p>
+                <p style='font-size: 16px;'>Your TableTalk verification code is:</p>
+                
+                <p style='text-align: center; margin: 30px 0;'>
+                    <span style='
+                        display: inline-block;
+                        padding: 14px 24px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #000000;
+                        background-color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 6px;
+                        border: 2px solid #000000;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                    '>
+                        $code
+                    </span>
+                </p>
+
+                <p style='font-size: 14px;'>Please enter this code on the website to complete your registration.</p>
+                <hr style='margin: 30px 0; border: none; border-top: 1px solid #000;'>
+                <p style='font-size: 12px; color: #555;'>If you didn’t sign up for TableTalk, you can safely ignore this email.</p>
+                <p style='font-size: 14px; margin-top: 40px;'>Thanks,<br>The TableTalk Team</p>
             </div>
-        ";
+            ";
+
 
         sendEmail($email, $subject, $body);
 

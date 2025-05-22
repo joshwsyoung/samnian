@@ -29,11 +29,10 @@ if ($user) {
     $subject = 'Reset Your TableTalk Password';
 
     $body = "
-<div style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 24px; border-radius: 10px; max-width: 500px; margin: auto; color: #333;'>
-    <h2 style='color: #234654;'>Reset Your Password</h2>
+<div style='font-family: Arial, sans-serif; background-color: #a2e435; padding: 24px; border-radius: 10px; max-width: 500px; margin: auto; color: #000000;'>
+    <h2 style='color: #000000;'>Reset Your Password</h2>
     <p style='font-size: 16px;'>Hi there 👋</p>
-    <p style='font-size: 16px;'>Click the button below to choose a new password:</p>
-    
+    <p style='font-size: 16px;'>Click the button below to choose a new password:</p>  
     <p style='text-align: center; margin: 30px 0;'>
         <a href=\"$resetLink\" 
            style=\"
@@ -41,30 +40,27 @@ if ($user) {
                padding: 14px 24px;
                font-size: 16px;
                font-weight: bold;
-               color: #234654;
-               background-color: #d9e3f1;
+               color: #000000;
+               background-color: #ffffff;
                text-decoration: none;
                border-radius: 6px;
+               border: 2px solid #000000;
                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
            \">
             Reset Password
         </a>
     </p>
-
     <p style='font-size: 14px;'>If you didn’t request this, just ignore this email — no changes will be made.</p>
-
     <p style='font-size: 14px; margin-top: 20px;'>This link will expire in 1 hour for your security.</p>
-
-    <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
-
-    <p style='font-size: 12px; color: #777;'>If the button doesn't work, copy and paste this link into your browser:</p>
-    <p style='font-size: 12px; word-break: break-all; color: #2a7ae2;'>
-        <a href=\"$resetLink\" style='color: #2a7ae2;'>$resetLink</a>
+    <hr style='margin: 30px 0; border: none; border-top: 1px solid #000;'>
+    <p style='font-size: 12px; color: #555;'>If the button doesn't work, copy and paste this link into your browser:</p>
+    <p style='font-size: 12px; word-break: break-all; color: #000000;'>
+        <a href=\"$resetLink\" style='color: #000000;'>$resetLink</a>
     </p>
-
     <p style='font-size: 14px; margin-top: 40px;'>Thanks,<br>The TableTalk Team</p>
 </div>
 ";
+
     sendEmail($email, $subject, $body);
 }
 
