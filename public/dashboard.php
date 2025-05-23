@@ -42,22 +42,6 @@ $stmt = $conn->prepare("SELECT * FROM matches WHERE id IN (SELECT match_id FROM 
 $stmt->execute([$user_id]);
 $match = $stmt->fetch();
 
-// Fetch OCEAN personality scores
-$stmt = $conn->prepare("SELECT * FROM personality_scores WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$scores = $stmt->fetch();
-
-// If no scores exist, assume they haven't taken the test yet
-if (!$scores) {
-    $scores = [
-        'openness' => 'Not available',
-        'conscientiousness' => 'Not available',
-        'extraversion' => 'Not available',
-        'agreeableness' => 'Not available',
-        'neuroticism' => 'Not available'
-    ];
-}
-
 ?>
 <?php
 include '../partials/greetings.php';
@@ -92,89 +76,6 @@ $greeting = getGreeting() . $name . '.';
     <?php endif; ?>
 
     <div class="row">
-        <!-- OCEAN Personality Radar -->
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title">OCEAN Personality Test</h5>
-                    <?php if (
-                        $scores['openness'] !== 'Not available' &&
-                        $scores['conscientiousness'] !== 'Not available' &&
-                        $scores['extraversion'] !== 'Not available' &&
-                        $scores['agreeableness'] !== 'Not available' &&
-                        $scores['neuroticism'] !== 'Not available'
-                    ): ?>
-                        <canvas id="oceanBarChart" width="400" height="300"></canvas>
-                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        <script>
-                            const ctx = document.getElementById('oceanBarChart').getContext('2d');
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
-                                    datasets: [{
-                                        label: 'Score (0–5)',
-                                        data: [
-                                            <?= $scores['openness'] ?>,
-                                            <?= $scores['conscientiousness'] ?>,
-                                            <?= $scores['extraversion'] ?>,
-                                            <?= $scores['agreeableness'] ?>,
-                                            <?= $scores['neuroticism'] ?>
-                                        ],
-                                        backgroundColor: [
-                                            '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f'
-                                        ],
-                                        borderRadius: 4,
-                                        barThickness: 25
-                                    }]
-                                },
-                                options: {
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    scales: {
-                                        x: {
-                                            min: 0,
-                                            max: 5,
-                                            ticks: {
-                                                stepSize: 1
-                                            },
-                                            title: {
-                                                display: true,
-                                                text: 'Score'
-                                            }
-                                        },
-                                        y: {
-                                            title: {
-                                                display: true,
-                                                text: 'Traits'
-                                            }
-                                        }
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (context) {
-                                                    return ` ${context.label}: ${context.raw}/5`;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        </script>
-                        <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
-                            data-bs-target="#personalSummaryModal">Personality summary</button>
-                    <?php else: ?>
-                        <p>Personality scores not available. Please take the test.</p>
-                        <a class="btn btn-secondary mt-3" href="ocean_test.php">Take the test!</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
         <!-- Interests Card -->
         <div class="col-md-4 mb-3">
             <div class="card">

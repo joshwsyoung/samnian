@@ -28,6 +28,21 @@ foreach ($required_fields as $field) {
         break;
     }
 }
+
+// Fetch OCEAN personality scores
+$stmt = $conn->prepare("SELECT * FROM personality_scores WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$scores = $stmt->fetch();
+
+if (!$scores) {
+    $scores = [
+        'openness' => 'Not available',
+        'conscientiousness' => 'Not available',
+        'extraversion' => 'Not available',
+        'agreeableness' => 'Not available',
+        'neuroticism' => 'Not available'
+    ];
+}
 ?>
 
 <div class="container py-5">
@@ -94,6 +109,100 @@ foreach ($required_fields as $field) {
                     </div>
                 <?php endif; ?>
             </div>
+        </div>
+    </div>
+
+    <!-- OCEAN Personality Test Results -->
+    <div class="card personality-card mt-3 mb-4">
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col">
+                    <h5 class="card-title">OCEAN Personality Test</h5>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#personalSummaryModal">
+                        <i class="bi bi-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <?php if (
+                $scores['openness'] !== 'Not available' &&
+                $scores['conscientiousness'] !== 'Not available' &&
+                $scores['extraversion'] !== 'Not available' &&
+                $scores['agreeableness'] !== 'Not available' &&
+                $scores['neuroticism'] !== 'Not available'
+            ): ?>
+                <div class="chart-responsive oceanBarChartProfile">
+                    <canvas id="oceanBarChartProfile"></canvas>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    const ctxProfile = document.getElementById('oceanBarChartProfile').getContext('2d');
+                    new Chart(ctxProfile, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
+                            datasets: [{
+                                label: 'Score (0–5)',
+                                data: [
+                                    <?= $scores['openness'] ?>,
+                                    <?= $scores['conscientiousness'] ?>,
+                                    <?= $scores['extraversion'] ?>,
+                                    <?= $scores['agreeableness'] ?>,
+                                    <?= $scores['neuroticism'] ?>
+                                ],
+                                backgroundColor: [
+                                    '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f'
+                                ],
+                                borderRadius: 4,
+                                barThickness: 25,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.6
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    min: 0,
+                                    max: 5,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Score'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Traits'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            return ` ${context.label}: ${context.raw}/5`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                </script>
+            <?php else: ?>
+                <p>Personality scores not available. Please take the test.</p>
+                <a class="btn btn-secondary mt-3" href="ocean_test.php">Take the test!</a>
+            <?php endif; ?>
+
         </div>
     </div>
 </div>
@@ -179,4 +288,37 @@ foreach ($required_fields as $field) {
     </div>
 </div>
 
+<!-- Personality Summary Modal -->
+<div class="modal fade" id="personalSummaryModal" tabindex="-1" aria-labelledby="personalSummaryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content fw-lighter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="personalSummaryModalLabel">Your Personality Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Openness:</strong><br><em>High:</em> Curious, imaginative, open to new experiences,
+                    enjoys
+                    art and ideas.<br><em>Low:</em> Practical, prefers routine, conservative in views, uncomfortable
+                    with change.</p>
+                <p><strong>Conscientiousness:</strong><br><em>High:</em> Organized, responsible, reliable,
+                    goal-oriented, plans ahead.<br><em>Low:</em> Spontaneous, careless with details, disorganized,
+                    struggles with follow-through.</p>
+                <p><strong>Extraversion:</strong><br><em>High:</em> Outgoing, energetic, talkative, enjoys social
+                    settings, assertive.<br><em>Low:</em> Reserved, reflective, prefers solitude, quiet, finds
+                    socializing draining.</p>
+                <p><strong>Agreeableness:</strong><br><em>High:</em> Compassionate, cooperative, trusting,
+                    empathetic,
+                    values getting along.<br><em>Low:</em> Competitive, skeptical, blunt, more focused on
+                    self-interest.
+                </p>
+                <p><strong>Neuroticism:</strong><br><em>High:</em> Emotionally reactive, anxious, prone to stress,
+                    mood
+                    swings.<br><em>Low:</em> Calm, emotionally stable, resilient, handles stress well.</p>
+                <p class="text-muted">Use the radar chart to interpret your scores: <br>0 = Low, 5 = High.</p>
+            </div>
+        </div>
+    </div>
+</div>
 <?php include_once('../partials/footer.php'); ?>

@@ -202,6 +202,32 @@ body.fade-out {
     object-fit: cover;
 }
 
+
+.chart-responsive {
+    width: 100%;
+    min-height: 220px;
+    height: 300px;
+    max-width: 100vw;
+}
+
+@media (max-width: 576px) {
+    .chart-responsive {
+        height: 220px;
+        min-height: 180px;
+    }
+
+    .personality-card {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+.oceanBarChartProfile {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+}
+
 /* ALERTS */
 .alert-danger {
     background-color: var(--bs-danger) !important;
