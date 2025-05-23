@@ -33,9 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $interestsRaw = $_POST['interests'] ?? '';
     $interests = is_array($interestsRaw) ? $interestsRaw : explode(',', $interestsRaw);
 
-    if (!$email || !$phone || !$password) {
-        header('Location: ' . BASE_URL . '/public/register.php?error=missing_fields');
-        exit;
+    $required_fields = ['name', 'email', 'password']; // Define required fields
+    foreach ($required_fields as $field) {
+        if (empty($_POST[$field])) {
+            header('Location: ' . BASE_URL . '/public/register.php?error=missing_fields');
+            exit;
+        }
     }
 
     try {
@@ -98,15 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $token = bin2hex(random_bytes(16));
 
         $stmt = $conn->prepare("
-            INSERT INTO users (name, email, phone, age, city, password_hash, verification_token, verified, line_1, line_2, line_3, town_or_city, county, postcode, formatted_address)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (name, email, age, password_hash, verification_token, verified, line_1, line_2, line_3, town_or_city, county, postcode, formatted_address)
+            VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $name,
             $email,
-            $phone,
             $age,
-            $city,
             $passwordHash,
             $token,
             $line_1,
