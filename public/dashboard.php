@@ -76,37 +76,6 @@ $greeting = getGreeting() . $name . '.';
     <?php endif; ?>
 
     <div class="row">
-        <!-- Interests Card -->
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <div>
-                        <h5 class="card-title">My Interests</h5>
-                        <?php if (!empty($user_selected_interests)): ?>
-                            <ul class="list-unstyled mb-0 small">
-                                <?php
-                                $max_interests = 7;
-                                $interests_to_show = array_slice($user_selected_interests, 0, $max_interests);
-                                $more_count = count($user_selected_interests) - $max_interests;
-                                foreach ($interests_to_show as $interest): ?>
-                                    <li>• <?= htmlspecialchars($interest) ?></li>
-                                <?php endforeach; ?>
-                                <?php if ($more_count > 0): ?>
-                                    <li class="text-muted">+ <?= $more_count ?> more</li>
-                                <?php endif; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p class="text-muted">You haven't selected any interests yet.</p>
-                        <?php endif; ?>
-                    </div>
-                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
-                        data-bs-target="#updateInterestsModal">
-                        Edit Preferences
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Preferences Card -->
         <div class="col-md-4  mb-3">
             <div class="card">
@@ -123,20 +92,6 @@ $greeting = getGreeting() . $name . '.';
 
     <!-- Matched Card -->
     <div class="row">
-        <div class="col-md-6 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title">Your Match</h5>
-                    <?php if ($match): ?>
-                        <p><strong>Matched Table:</strong> Event on <?php echo htmlspecialchars($match['event_date']); ?> at
-                            <?php echo htmlspecialchars($match['slot']); ?>.
-                        </p>
-                    <?php else: ?>
-                        <p>No matches yet.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
         <div class="col-md-6 mb-3">
             <div class="card">
                 <div class="card-body fw-lighter fs-6">
@@ -183,39 +138,6 @@ $greeting = getGreeting() . $name . '.';
             });
         });
     </script>
-
-
-    <!-- Modals -->
-    <!-- Interests modal -->
-    <div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content fw-lighter">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="updateInterestsModalLabel">Update Your Interests</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="../handlers/update_interests_handler.php" method="POST">
-                        <div id="interest-cards">
-                            <?php foreach ($all_interests as $interest):
-                                $isSelected = in_array($interest['name'], $user_selected_interests); ?>
-                                <div class="card-option <?= $isSelected ? 'selected' : '' ?>"
-                                    data-value="<?= htmlspecialchars($interest['name']) ?>">
-                                    <?= htmlspecialchars($interest['name']) ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <input type="hidden" name="selected_interests" id="selectedInterests"
-                            value="<?= implode(',', $user_selected_interests) ?>">
-
-                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Preferences Modal -->
     <div class="modal fade" id="preferencesModal" tabindex="-1" aria-labelledby="preferencesModalLabel"

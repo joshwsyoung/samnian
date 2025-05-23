@@ -6,6 +6,7 @@ include_once('../config.php');
 include_once('../db.php');
 include_once('../partials/auth_check.php');
 include_once('../partials/header.php');
+include '../partials/greetings.php';
 
 // Fetch user data
 $user_id = $_SESSION['user_id'];
@@ -18,6 +19,12 @@ if (!$user) {
     include_once('../partials/footer.php');
     exit;
 }
+
+// Place greeting code here!
+$fullName = isset($user['name']) ? htmlspecialchars($user['name']) : '';
+$firstName = explode(' ', $fullName)[0];
+$name = !empty($firstName) ? $firstName : 'friend';
+$greeting = getGreeting() . $name . '.';
 
 // List all required fields
 $required_fields = ['name', 'email', 'phone', 'age', 'city', 'price_point', 'profile_image'];
@@ -43,11 +50,34 @@ if (!$scores) {
         'neuroticism' => 'Not available'
     ];
 }
+
+// Fetch all interests
+$stmt = $conn->prepare("SELECT * FROM interests");
+$stmt->execute();
+$all_interests = $stmt->fetchAll();
+
+// Fetch user's selected interests
+$stmtUserInterests = $conn->prepare("
+    SELECT i.name 
+    FROM user_interests ui 
+    JOIN interests i ON ui.interest_id = i.id 
+    WHERE ui.user_id = ?
+");
+$stmtUserInterests->execute([$user_id]);
+$user_selected_interests = array_column($stmtUserInterests->fetchAll(), 'name');
+
+// Fetch matched table info (if any)
+$stmt = $conn->prepare("SELECT * FROM matches WHERE id IN (SELECT match_id FROM match_users WHERE user_id = ?)");
+$stmt->execute([$user_id]);
+$match = $stmt->fetch();
+
 ?>
 
 <div class="container py-5">
     <div class="text-center mb-4">
-        <h1>Your Profile</h1>
+        <h2 class="display-6 mb-3 mt-3">
+            <?php echo $greeting; ?>
+        </h2>
         <p class="text-muted">Here’s what we’ve got on file for you.</p>
     </div>
 
@@ -108,6 +138,52 @@ if (!$scores) {
                         </button>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    <!-- Interests Card -->
+    <div class="row">
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                <div class="card-body fw-lighter fs-6">
+                    <div>
+                        <h5 class="card-title">My Interests</h5>
+                        <?php if (!empty($user_selected_interests)): ?>
+                            <ul class="list-unstyled mb-0 small">
+                                <?php
+                                $max_interests = 7;
+                                $interests_to_show = array_slice($user_selected_interests, 0, $max_interests);
+                                $more_count = count($user_selected_interests) - $max_interests;
+                                foreach ($interests_to_show as $interest): ?>
+                                    <li>• <?= htmlspecialchars($interest) ?></li>
+                                <?php endforeach; ?>
+                                <?php if ($more_count > 0): ?>
+                                    <li class="text-muted">+ <?= $more_count ?> more</li>
+                                <?php endif; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="text-muted">You haven't selected any interests yet.</p>
+                        <?php endif; ?>
+                    </div>
+                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
+                        data-bs-target="#updateInterestsModal">
+                        Edit Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-3">
+            <div class="card">
+                <div class="card-body fw-lighter fs-6">
+                    <h5 class="card-title">Your Match</h5>
+                    <?php if ($match): ?>
+                        <p><strong>Matched Table:</strong> Event on <?php echo htmlspecialchars($match['event_date']); ?> at
+                            <?php echo htmlspecialchars($match['slot']); ?>.
+                        </p>
+                    <?php else: ?>
+                        <p>No matches yet.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -208,6 +284,7 @@ if (!$scores) {
 </div>
 
 
+
 <!-- Update Profile Modal -->
 <div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel"
     aria-hidden="true">
@@ -265,6 +342,19 @@ if (!$scores) {
                             ?>
                         </select>
                     </div>
+
+                    <div class="card-body fw-lighter fs-6">
+                        <h5 class="card-title">Theme</h5>
+                        <div class="form-check form-check-inline mb-3">
+                            <input class="form-check-input" type="radio" name="themeRadio" id="themeLight"
+                                value="light">
+                            <label class="form-check-label" for="themeLight">Light</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="themeRadio" id="themeDark" value="dark">
+                            <label class="form-check-label" for="themeDark">Dark</label>
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label for="profile_image">Profile Image</label>
                         <input type="file" name="profile_image" class="form-control" accept="image/*">
@@ -275,7 +365,36 @@ if (!$scores) {
                     </div>
                     <button type="submit" class="btn btn-secondary mt-3">Save Changes</button>
                 </form>
+                <script>
+                    function toggleTheme() {
+                        const body = document.body;
+                        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                        document.documentElement.setAttribute('data-bs-theme', newTheme);
+                    }
 
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // Set initial radio state based on current theme
+                        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+                        document.getElementById('theme' + currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)).checked
+                            = true;
+
+                        document.querySelectorAll('input[name="themeRadio"]').forEach(function (radio) {
+                            radio.addEventListener('change', function () {
+                                document.documentElement.setAttribute('data-bs-theme', this.value);
+
+                                // Save theme to DB via AJAX
+                                fetch('../handlers/update_theme_handler.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    },
+                                    body: 'theme=' + encodeURIComponent(this.value)
+                                });
+                            });
+                        });
+                    });
+                </script>
                 <hr>
 
                 <!-- Delete Account Button -->
@@ -321,4 +440,34 @@ if (!$scores) {
         </div>
     </div>
 </div>
+
+<!-- Interests Modal -->
+<div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content fw-lighter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateInterestsModalLabel">Update Your Interests</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="../handlers/update_interests_handler.php" method="POST">
+                    <div id="interest-cards">
+                        <?php foreach ($all_interests as $interest):
+                            $isSelected = in_array($interest['name'], $user_selected_interests); ?>
+                            <div class="card-option <?= $isSelected ? 'selected' : '' ?>"
+                                data-value="<?= htmlspecialchars($interest['name']) ?>">
+                                <?= htmlspecialchars($interest['name']) ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <input type="hidden" name="selected_interests" id="selectedInterests"
+                        value="<?= implode(',', $user_selected_interests) ?>">
+                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php include_once('../partials/footer.php'); ?>

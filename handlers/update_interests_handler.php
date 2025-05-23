@@ -41,8 +41,8 @@ if (isset($_POST['selected_interests']) && !empty($_POST['selected_interests']))
         // Set success message
         $_SESSION['success'] = 'Your interests have been updated successfully!';
 
-        // Redirect to dashboard or any page you want after the update
-        header('Location: ../public/dashboard.php');
+        // Redirect to profile or any page you want after the update
+        header('Location: ../public/profile.php');
         exit();
 
     } catch (PDOException $e) {
@@ -50,15 +50,15 @@ if (isset($_POST['selected_interests']) && !empty($_POST['selected_interests']))
         $conn->rollBack();
         // Optionally, log the error or show an error message
         error_log("Error updating user interests: " . $e->getMessage());
-        // Redirect back to the dashboard with an error message
+        // Redirect back to the profile with an error message
         $_SESSION['error'] = 'An error occurred while updating your interests. Please try again later.';
-        header('Location: ../public/dashboard.php');
+        header('Location: ../public/profile.php');
         exit();
     }
 } else {
     // No interests were selected
     $_SESSION['error'] = 'Please select at least one interest.';
-    header('Location: ../public/dashboard.php');
+    header('Location: ../public/profile.php');
     exit();
 }
 ?>
