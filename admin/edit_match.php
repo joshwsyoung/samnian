@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 require_once('../config.php');
 require_once('../db.php');
@@ -23,6 +26,12 @@ if (!$match) {
     header('Location: ' . BASE_URL . '/admin/matches.php?error=not_found');
     exit;
 }
+
+// Fetch all unique cities from users table
+$cityOptions = $conn->query("SELECT DISTINCT city FROM users WHERE city IS NOT NULL AND city != '' ORDER BY city ASC")->fetchAll(PDO::FETCH_COLUMN);
+
+// Fetch all unique price points from users table
+$pricePoints = $conn->query("SELECT DISTINCT price_point FROM users WHERE price_point IS NOT NULL AND price_point != '' ORDER BY price_point ASC")->fetchAll(PDO::FETCH_COLUMN);
 
 include_once('../partials/header.php');
 ?>
@@ -72,6 +81,52 @@ include_once('../partials/header.php');
 
     <h3 class="mt-5">Manage Users in This Match</h3>
 
+    <!-- Filter Form (above tables) -->
+    <form method="get" class="mb-4">
+        <input type="hidden" name="id" value="<?= htmlspecialchars($match_id) ?>">
+        <div class="row g-2">
+            <div class="col-md-2">
+                <select class="form-select" name="city">
+                    <option value="">Any City</option>
+                    <?php foreach ($cityOptions as $city): ?>
+                        <option value="<?= htmlspecialchars($city) ?>" <?= (isset($_GET['city']) && $_GET['city'] == $city) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($city) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="age" class="form-control" placeholder="Age"
+                    value="<?= htmlspecialchars($_GET['age'] ?? '') ?>">
+            </div>
+            <div class="col-md-2">
+                <select name="interest" class="form-select">
+                    <option value="">Any Interest</option>
+                    <?php
+                    $allInterests = $conn->query("SELECT id, name FROM interests")->fetchAll();
+                    foreach ($allInterests as $interest) {
+                        $selected = (isset($_GET['interest']) && $_GET['interest'] == $interest['id']) ? 'selected' : '';
+                        echo "<option value=\"{$interest['id']}\" $selected>" . htmlspecialchars($interest['name']) . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="price_point" class="form-select">
+                    <option value="">Any Price Point</option>
+                    <?php foreach ($pricePoints as $pp): ?>
+                        <option value="<?= htmlspecialchars($pp) ?>" <?= (isset($_GET['price_point']) && $_GET['price_point'] == $pp) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($pp) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit">Filter</button>
+            </div>
+        </div>
+    </form>
+
     <!-- Assigned Users Table -->
     <h5>Assigned Users</h5>
     <table class="table table-bordered mb-3">
@@ -81,13 +136,13 @@ include_once('../partials/header.php');
                 <th>Name</th>
                 <th>Age</th>
                 <th>Location</th>
-                <th>Availability</th>
                 <th>Price Point</th>
                 <th>O</th>
                 <th>C</th>
                 <th>E</th>
                 <th>A</th>
                 <th>N</th>
+                <th>Interests</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -97,29 +152,40 @@ include_once('../partials/header.php');
                                            ps.openness, ps.conscientiousness, ps.extraversion, ps.agreeableness, ps.neuroticism
                                     FROM users u
                                     JOIN match_users mu ON u.id = mu.user_id
-                                    JOIN availability a ON u.id = a.user_id
+                                    LEFT JOIN availability a ON u.id = a.user_id
                                     JOIN matches m ON mu.match_id = m.id
                                     LEFT JOIN personality_scores ps ON u.id = ps.user_id
-                                    WHERE mu.match_id = ? 
-                                    AND a.event_date IS NOT NULL 
-                                    AND a.slot IS NOT NULL 
-                                    AND m.price_point IS NOT NULL
-                                    AND u.city IS NOT NULL 
-                                    AND ps.user_id IS NOT NULL");
+                                    WHERE mu.match_id = ?");
             $assigned->execute([$match_id]);
-            foreach ($assigned as $user): ?>
+            foreach ($assigned as $user):
+                // Fetch interests for this user
+                $stmtInterests = $conn->prepare("
+                    SELECT i.name 
+                    FROM user_interests ui 
+                    JOIN interests i ON ui.interest_id = i.id 
+                    WHERE ui.user_id = ?
+                ");
+                $stmtInterests->execute([$user['id']]);
+                $user_interests = array_column($stmtInterests->fetchAll(), 'name');
+                ?>
                 <tr>
                     <td><?= htmlspecialchars($user['id']) ?></td>
                     <td><?= htmlspecialchars($user['name']) ?></td>
                     <td><?= htmlspecialchars($user['age']) ?></td>
                     <td><?= htmlspecialchars($user['city']) ?></td>
-                    <td><?= htmlspecialchars($user['event_date']) ?> at <?= htmlspecialchars($user['slot']) ?></td>
                     <td><?= htmlspecialchars($user['price_point']) ?></td>
-                    <td><?= htmlspecialchars($user['openness']) ?></td>
-                    <td><?= htmlspecialchars($user['conscientiousness']) ?></td>
-                    <td><?= htmlspecialchars($user['extraversion']) ?></td>
-                    <td><?= htmlspecialchars($user['agreeableness']) ?></td>
-                    <td><?= htmlspecialchars($user['neuroticism']) ?></td>
+                    <td><?= $user['openness'] === null ? '' : htmlspecialchars($user['openness']) ?></td>
+                    <td><?= $user['conscientiousness'] === null ? '' : htmlspecialchars($user['conscientiousness']) ?></td>
+                    <td><?= $user['extraversion'] === null ? '' : htmlspecialchars($user['extraversion']) ?></td>
+                    <td><?= $user['agreeableness'] === null ? '' : htmlspecialchars($user['agreeableness']) ?></td>
+                    <td><?= $user['neuroticism'] === null ? '' : htmlspecialchars($user['neuroticism']) ?></td>
+                    <td>
+                        <?php if (!empty($user_interests)): ?>
+                            <?= htmlspecialchars(implode(', ', $user_interests)) ?>
+                        <?php else: ?>
+                            <span class="text-muted">None</span>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <form action="<?= BASE_URL ?>/handlers/update_match_users.php" method="POST" class="m-0">
                             <input type="hidden" name="action" value="remove">
@@ -142,46 +208,79 @@ include_once('../partials/header.php');
                 <th>Name</th>
                 <th>Age</th>
                 <th>Location</th>
-                <th>Availability</th>
                 <th>Price Point</th>
                 <th>O</th>
                 <th>C</th>
                 <th>E</th>
                 <th>A</th>
                 <th>N</th>
+                <th>Interests</th>
+
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $unassigned = $conn->prepare("
-            SELECT u.id, u.name, u.age, u.city, a.event_date, a.slot, m.price_point,
-                   ps.openness, ps.conscientiousness, ps.extraversion, ps.agreeableness, ps.neuroticism
-            FROM users u
-            LEFT JOIN availability a ON u.id = a.user_id
-            LEFT JOIN matches m ON m.id = ?
-            LEFT JOIN personality_scores ps ON u.id = ps.user_id
-            WHERE u.id NOT IN (SELECT user_id FROM match_users WHERE match_id = ?)
-            AND a.event_date IS NOT NULL 
-            AND a.slot IS NOT NULL 
-            AND m.price_point IS NOT NULL
-            AND u.city IS NOT NULL 
-            AND ps.user_id IS NOT NULL
-        ");
-            $unassigned->execute([$match_id, $match_id]);
-            foreach ($unassigned as $user): ?>
+            $where = "u.id NOT IN (SELECT user_id FROM match_users WHERE match_id = ?)";
+            $params = [$match_id];
+
+            if (!empty($_GET['city'])) {
+                $where .= " AND u.city = ?";
+                $params[] = $_GET['city'];
+            }
+            if (!empty($_GET['age'])) {
+                $where .= " AND u.age = ?";
+                $params[] = $_GET['age'];
+            }
+            if (!empty($_GET['interest'])) {
+                $where .= " AND EXISTS (
+                    SELECT 1 FROM user_interests ui
+                    WHERE ui.user_id = u.id AND ui.interest_id = ?
+                )";
+                $params[] = $_GET['interest'];
+            }
+            if (!empty($_GET['price_point'])) {
+                $where .= " AND u.price_point = ?";
+                $params[] = $_GET['price_point'];
+            }
+
+            $sql = "
+                SELECT u.id, u.name, u.age, u.city, u.price_point,
+                       ps.openness, ps.conscientiousness, ps.extraversion, ps.agreeableness, ps.neuroticism
+                FROM users u
+                LEFT JOIN personality_scores ps ON u.id = ps.user_id
+                WHERE $where
+            ";
+            $unassigned = $conn->prepare($sql);
+            $unassigned->execute($params);
+            foreach ($unassigned as $user):
+                $stmtInterests = $conn->prepare("
+                    SELECT i.name 
+                    FROM user_interests ui 
+                    JOIN interests i ON ui.interest_id = i.id 
+                    WHERE ui.user_id = ?
+                ");
+                $stmtInterests->execute([$user['id']]);
+                $user_interests = array_column($stmtInterests->fetchAll(), 'name');
+                ?>
                 <tr>
                     <td><?= htmlspecialchars($user['id']) ?></td>
                     <td><?= htmlspecialchars($user['name']) ?></td>
                     <td><?= htmlspecialchars($user['age']) ?></td>
                     <td><?= htmlspecialchars($user['city']) ?></td>
-                    <td><?= htmlspecialchars($user['event_date']) ?> at <?= htmlspecialchars($user['slot']) ?></td>
                     <td><?= htmlspecialchars($user['price_point']) ?></td>
-                    <td><?= htmlspecialchars($user['openness']) ?></td>
-                    <td><?= htmlspecialchars($user['conscientiousness']) ?></td>
-                    <td><?= htmlspecialchars($user['extraversion']) ?></td>
-                    <td><?= htmlspecialchars($user['agreeableness']) ?></td>
-                    <td><?= htmlspecialchars($user['neuroticism']) ?></td>
+                    <td><?= $user['openness'] === null ? '' : htmlspecialchars($user['openness']) ?></td>
+                    <td><?= $user['conscientiousness'] === null ? '' : htmlspecialchars($user['conscientiousness']) ?></td>
+                    <td><?= $user['extraversion'] === null ? '' : htmlspecialchars($user['extraversion']) ?></td>
+                    <td><?= $user['agreeableness'] === null ? '' : htmlspecialchars($user['agreeableness']) ?></td>
+                    <td><?= $user['neuroticism'] === null ? '' : htmlspecialchars($user['neuroticism']) ?></td>
+                    <td>
+                        <?php if (!empty($user_interests)): ?>
+                            <?= htmlspecialchars(implode(', ', $user_interests)) ?>
+                        <?php else: ?>
+                            <span class="text-muted">None</span>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <form action="<?= BASE_URL ?>/handlers/update_match_users.php" method="POST" class="m-0">
                             <input type="hidden" name="action" value="add">
