@@ -16,6 +16,7 @@ $phone = trim($_POST['phone'] ?? '');
 $age = trim($_POST['age'] ?? '');
 $city = trim($_POST['city'] ?? '');
 $price_point = trim($_POST['price_point'] ?? '');
+$theme = trim($_POST['theme'] ?? 'light');
 
 $errors = [];
 
@@ -70,8 +71,8 @@ if (!empty($errors)) {
 
 // ✅ Update user
 if ($profile_image) {
-    $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, age = ?, city = ?, price_point = ?, profile_image = ? WHERE id = ?");
-    $stmt->execute([$name, $email, $phone, $age, $city, $price_point, $profile_image, $user_id]);
+    $stmt = $conn->prepare("UPDATE users SET name=?, email=?, phone=?, age=?, city=?, price_point=?, profile_image=?, theme=? WHERE id=?");
+    $stmt->execute([$name, $email, $phone, $age, $city, $price_point, $profile_image, $theme, $user_id]);
 } else {
     $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, age = ?, city = ?, price_point = ? WHERE id = ?");
     $stmt->execute([$name, $email, $phone, $age, $city, $price_point, $user_id]);

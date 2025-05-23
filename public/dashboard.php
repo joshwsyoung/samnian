@@ -42,22 +42,6 @@ $stmt = $conn->prepare("SELECT * FROM matches WHERE id IN (SELECT match_id FROM 
 $stmt->execute([$user_id]);
 $match = $stmt->fetch();
 
-// Fetch OCEAN personality scores
-$stmt = $conn->prepare("SELECT * FROM personality_scores WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$scores = $stmt->fetch();
-
-// If no scores exist, assume they haven't taken the test yet
-if (!$scores) {
-    $scores = [
-        'openness' => 'Not available',
-        'conscientiousness' => 'Not available',
-        'extraversion' => 'Not available',
-        'agreeableness' => 'Not available',
-        'neuroticism' => 'Not available'
-    ];
-}
-
 ?>
 <?php
 include '../partials/greetings.php';
@@ -92,120 +76,6 @@ $greeting = getGreeting() . $name . '.';
     <?php endif; ?>
 
     <div class="row">
-        <!-- OCEAN Personality Radar -->
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title">OCEAN Personality Test</h5>
-                    <?php if (
-                        $scores['openness'] !== 'Not available' &&
-                        $scores['conscientiousness'] !== 'Not available' &&
-                        $scores['extraversion'] !== 'Not available' &&
-                        $scores['agreeableness'] !== 'Not available' &&
-                        $scores['neuroticism'] !== 'Not available'
-                    ): ?>
-                        <canvas id="oceanBarChart" width="400" height="300"></canvas>
-                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        <script>
-                            const ctx = document.getElementById('oceanBarChart').getContext('2d');
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'],
-                                    datasets: [{
-                                        label: 'Score (0–5)',
-                                        data: [
-                                            <?= $scores['openness'] ?>,
-                                            <?= $scores['conscientiousness'] ?>,
-                                            <?= $scores['extraversion'] ?>,
-                                            <?= $scores['agreeableness'] ?>,
-                                            <?= $scores['neuroticism'] ?>
-                                        ],
-                                        backgroundColor: [
-                                            '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f'
-                                        ],
-                                        borderRadius: 4,
-                                        barThickness: 25
-                                    }]
-                                },
-                                options: {
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    scales: {
-                                        x: {
-                                            min: 0,
-                                            max: 5,
-                                            ticks: {
-                                                stepSize: 1
-                                            },
-                                            title: {
-                                                display: true,
-                                                text: 'Score'
-                                            }
-                                        },
-                                        y: {
-                                            title: {
-                                                display: true,
-                                                text: 'Traits'
-                                            }
-                                        }
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (context) {
-                                                    return ` ${context.label}: ${context.raw}/5`;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        </script>
-                        <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
-                            data-bs-target="#personalSummaryModal">Personality summary</button>
-                    <?php else: ?>
-                        <p>Personality scores not available. Please take the test.</p>
-                        <a class="btn btn-secondary mt-3" href="ocean_test.php">Take the test!</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Interests Card -->
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <div>
-                        <h5 class="card-title">My Interests</h5>
-                        <?php if (!empty($user_selected_interests)): ?>
-                            <ul class="list-unstyled mb-0 small">
-                                <?php
-                                $max_interests = 7;
-                                $interests_to_show = array_slice($user_selected_interests, 0, $max_interests);
-                                $more_count = count($user_selected_interests) - $max_interests;
-                                foreach ($interests_to_show as $interest): ?>
-                                    <li>• <?= htmlspecialchars($interest) ?></li>
-                                <?php endforeach; ?>
-                                <?php if ($more_count > 0): ?>
-                                    <li class="text-muted">+ <?= $more_count ?> more</li>
-                                <?php endif; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p class="text-muted">You haven't selected any interests yet.</p>
-                        <?php endif; ?>
-                    </div>
-                    <button class="btn btn-secondary mt-3" data-bs-toggle="modal"
-                        data-bs-target="#updateInterestsModal">
-                        Edit Preferences
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Preferences Card -->
         <div class="col-md-4  mb-3">
             <div class="card">
@@ -222,20 +92,6 @@ $greeting = getGreeting() . $name . '.';
 
     <!-- Matched Card -->
     <div class="row">
-        <div class="col-md-6 mb-3">
-            <div class="card">
-                <div class="card-body fw-lighter fs-6">
-                    <h5 class="card-title">Your Match</h5>
-                    <?php if ($match): ?>
-                        <p><strong>Matched Table:</strong> Event on <?php echo htmlspecialchars($match['event_date']); ?> at
-                            <?php echo htmlspecialchars($match['slot']); ?>.
-                        </p>
-                    <?php else: ?>
-                        <p>No matches yet.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
         <div class="col-md-6 mb-3">
             <div class="card">
                 <div class="card-body fw-lighter fs-6">
@@ -282,39 +138,6 @@ $greeting = getGreeting() . $name . '.';
             });
         });
     </script>
-
-
-    <!-- Modals -->
-    <!-- Interests modal -->
-    <div class="modal fade" id="updateInterestsModal" tabindex="-1" aria-labelledby="updateInterestsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content fw-lighter">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="updateInterestsModalLabel">Update Your Interests</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="../handlers/update_interests_handler.php" method="POST">
-                        <div id="interest-cards">
-                            <?php foreach ($all_interests as $interest):
-                                $isSelected = in_array($interest['name'], $user_selected_interests); ?>
-                                <div class="card-option <?= $isSelected ? 'selected' : '' ?>"
-                                    data-value="<?= htmlspecialchars($interest['name']) ?>">
-                                    <?= htmlspecialchars($interest['name']) ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <input type="hidden" name="selected_interests" id="selectedInterests"
-                            value="<?= implode(',', $user_selected_interests) ?>">
-
-                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Preferences Modal -->
     <div class="modal fade" id="preferencesModal" tabindex="-1" aria-labelledby="preferencesModalLabel"
