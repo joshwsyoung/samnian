@@ -4,14 +4,23 @@ include_once('../config.php');
 if (session_status() === PHP_SESSION_NONE)
   session_start();
 
-// echo 'User_id:' . $_SESSION['user_id'];
-// echo '<br> JOSH IS WORKING ON THE SITE';
-//echo '<br> KALEN IS WORKING ON THE SITE';
+$user = []; // Initialize $user
+$theme = 'light'; // Default theme
 
+// Fetch user from the database if logged in
+if (isset($_SESSION['user_id'])) {
+  $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+  $stmt->execute([$_SESSION['user_id']]);
+  $user = $stmt->fetch();
 
+  // Get theme from DB
+  $stmt = $conn->prepare("SELECT theme FROM users WHERE id = ?");
+  $stmt->execute([$_SESSION['user_id']]);
+  $theme = $stmt->fetchColumn() ?: 'light';
+}
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="<?php echo htmlspecialchars($theme); ?>">
 
 <head>
   <meta charset="UTF-8">
@@ -69,7 +78,7 @@ if (session_status() === PHP_SESSION_NONE)
       </a>
 
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto nav-text">
           <?php if (isset($_SESSION['user_id'])): ?>
             <?php if ($_SESSION['role'] === 'admin'): ?>
               <!-- Admin options -->
@@ -91,12 +100,11 @@ if (session_status() === PHP_SESSION_NONE)
                 <a class="nav-link" href="<?= BASE_URL ?>/public/messages.php">Chat</a>
               </li>
             <?php endif; ?>
-            <!-- Logout -->
-            <li class="nav-item">
-              <a class="nav-link" href="<?= BASE_URL ?>/public/logout.php">Logout</a>
-            </li>
             <li class="nav-item">
               <a class="nav-link" href="<?= BASE_URL ?>/public/profile.php">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?= BASE_URL ?>/public/logout.php">Logout</a>
             </li>
           <?php else: ?>
             <!-- Guest options -->

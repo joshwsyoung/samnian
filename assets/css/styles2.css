@@ -187,6 +187,21 @@ body.fade-out {
     text-align: center;
 }
 
+/* Ocean Test */
+.progress-bar {
+    background-color: var(--bs-secondary-bg);
+}
+
+/* Profile */
+.profile-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid black;
+    object-fit: cover;
+}
+
 /* ALERTS */
 .alert-danger {
     background-color: var(--bs-danger) !important;
@@ -196,17 +211,12 @@ body.fade-out {
     background-color: var(--bs-success) !important;
 }
 
-/* Ocean Test */
-.progress-bar {
-    background-color: var(--bs-secondary-bg);
-}
-
 /* FOOTER */
 .mobile-bottom-nav {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    background: #a2e436;
+    background-color: var(--bs-secondary-bg);
     border: var(--bs-border-width) solid var(--bs-border-color);
     border-radius: 0.875rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -218,7 +228,7 @@ body.fade-out {
 
 .mobile-bottom-nav .nav-item {
     text-align: center;
-    color: black;
+    color: var(--bs-emphasis-color);
     text-decoration: none;
     font-size: 12px;
     display: flex;
@@ -377,13 +387,13 @@ body.fade-out {
     color-scheme: dark;
     --bs-body-color: #dee2e6;
     --bs-body-color-rgb: 222, 226, 230;
-    --bs-body-bg: #212529;
+    --bs-body-bg: #262626;
     --bs-body-bg-rgb: 33, 37, 41;
     --bs-emphasis-color: #fff;
     --bs-emphasis-color-rgb: 255, 255, 255;
     --bs-secondary-color: rgba(222, 226, 230, 0.75);
     --bs-secondary-color-rgb: 222, 226, 230;
-    --bs-secondary-bg: #343a40;
+    --bs-secondary-bg: #3c532c;
     --bs-secondary-bg-rgb: 52, 58, 64;
     --bs-tertiary-color: rgba(222, 226, 230, 0.5);
     --bs-tertiary-color-rgb: 222, 226, 230;
@@ -4320,7 +4330,7 @@ textarea.form-control-lg {
     padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
     font-size: var(--bs-nav-link-font-size);
     font-weight: var(--bs-nav-link-font-weight);
-    color: var(--bs-nav-link-color);
+    color: var(--bs-emphasis-color);
     text-decoration: none;
     background: 0 0;
     border: 0;
