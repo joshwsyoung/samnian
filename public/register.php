@@ -28,21 +28,6 @@ if (!defined('BASE_URL')) {
       <input type="email" class="form-control" name="email" required>
     </div>
 
-    <div class="mb-3">
-      <label for="phone" class="form-label">Phone Number</label>
-      <input type="tel" class="form-control" name="phone" placeholder="Enter your phone number" required>
-    </div>
-    <div class="mb-3">
-      <label for="city" class="form-label">City</label>
-      <select class="form-control" name="city" required>
-        <option value="">Select your city</option>
-        <option value="London">London</option>
-        <option value="Bristol">Bristol</option>
-        <option value="Marlow">Marlow</option>
-        <option value="Durban SA">Durban SA</option>
-      </select>
-    </div>
-
     <!-- JOSH TO FIX THIS PLS 
     <input type="text" id="postcode" name="postcode_raw" placeholder="Postcode" required class="form-control mb-2">
     <select id="address-select" class="form-select mb-2" required>

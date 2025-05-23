@@ -123,7 +123,8 @@ foreach ($required_fields as $field) {
                     <div class="mb-3">
                         <label for="phone">Phone</label>
                         <input type="text" class="form-control" name="phone"
-                            value="<?= htmlspecialchars($user['phone']) ?>" required>
+                            value="<?= isset($user['phone']) ? htmlspecialchars($user['phone']) : '' ?>" required
+                            placeholder="">
                     </div>
                     <div class="mb-3">
                         <label for="age">Age</label>
@@ -133,6 +134,7 @@ foreach ($required_fields as $field) {
                     <div class="mb-3">
                         <label for="city">City</label>
                         <select class="form-select" name="city" required>
+                            <option value="" disabled <?= empty($user['city']) ? 'selected' : '' ?>>Select City</option>
                             <?php
                             $cities = ['Marlow', 'London', 'Bristol', 'Durban SA'];
                             foreach ($cities as $city) {
