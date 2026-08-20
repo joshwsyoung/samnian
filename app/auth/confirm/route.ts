@@ -3,7 +3,16 @@ import { type NextRequest } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-const INVALID_LINK_ERROR = "That link is invalid or has expired.";
+const MALFORMED_LINK_ERROR = "That link is invalid or has expired.";
+// Shown when the token itself is rejected (as opposed to missing entirely).
+// The overwhelmingly common cause isn't a genuinely dead link — it's Gmail/
+// Outlook/corporate email security automatically fetching the link to scan
+// it for phishing, seconds after it's sent, which consumes the one-time
+// token before the recipient ever clicks. The account is almost always
+// already confirmed by that same automatic visit, so point at logging in
+// rather than implying signup failed.
+const TOKEN_REJECTED_ERROR =
+  "That link has already been used or has expired. If you just signed up, your account is likely already confirmed — try logging in.";
 
 function escapeAttr(value: string) {
   return value
@@ -33,7 +42,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "/dashboard";
 
   if (!tokenHash || !type) {
-    redirect(`/login?error=${encodeURIComponent(INVALID_LINK_ERROR)}`);
+    redirect(`/login?error=${encodeURIComponent(MALFORMED_LINK_ERROR)}`);
   }
 
   const isRecovery = type === "recovery";
@@ -79,7 +88,7 @@ export async function POST(request: NextRequest) {
   const next = String(formData.get("next") ?? "/dashboard");
 
   if (!tokenHash || !type) {
-    redirect(`/login?error=${encodeURIComponent(INVALID_LINK_ERROR)}`);
+    redirect(`/login?error=${encodeURIComponent(MALFORMED_LINK_ERROR)}`);
   }
 
   const supabase = await createClient();
@@ -87,5 +96,5 @@ export async function POST(request: NextRequest) {
   if (!error) {
     redirect(next);
   }
-  redirect(`/login?error=${encodeURIComponent(INVALID_LINK_ERROR)}`);
+  redirect(`/login?error=${encodeURIComponent(TOKEN_REJECTED_ERROR)}`);
 }
