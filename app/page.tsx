@@ -1,65 +1,56 @@
 import Link from "next/link";
+import "./design-system.css";
 
 export default function LandingPage() {
   return (
-    <>
-      <div className="container mt-5 text-center py-5">
-        <h1 className="title mb-3">Samnian</h1>
-        <p className="subtitle mb-4">GET SOCIAL</p>
-        <p className="lead">A small team helping connect everyone for a great dinner!</p>
-        <div className="d-grid gap-3 col-10 col-sm-6 mx-auto my-4">
-          <Link href="/register" className="btn">Join In!</Link>
-        </div>
-      </div>
+    <div className="sm-scope">
+      <div className="container">
+        <section className="sm-hero-landing">
+          <div className="sm-kicker">Get social</div>
+          <h1>
+            Great dinners start at <span className="sm-accent-word">Samnian</span>.
+          </h1>
+          <p>
+            We match you with a small group for a Wednesday dinner, based on your personality
+            and your plans — no swiping, no small talk over a screen.
+          </p>
+          <div className="sm-hero-actions">
+            <Link href="/register" className="sm-btn sm-btn-primary">Join in</Link>
+            <Link href="/login" className="sm-btn sm-btn-ghost">Already a member? Log in</Link>
+          </div>
+        </section>
 
-      <section id="how-it-works" className="bg-light py-5 rounded">
-        <div className="container">
-          <h2 className="text-center mb-5">How it works</h2>
-          <div className="row g-4">
-            <div className="col-12 col-md-6 col-lg-3">
-              <div
-                className="p-4 rounded shadow-sm h-100 step-card"
-                style={{ background: "url('/images/Friends-1.jpg') center/cover no-repeat" }}
-              >
-                <h3 className="fs-4 mb-2">Take the Test</h3>
-                <p className="small">Complete our quick personality quiz (OCEAN model) to help us understand you.</p>
-              </div>
-            </div>
-            <div className="col-12 col-md-6 col-lg-3">
-              <div
-                className="p-4 rounded shadow-sm h-100 step-card"
-                style={{ background: "url('/images/Friends-2.jpg') center/cover no-repeat" }}
-              >
-                <h3 className="fs-4 mb-2">Set Availability</h3>
-                <p className="small">Choose the Wednesdays you&rsquo;re free and your preferences like city and budget.</p>
-              </div>
-            </div>
-            <div className="col-12 col-md-6 col-lg-3">
-              <div
-                className="p-4 rounded shadow-sm h-100 step-card"
-                style={{ background: "url('/images/Friends-3.jpg') center/cover no-repeat" }}
-              >
-                <h3 className="fs-4 mb-2">Get Matched</h3>
-                <p className="small">We&rsquo;ll match you with a small group for a great shared meal.</p>
-              </div>
-            </div>
-            <div className="col-12 col-md-6 col-lg-3">
-              <div
-                className="p-4 rounded shadow-sm h-100 step-card"
-                style={{ background: "url('/images/Friends-1.jpg') center/cover no-repeat" }}
-              >
-                <h3 className="fs-4 mb-2">Enjoy Dinner</h3>
-                <p className="small">Meet new people and enjoy good food and great conversation.</p>
-              </div>
-            </div>
+        <div className="sm-steps-head">
+          <h2>How it works</h2>
+        </div>
+        <div className="sm-steps">
+          <div className="sm-step-card" style={{ backgroundImage: "url('/images/Friends-1.jpg')" }}>
+            <div className="sm-step-num">Step 1</div>
+            <h3>Take the test</h3>
+            <p>Complete our quick personality quiz (OCEAN model) to help us understand you.</p>
+          </div>
+          <div className="sm-step-card" style={{ backgroundImage: "url('/images/Friends-2.jpg')" }}>
+            <div className="sm-step-num">Step 2</div>
+            <h3>Set availability</h3>
+            <p>Choose the Wednesdays you&rsquo;re free and your preferences like city and budget.</p>
+          </div>
+          <div className="sm-step-card" style={{ backgroundImage: "url('/images/Friends-3.jpg')" }}>
+            <div className="sm-step-num">Step 3</div>
+            <h3>Get matched</h3>
+            <p>We&rsquo;ll match you with a small group for a great shared meal.</p>
+          </div>
+          <div className="sm-step-card" style={{ backgroundImage: "url('/images/Friends-1.jpg')" }}>
+            <div className="sm-step-num">Step 4</div>
+            <h3>Enjoy dinner</h3>
+            <p>Meet new people and enjoy good food and great conversation.</p>
           </div>
         </div>
-      </section>
 
-      <div className="container text-center py-5">
-        <h2 className="mb-4">Ready to meet your table?</h2>
-        <Link href="/register" className="btn">Register &amp; Take the Test</Link>
+        <div className="sm-cta-band">
+          <h2>Ready to meet your table?</h2>
+          <Link href="/register" className="sm-btn sm-btn-primary">Register &amp; take the test</Link>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

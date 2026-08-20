@@ -10,7 +10,7 @@ import { getSession } from "@/lib/auth";
 // New design-system typeface — a fuller weight range than the legacy
 // self-hosted Poppins-Light, kept under its own variable so pages that
 // haven't been redesigned yet (still on globals.css's Poppins) are
-// unaffected. See app/dashboard/dashboard.css for where this is used.
+// unaffected. See app/design-system.css for where this is used.
 const poppinsV2 = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
