@@ -43,10 +43,15 @@ export async function registerAction(formData: FormData) {
     // against two different Supabase projects. Surface that plainly instead
     // of an opaque 500, since it's an env misconfiguration, not a user error.
     if ((err as { code?: string })?.code === "23503") {
+      // Include which Supabase project auth is actually pointed at (the ref
+      // is the URL's subdomain) so this is diagnosable from the error page
+      // alone, without cross-referencing Vercel env vars against Supabase
+      // projects by hand every time this happens.
+      const authRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/^https:\/\/([^.]+)\./)?.[1] ?? "unknown";
       redirect(
         "/register?error=" +
           encodeURIComponent(
-            "Registration is misconfigured on this deployment (auth and database aren't pointing at the same Supabase project). Please let the site admin know."
+            `Registration is misconfigured on this deployment: NEXT_PUBLIC_SUPABASE_URL (project "${authRef}") and DATABASE_URL point at different Supabase projects. Please let the site admin know.`
           )
       );
     }
