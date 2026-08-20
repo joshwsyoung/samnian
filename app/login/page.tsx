@@ -18,9 +18,8 @@ export default async function LoginPage({
           Invalid email or password. <Link href="/reset-password/request">Forgot your password?</Link>
         </div>
       )}
-      {error === "unknown" && <div className="alert alert-danger">An unknown error occurred. Please try again.</div>}
+      {error && error !== "invalid_credentials" && <div className="alert alert-danger">{error}</div>}
 
-      {success === "registered" && <div className="alert alert-success">Registration successful! You can now log in.</div>}
       {success === "password_reset" && <div className="alert alert-success">Password reset successful! You can now log in.</div>}
 
       <form action={loginAction} className="mt-4">

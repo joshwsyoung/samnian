@@ -1,8 +1,8 @@
 import Link from "next/link";
 import LogoMark from "./LogoMark";
-import type { SessionPayload } from "@/lib/auth";
+import type { Session } from "@/lib/auth";
 
-export default function NavBar({ session }: { session: SessionPayload | null }) {
+export default function NavBar({ session }: { session: Session | null }) {
   const isAdmin = session?.role === "admin";
 
   return (
@@ -79,7 +79,7 @@ export default function NavBar({ session }: { session: SessionPayload | null }) 
   );
 }
 
-export function MobileBottomNav({ session }: { session: SessionPayload | null }) {
+export function MobileBottomNav({ session }: { session: Session | null }) {
   const isAdmin = session?.role === "admin";
 
   return (

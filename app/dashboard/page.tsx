@@ -17,7 +17,7 @@ export default async function DashboardPage({
 }) {
   const session = await requireUser();
   const { success, error } = await searchParams;
-  const userId = Number(session.sub);
+  const userId = session.id;
 
   const [user] = await db().select().from(users).where(eq(users.id, userId)).limit(1);
   const [userAvailability] = await db().select().from(availability).where(eq(availability.userId, userId)).limit(1);

@@ -9,7 +9,7 @@ import { updateMatchAction, updateMatchUsersAction } from "../actions";
 
 export const dynamic = "force-dynamic";
 
-async function interestsFor(userId: number) {
+async function interestsFor(userId: string) {
   const rows = await db()
     .select({ name: interests.name })
     .from(userInterests)

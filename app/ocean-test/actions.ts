@@ -10,7 +10,7 @@ type Trait = "O" | "C" | "E" | "A" | "N";
 
 export async function submitOceanTestAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
 
   const questions = await db()
     .select()

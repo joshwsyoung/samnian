@@ -1,26 +1,25 @@
-# TalkTable
+# Samnian
 
 A small dinner-matchmaking app: take an OCEAN personality quiz, set your
 availability and budget, get matched to a table, chat with your match.
 
 Rewritten from a PHP/MySQL app (kept for reference in [`legacy-php/`](./legacy-php))
 into TypeScript on **Next.js**, deployable to **Vercel**, backed by
-**Postgres (Supabase)**. The UI is a direct port of the original Bootstrap
-markup and stylesheet — same look, same layout, same custom CSS file — just
-rendered as React instead of PHP templates.
+**Postgres + Auth (Supabase)**. The UI is a direct port of the original
+Bootstrap markup and stylesheet — same look, same layout, same custom CSS
+file — just rendered as React instead of PHP templates.
 
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript**, React Server Components and
   Server Actions instead of separate API/handler files.
-- **Drizzle ORM** + `postgres.js` against **Postgres** (developed against
-  Supabase; any Postgres works).
-- **Auth**: signed, `httpOnly` JWT session cookie (via `jose`) + `bcryptjs`
-  password hashing — no external auth service, no server-side session store,
-  so it runs cleanly on Vercel's serverless functions.
-- **Email**: SMTP via `nodemailer` (verification codes, password resets). If
-  unset, emails are logged to the console instead of sent — fine for local
-  dev.
+- **Auth**: **Supabase Auth** (`@supabase/ssr`) — handles password hashing,
+  sessions, and sending the verification/password-reset emails itself.
+  No JWT secret to generate, no SMTP to configure.
+- **Drizzle ORM** + `postgres.js` against **Postgres** for everything that
+  isn't identity (profiles, matches, chat, availability, the OCEAN test).
+  Runs over a direct `DATABASE_URL` connection, independent of Supabase's
+  client libraries.
 - **File uploads**: `@vercel/blob` for profile photos (Vercel's serverless
   functions have no writable local disk, unlike the old PHP `uploads/`
   folder).
@@ -30,15 +29,45 @@ rendered as React instead of PHP templates.
   `bootstrap-icons`, both self-hosted via npm instead of CDN `<script>` tags.
 - **Charts**: `chart.js` / `react-chartjs-2` for the OCEAN results bar chart.
 
+## How auth works
+
+Identity (email, password, sessions, email confirmation, password reset)
+lives entirely in Supabase Auth's `auth.users` — this app never stores or
+sees a password. `public.users` is this app's *profile* table for that same
+person (name, phone, city, price preference, role, …), created right after
+`supabase.auth.signUp()` succeeds, keyed by the same `id`.
+
+- **Register** → `supabase.auth.signUp()` → Supabase emails a confirmation
+  link → `app/auth/confirm/route.ts` verifies it and starts a session.
+- **Login** → `supabase.auth.signInWithPassword()`.
+- **Forgot password** → `supabase.auth.resetPasswordForEmail()` → the email
+  link lands on `/auth/confirm`, which verifies it and redirects to
+  `/reset-password/update`, where `supabase.auth.updateUser({ password })`
+  runs against the now-authenticated recovery session.
+- **Delete account** → signs out, then `SUPABASE_SERVICE_ROLE_KEY`-backed
+  `auth.admin.deleteUser()` removes the real login — Postgres cascades the
+  rest (profile row, availability, matches, chat, interests) via the FK
+  from `public.users.id` to `auth.users.id`.
+- A user's login **email is not editable from their own profile form** —
+  changing it is an identity operation, not a profile edit, so it's shown
+  read-only there. Admins *can* change a user's email (via `admin.updateUserById`),
+  since fixing a broken login for someone else is a legitimate admin task.
+
+One UX change from the legacy app worth knowing: email verification used to
+be a 4-digit code you typed in; it's now "click the link we emailed you",
+which is what Supabase Auth does out of the box. Getting the code-entry UI
+back would mean customizing the confirmation email template in the
+Supabase dashboard (Auth → Email Templates) to include `{{ .Token }}` —
+not something this app's code controls.
+
 ## What changed vs. the PHP app
 
 - **Database**: MySQL → Postgres. The schema in `db/schema.ts` was
   reconstructed from what the PHP handlers actually read/wrote (the old
-  `tables.sql` was stale — missing `verified`, `email_verification_codes`,
-  `password_reset_codes`, etc.). It's a fresh schema with no legacy data
-  migrated in (by design — see the PR/session notes).
-- **Sessions**: PHP `$_SESSION` → a signed JWT cookie. No server-side session
-  storage needed, which matters on Vercel's stateless functions.
+  `tables.sql` was stale). Fresh schema, no legacy data migrated in.
+- **Auth**: PHP `$_SESSION` + a hand-rolled password table → Supabase Auth
+  (see above). `email_verification_codes` and `password_reset_codes` no
+  longer exist — Supabase Auth owns that job now.
 - **File uploads**: local `uploads/` folder → Vercel Blob.
 - Two admin dashboard entries were dropped: `admin/messages.php` posted to a
   `handlers/messages_handler.php` that didn't exist in the repo, and
@@ -55,7 +84,7 @@ rendered as React instead of PHP templates.
 - `personality_tests` and `interests` had no seed data anywhere in the
   repo (they were populated by hand in the old production database). See
   **Seeding** below — `db/seed.ts` ships a reasonable starter set for both,
-  clearly marked as such.
+  clearly marked as such, and the live database already has it loaded.
 
 ## ⚠️ Rotate these credentials
 
@@ -70,9 +99,10 @@ from history that's already been pushed.
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in DATABASE_URL and SESSION_SECRET at minimum
-npm run db:push              # or db:generate + db:migrate, see below
-npm run db:seed              # interests + OCEAN questions
+cp .env.example .env.local   # fill in DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL,
+                              # NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+npm run db:push               # or db:generate + db:migrate, see below
+npm run db:seed                # interests + OCEAN questions (skips if already seeded)
 npm run dev
 ```
 
@@ -84,61 +114,78 @@ Schema lives in `db/schema.ts`. Two ways to apply it:
 - `npm run db:generate` then `npm run db:migrate` — generates a versioned
   SQL file under `drizzle/` first, the way you'd want in CI/production.
 
+`drizzle/0000_adorable_grim_reaper.sql` is written for a **fresh** Postgres
+database — including the enum types this schema uses. Applying it to a
+Supabase project that already has some of those types (e.g. if you'd run an
+earlier revision of this schema) will fail on the `CREATE TYPE` statements;
+drop the stale objects first or start from a clean database. It does *not*
+try to create `auth.users` — Supabase already owns that table.
+
 ## Deploying
 
-1. **Database**: create a [Supabase](https://supabase.com) project (or any
-   Postgres), then run the migration in `drizzle/0000_organic_krista_starr.sql`
-   against it (or `npm run db:migrate` with `DATABASE_URL` pointed at it).
-2. **Vercel project**: import this repo, add the env vars from
-   `.env.example` (`DATABASE_URL`, `SESSION_SECRET`, `SMTP_*`) in Project
-   Settings → Environment Variables.
-3. **Blob storage**: Project → Storage → connect a Blob store — Vercel
+1. **Supabase project**: create one (or reuse an existing one — this app
+   only adds its own tables, nothing schema-wide). Grab, from
+   Settings → API: the project URL, the `anon`/publishable key, and the
+   `service_role` secret. From Settings → Database: the pooled connection
+   string, for `DATABASE_URL`.
+2. Run the migration in `drizzle/0000_adorable_grim_reaper.sql` against it
+   (or `npm run db:migrate` with `DATABASE_URL` pointed at it), then
+   `npm run db:seed`.
+3. **Vercel project**: import this repo, add the env vars from
+   `.env.example` in Project Settings → Environment Variables.
+4. **Blob storage**: Project → Storage → connect a Blob store — Vercel
    injects `BLOB_READ_WRITE_TOKEN` automatically, no manual copy-paste
    needed.
-4. Deploy. No build-time DB access is required — every page that touches
-   the database also reads the session cookie, so Next.js treats it as
-   dynamic (rendered per-request) rather than trying to prerender it.
+5. Deploy. No build-time DB or Supabase access is required — every page
+   that touches either also reads the session cookie, so Next.js treats it
+   as dynamic (rendered per-request) rather than trying to prerender it.
 
 ### Supabase Row Level Security
 
-If you point this at a Supabase project, note that **Supabase's own
-Postgres advisor will flag the new tables as having RLS disabled** — that's
-expected here: this app talks to Postgres directly via `DATABASE_URL`
-(bypassing PostgREST/RLS entirely, same trust model as any other backend
-with a database password), not through Supabase's client-side `anon` key.
-If anything else in that same Supabase project *does* use the public
-`anon`/`authenticated` REST API, turn RLS on for these tables so that API
-can't read/write them:
+**This matters more here than it would in a typical Supabase app, and it's
+currently off — read this before going further.** Because this app uses
+real Supabase Auth accounts, every registered user now holds a genuine
+Supabase JWT. With RLS disabled, that JWT works directly against Supabase's
+public PostgREST API (`your-project.supabase.co/rest/v1/...`) — completely
+bypassing this app's own authorization logic. Concretely, right now any
+signed-up user could call that API themselves to read every other user's
+profile, or set their own `role` to `'admin'`.
+
+This app itself never uses that API — it always reads/writes over
+`DATABASE_URL` via Drizzle, a separate, direct Postgres connection that
+RLS doesn't apply to. So enabling RLS with **no policies at all** is safe
+for this app specifically: it simply locks the PostgREST door this app
+doesn't use, without touching anything this app does. I didn't turn it on
+myself since Supabase's tooling asks that a person decide this, not an
+agent — but I'd genuinely recommend running this:
 
 ```sql
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.availability ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversation_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.email_verification_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.interests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.match_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matches ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.password_reset_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.personality_scores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.personality_tests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_interests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ```
 
-With no policies added, this blocks the `anon`/`authenticated` REST API
-from touching these tables entirely — which is what you want, since this
-app never uses that API. Don't run this against tables another app in the
-same Supabase project *does* need PostgREST access to without adding
-matching policies first.
+If this Supabase project is shared with another app that *does* need
+PostgREST access to some of these tables, add matching policies instead of
+running this blind.
 
 ## Project layout
 
 ```
 app/                  routes (App Router) — one folder per page, colocated
                        actions.ts files hold that route's Server Actions
+app/auth/confirm/      shared callback for Supabase Auth email links
 components/            shared React components
-lib/                    db client, auth, mailer, blob upload, constants
+lib/                    db client, auth session helper, supabase/, blob upload, constants
+lib/supabase/           Supabase clients — server.ts (cookies-based), admin.ts (service role)
 db/                     Drizzle schema + seed script
 drizzle/                generated SQL migrations
 legacy-php/             the original PHP app, kept for reference only

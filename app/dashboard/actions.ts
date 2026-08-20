@@ -10,7 +10,7 @@ import { PRICE_LEVELS, SLOTS, type PriceLevel, type Slot } from "@/lib/constants
 export async function updateThemeAction(formData: FormData) {
   const session = await requireUser();
   const theme = formData.get("theme") === "dark" ? "dark" : "light";
-  await db().update(users).set({ theme }).where(eq(users.id, Number(session.sub)));
+  await db().update(users).set({ theme }).where(eq(users.id, session.id));
 }
 
 export async function updateAvailabilityAction(formData: FormData) {
@@ -22,7 +22,7 @@ export async function updateAvailabilityAction(formData: FormData) {
     redirect("/dashboard?error=" + encodeURIComponent("Please select a date and time slot."));
   }
 
-  const userId = Number(session.sub);
+  const userId = session.id;
   await db()
     .insert(availability)
     .values({ userId, eventDate, slot })
@@ -39,7 +39,7 @@ export async function updatePricePointAction(formData: FormData) {
     redirect("/dashboard?error=" + encodeURIComponent("Price point is required."));
   }
 
-  await db().update(users).set({ priceLevel }).where(eq(users.id, Number(session.sub)));
+  await db().update(users).set({ priceLevel }).where(eq(users.id, session.id));
   redirect("/dashboard?success=" + encodeURIComponent("Price point updated successfully!"));
 }
 
@@ -50,7 +50,7 @@ export async function updatePreferencesAction(formData: FormData) {
     redirect("/dashboard?error=" + encodeURIComponent("Invalid match selection."));
   }
 
-  const userId = Number(session.sub);
+  const userId = session.id;
   await db().delete(matchUsers).where(eq(matchUsers.userId, userId));
   await db().insert(matchUsers).values({ matchId, userId });
 

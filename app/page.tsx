@@ -4,7 +4,7 @@ export default function LandingPage() {
   return (
     <>
       <div className="container mt-5 text-center py-5">
-        <h1 className="title mb-3">FindFolk</h1>
+        <h1 className="title mb-3">Samnian</h1>
         <p className="subtitle mb-4">GET SOCIAL</p>
         <p className="lead">A small team helping connect everyone for a great dinner!</p>
         <div className="d-grid gap-3 col-10 col-sm-6 mx-auto my-4">

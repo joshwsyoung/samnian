@@ -5,16 +5,15 @@ import BootstrapClient from "@/components/BootstrapClient";
 import FadeIn from "@/components/FadeIn";
 import NavBar, { MobileBottomNav } from "@/components/NavBar";
 import { getSession } from "@/lib/auth";
-import { getUserTheme } from "@/lib/queries";
 
 export const metadata: Metadata = {
-  title: "TalkTable",
+  title: "Samnian",
   description: "A small team helping connect everyone for a great dinner!",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  const theme = session ? await getUserTheme(session.sub) : "light";
+  const theme = session?.theme ?? "light";
 
   return (
     <html lang="en" data-bs-theme={theme}>

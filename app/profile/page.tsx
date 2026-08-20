@@ -22,7 +22,7 @@ export default async function ProfilePage({
 }) {
   const session = await requireUser();
   const { success, error } = await searchParams;
-  const userId = Number(session.sub);
+  const userId = session.id;
 
   const [user] = await db().select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) {
@@ -179,7 +179,8 @@ export default async function ProfilePage({
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email">Email</label>
-                  <input type="email" className="form-control" name="email" defaultValue={user.email} required />
+                  <input type="email" className="form-control" defaultValue={user.email} disabled />
+                  <div className="form-text">Your login email — contact us to change it.</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="phone">Phone</label>

@@ -40,7 +40,7 @@ export async function updateMatchUsersAction(formData: FormData) {
   await requireAdmin();
 
   const matchId = Number(formData.get("match_id"));
-  const userId = Number(formData.get("user_id"));
+  const userId = String(formData.get("user_id") ?? "");
   const action = String(formData.get("action") ?? "");
 
   const [match] = await db().select().from(matches).where(eq(matches.id, matchId)).limit(1);

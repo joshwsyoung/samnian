@@ -4,16 +4,19 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { interests, userInterests, users } from "@/db/schema";
-import { clearSessionCookie, requireUser } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ProfileImageError, uploadProfileImage } from "@/lib/blob";
 import { PRICE_LEVELS, type PriceLevel } from "@/lib/constants";
 
 export async function updateProfileAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
 
+  // Login email is managed by Supabase Auth, not editable from here — see
+  // the profile page, where it's rendered read-only.
   const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const age = String(formData.get("age") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim();
@@ -21,7 +24,6 @@ export async function updateProfileAction(formData: FormData) {
 
   const errors: string[] = [];
   if (!name) errors.push("Name is required.");
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push("Valid email is required.");
   if (!phone) errors.push("Phone number is required.");
   const ageNum = Number(age);
   if (!age || Number.isNaN(ageNum) || ageNum < 16 || ageNum > 100) errors.push("Valid age is required.");
@@ -32,7 +34,7 @@ export async function updateProfileAction(formData: FormData) {
   const file = formData.get("profile_image");
   if (file instanceof File && file.size > 0) {
     try {
-      profileImageUrl = await uploadProfileImage(String(userId), file);
+      profileImageUrl = await uploadProfileImage(userId, file);
     } catch (err) {
       errors.push(err instanceof ProfileImageError ? err.message : "Failed to upload image.");
     }
@@ -46,7 +48,6 @@ export async function updateProfileAction(formData: FormData) {
     .update(users)
     .set({
       name,
-      email,
       phone,
       age: ageNum,
       city,
@@ -60,7 +61,7 @@ export async function updateProfileAction(formData: FormData) {
 
 export async function updateInterestsAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
 
   const selectedNames = String(formData.get("selected_interests") ?? "")
     .split(",")
@@ -92,7 +93,15 @@ export async function updateInterestsAction(formData: FormData) {
 
 export async function deleteAccountAction() {
   const session = await requireUser();
-  await db().delete(users).where(eq(users.id, Number(session.sub)));
-  await clearSessionCookie();
+
+  // Sign out first, while the session is still valid, then delete the auth
+  // user with the admin client — Postgres cascades the rest (profile row,
+  // availability, interests, matches, chat) via the FK to auth.users.
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+
+  const admin = createAdminClient();
+  await admin.auth.admin.deleteUser(session.id);
+
   redirect("/");
 }

@@ -1,27 +1,21 @@
 import Link from "next/link";
-import { and, eq, gt } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { passwordResetCodes } from "@/db/schema";
+import { createClient } from "@/lib/supabase/server";
 import PasswordInput from "@/components/PasswordInput";
-import { performResetAction } from "../actions";
+import { updatePasswordAction } from "../actions";
 
-export default async function ResetPasswordPage({
-  params,
+export default async function UpdatePasswordPage({
   searchParams,
 }: {
-  params: Promise<{ token: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
-  const { token } = await params;
   const { error } = await searchParams;
 
-  const [record] = await db()
-    .select()
-    .from(passwordResetCodes)
-    .where(and(eq(passwordResetCodes.token, token), gt(passwordResetCodes.expiresAt, new Date())))
-    .limit(1);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!record && error !== "nomatch" && error !== "missing") {
+  if (!user) {
     return (
       <div className="container mt-5">
         <div className="row justify-content-center">
@@ -48,9 +42,9 @@ export default async function ResetPasswordPage({
 
       {error === "nomatch" && <div className="alert alert-danger">Passwords do not match. Please try again.</div>}
       {error === "missing" && <div className="alert alert-danger">Please fill in both password fields.</div>}
+      {error && error !== "nomatch" && error !== "missing" && <div className="alert alert-danger">{error}</div>}
 
-      <form action={performResetAction}>
-        <input type="hidden" name="token" value={token} />
+      <form action={updatePasswordAction}>
         <PasswordInput name="password" label="New Password" />
         <PasswordInput name="confirm_password" label="Confirm New Password" enforcePattern={false} />
         <button type="submit" className="btn">Reset Password</button>

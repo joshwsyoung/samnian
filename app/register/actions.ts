@@ -1,21 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { users, emailVerificationCodes } from "@/db/schema";
-import { hashPassword } from "@/lib/auth";
-import { sendEmail, verificationCodeEmail } from "@/lib/mailer";
-
-function generateCode() {
-  return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
-}
-
-async function issueVerificationCode(email: string) {
-  const code = generateCode();
-  await db().insert(emailVerificationCodes).values({ email, code });
-  await sendEmail(email, "Your TalkTable Verification Code", verificationCodeEmail(code));
-}
+import { users } from "@/db/schema";
+import { createClient } from "@/lib/supabase/server";
+import { getBaseUrl } from "@/lib/url";
 
 export async function registerAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
@@ -26,19 +15,31 @@ export async function registerAction(formData: FormData) {
     redirect("/register?error=missing_fields");
   }
 
-  const [existing] = await db().select().from(users).where(eq(users.email, email)).limit(1);
+  const supabase = await createClient();
+  const baseUrl = await getBaseUrl();
 
-  if (existing) {
-    if (!existing.verified) {
-      await issueVerificationCode(email);
-      redirect(`/verify-email?email=${encodeURIComponent(email)}`);
-    }
-    redirect("/register?error=already_registered");
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=/dashboard` },
+  });
+
+  if (error || !data.user) {
+    redirect("/register?error=" + encodeURIComponent(error?.message ?? "Something went wrong."));
   }
 
-  const passwordHash = await hashPassword(password);
-  await db().insert(users).values({ name, email, passwordHash, verified: false });
-  await issueVerificationCode(email);
+  // Create this app's profile row for the new auth user. onConflictDoNothing
+  // covers re-submitting the form for an email that already has one.
+  await db()
+    .insert(users)
+    .values({ id: data.user.id, name, email })
+    .onConflictDoNothing({ target: users.id });
+
+  // If email confirmation is off in this Supabase project, signUp already
+  // returns a live session — skip straight in instead of asking to verify.
+  if (data.session) {
+    redirect("/dashboard");
+  }
 
   redirect(`/verify-email?email=${encodeURIComponent(email)}`);
 }

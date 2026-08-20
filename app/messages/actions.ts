@@ -8,10 +8,10 @@ import { requireUser } from "@/lib/auth";
 
 export async function createConversationAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
 
   const title = String(formData.get("title") ?? "").trim();
-  const invitedUserIds = formData.getAll("users").map(Number).filter(Boolean);
+  const invitedUserIds = formData.getAll("users").map(String).filter(Boolean);
   const matchIdRaw = formData.get("match_id");
   const matchId = matchIdRaw ? Number(matchIdRaw) : null;
 
@@ -55,7 +55,7 @@ export async function createConversationAction(formData: FormData) {
 
 export async function sendMessageAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
   const conversationId = Number(formData.get("conversation_id"));
   const message = String(formData.get("message") ?? "").trim();
 
@@ -79,7 +79,7 @@ export async function sendMessageAction(formData: FormData) {
 
 export async function inviteDecisionAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
   const conversationId = Number(formData.get("conversation_id"));
   const decision = String(formData.get("decision") ?? "");
 
@@ -113,9 +113,9 @@ export async function inviteDecisionAction(formData: FormData) {
 
 export async function inviteUserAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
   const conversationId = Number(formData.get("conversation_id"));
-  const inviteUserId = Number(formData.get("invite_user_id"));
+  const inviteUserId = String(formData.get("invite_user_id") ?? "");
 
   if (!conversationId || !inviteUserId) {
     redirect("/messages?error=missing_data");
@@ -146,9 +146,9 @@ export async function inviteUserAction(formData: FormData) {
 
 export async function removeUserAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
   const conversationId = Number(formData.get("conversation_id"));
-  const userIdToRemove = Number(formData.get("user_id"));
+  const userIdToRemove = String(formData.get("user_id") ?? "");
 
   if (!conversationId || !userIdToRemove) {
     redirect("/messages?error=missing_data");
@@ -179,7 +179,7 @@ export async function removeUserAction(formData: FormData) {
 
 export async function deleteConversationAction(formData: FormData) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
   const conversationId = Number(formData.get("conversation_id"));
 
   if (!conversationId) {

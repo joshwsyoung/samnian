@@ -20,7 +20,7 @@ export default async function MessagesPage({
   searchParams: Promise<{ conversation_id?: string; error?: string; deleted?: string }>;
 }) {
   const session = await requireUser();
-  const userId = Number(session.sub);
+  const userId = session.id;
   const { conversation_id, error } = await searchParams;
   const conversationId = conversation_id ? Number(conversation_id) : null;
 
@@ -55,11 +55,11 @@ export default async function MessagesPage({
 
   const allUsers = await db().select({ id: users.id, name: users.name }).from(users);
 
-  let activeConversation: { id: number; title: string; userId: number } | null = null;
+  let activeConversation: { id: number; title: string; userId: string } | null = null;
   let isMember = false;
-  let messages: { senderId: number | null; senderName: string | null; message: string; sentAt: Date }[] = [];
-  let participants: { id: number; name: string; status: "pending" | "accepted" | "declined" }[] = [];
-  let inviteCandidates: { id: number; name: string }[] = [];
+  let messages: { senderId: string | null; senderName: string | null; message: string; sentAt: Date }[] = [];
+  let participants: { id: string; name: string; status: "pending" | "accepted" | "declined" }[] = [];
+  let inviteCandidates: { id: string; name: string }[] = [];
 
   if (conversationId) {
     const [conv] = await db().select().from(conversations).where(eq(conversations.id, conversationId)).limit(1);

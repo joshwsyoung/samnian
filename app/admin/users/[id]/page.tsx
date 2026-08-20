@@ -12,7 +12,7 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
   await requireAdmin();
   const { id } = await params;
 
-  const [user] = await db().select().from(users).where(eq(users.id, Number(id))).limit(1);
+  const [user] = await db().select().from(users).where(eq(users.id, id)).limit(1);
   if (!user) notFound();
 
   return (

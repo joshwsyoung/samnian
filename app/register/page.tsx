@@ -13,13 +13,18 @@ export default async function RegisterPage({
     <div className="container mt-5">
       <h2>Register</h2>
 
-      {error === "already_registered" && (
-        <div className="alert alert-danger">
-          That email is already registered. Please <Link href="/login">log in</Link>.
-        </div>
-      )}
       {error === "missing_fields" && (
         <div className="alert alert-danger">Please fill in all fields.</div>
+      )}
+      {error && error !== "missing_fields" && (
+        <div className="alert alert-danger">
+          {error}
+          {error.toLowerCase().includes("registered") && (
+            <>
+              {" "}Please <Link href="/login">log in</Link> instead.
+            </>
+          )}
+        </div>
       )}
 
       <form action={registerAction}>
