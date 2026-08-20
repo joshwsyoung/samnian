@@ -540,3 +540,115 @@
 
 .sm-cta-band { text-align: center; padding: 8px 16px 56px; }
 .sm-cta-band h2 { font-size: 1.5rem; margin-bottom: 18px; }
+
+/*
+ * Site header + mobile tab bar. Applied via .sm-scope directly on the
+ * <nav> elements (they sit in the root layout, outside any page's own
+ * .sm-scope container) so every route gets the redesigned chrome even
+ * before its own content is migrated. Overrides target the existing
+ * Bootstrap class names at two-class specificity so they win regardless
+ * of stylesheet load order, without touching the vendored rules or the
+ * collapse-toggle JS that depends on those class names.
+ */
+.sm-scope.navbar {
+  background: var(--sm-surface);
+  border-bottom: 1px solid var(--sm-border);
+  box-shadow: none;
+  padding: 4px 0;
+}
+
+.sm-scope .sm-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--sm-accent-strong);
+}
+.sm-scope .sm-brand:hover, .sm-scope .sm-brand:focus { color: var(--sm-accent-strong); }
+.sm-scope .sm-brand-word {
+  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--sm-text);
+}
+
+.sm-scope .navbar-toggler {
+  border: none;
+  padding: 6px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+.sm-scope .navbar-toggler:hover { background: var(--sm-surface-2); }
+.sm-scope .navbar-toggler:focus { box-shadow: 0 0 0 2px var(--sm-accent-strong); }
+.sm-scope .navbar-toggler-icon {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%231b2b2a' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+[data-bs-theme="dark"] .sm-scope .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23e7f1ef' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* .sm-scope.navbar (compound, not descendant) so this beats the vendored
+   .navbar-expand-md .navbar-nav .nav-link rule, which sets horizontal
+   padding at the same descendant-selector specificity. */
+.sm-scope.navbar .navbar-nav .nav-link {
+  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--sm-text-muted);
+  padding: 8px 14px;
+  border-radius: 999px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.sm-scope.navbar .navbar-nav .nav-link:hover, .sm-scope.navbar .navbar-nav .nav-link:focus {
+  color: var(--sm-text);
+  background: var(--sm-surface-2);
+}
+.sm-scope .sm-nav-cta { display: flex; align-items: center; margin-left: 4px; }
+.sm-scope .sm-nav-cta .sm-btn { padding: 8px 18px; font-size: 0.88rem; }
+
+/* Mobile tab bar: a centered floating pill, replacing the old
+   left:50%-without-transform rule that actually clipped it to the
+   right half of the viewport. */
+.sm-scope.mobile-bottom-nav {
+  position: fixed;
+  left: 50%;
+  right: auto;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  margin: 0;
+  background: var(--sm-surface);
+  border: 1px solid var(--sm-border);
+  border-radius: 999px;
+  box-shadow: var(--sm-shadow);
+  padding: 6px;
+  z-index: 1000;
+}
+.sm-scope.mobile-bottom-nav .navbar-nav {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+}
+.sm-scope.mobile-bottom-nav .nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--sm-text-muted);
+  padding: 8px 13px;
+  border-radius: 999px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.sm-scope.mobile-bottom-nav .nav-link i { font-size: 1.15rem; }
+.sm-scope.mobile-bottom-nav .nav-link:hover, .sm-scope.mobile-bottom-nav .nav-link:focus {
+  color: var(--sm-accent-strong);
+  background: var(--sm-surface-2);
+}

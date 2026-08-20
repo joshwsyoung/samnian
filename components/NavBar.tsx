@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LogoMark from "./LogoMark";
 import type { Session } from "@/lib/auth";
+import "../app/design-system.css";
 
 export default function NavBar({ session }: { session: Session | null }) {
   const isAdmin = session?.role === "admin";
@@ -8,8 +9,13 @@ export default function NavBar({ session }: { session: Session | null }) {
   return (
     <>
       {/* Desktop navbar */}
-      <nav className="navbar navbar-expand-md fw-light d-none d-sm-block">
+      <nav className="sm-scope navbar navbar-expand-md d-none d-sm-block">
         <div className="container-fluid">
+          <Link className="navbar-brand sm-brand" href="/">
+            <LogoMark size={30} filterId="navVectorShadow" />
+            <span className="sm-brand-word">Samnian</span>
+          </Link>
+
           <button
             className="navbar-toggler"
             type="button"
@@ -22,12 +28,8 @@ export default function NavBar({ session }: { session: Session | null }) {
             <span className="navbar-toggler-icon" />
           </button>
 
-          <Link className="navbar-brand ms-auto" href="/">
-            <LogoMark filterId="navVectorShadow" />
-          </Link>
-
           <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto nav-text">
+            <ul className="navbar-nav ms-auto">
               {session ? (
                 <>
                   {isAdmin ? (
@@ -64,8 +66,8 @@ export default function NavBar({ session }: { session: Session | null }) {
                   <li className="nav-item">
                     <Link className="nav-link" href="/login">Login</Link>
                   </li>
-                  <li className="nav-item">
-                    <Link className="nav-link" href="/register">Register</Link>
+                  <li className="nav-item sm-nav-cta">
+                    <Link className="sm-btn sm-btn-primary" href="/register">Register</Link>
                   </li>
                 </>
               )}
@@ -73,8 +75,6 @@ export default function NavBar({ session }: { session: Session | null }) {
           </div>
         </div>
       </nav>
-
-      <div className="fw-light" />
     </>
   );
 }
@@ -83,70 +83,68 @@ export function MobileBottomNav({ session }: { session: Session | null }) {
   const isAdmin = session?.role === "admin";
 
   return (
-    <nav className="mobile-bottom-nav fixed-bottom d-block d-sm-none">
-      <div className="container-fluid justify-content-around">
-        <ul className="navbar-nav flex-row w-100 justify-content-around">
-          {session ? (
-            <>
-              {isAdmin ? (
-                <>
-                  <li className="nav-item">
-                    <Link className="nav-link text-center" href="/admin">
-                      <i className="bi bi-speedometer2" /><br />Dashboard
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link text-center" href="/admin/users">
-                      <i className="bi bi-people" /><br />Users
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link text-center" href="/admin/matches">
-                      <i className="bi bi-list-check" /><br />Matches
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li className="nav-item">
-                    <Link className="nav-link text-center" href="/dashboard">
-                      <i className="bi bi-house-door" /><br />Home
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link text-center" href="/messages">
-                      <i className="bi bi-chat-dots" /><br />Chat
-                    </Link>
-                  </li>
-                </>
-              )}
-              <li className="nav-item">
-                <Link className="nav-link" href="/profile">
-                  <i className="bi bi-person" /><br />Profile
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-center" href="/logout">
-                  <i className="bi bi-box-arrow-right" /><br />Logout
-                </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link text-center" href="/login">
-                  <i className="bi bi-box-arrow-in-right" /><br />Login
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-center" href="/register">
-                  <i className="bi bi-person-plus" /><br />Register
-                </Link>
-              </li>
-            </>
-          )}
-        </ul>
-      </div>
+    <nav className="sm-scope mobile-bottom-nav fixed-bottom d-block d-sm-none">
+      <ul className="navbar-nav">
+        {session ? (
+          <>
+            {isAdmin ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/admin">
+                    <i className="bi bi-speedometer2" />Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/admin/users">
+                    <i className="bi bi-people" />Users
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/admin/matches">
+                    <i className="bi bi-list-check" />Matches
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/dashboard">
+                    <i className="bi bi-house-door" />Home
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" href="/messages">
+                    <i className="bi bi-chat-dots" />Chat
+                  </Link>
+                </li>
+              </>
+            )}
+            <li className="nav-item">
+              <Link className="nav-link" href="/profile">
+                <i className="bi bi-person" />Profile
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" href="/logout">
+                <i className="bi bi-box-arrow-right" />Logout
+              </Link>
+            </li>
+          </>
+        ) : (
+          <>
+            <li className="nav-item">
+              <Link className="nav-link" href="/login">
+                <i className="bi bi-box-arrow-in-right" />Login
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" href="/register">
+                <i className="bi bi-person-plus" />Register
+              </Link>
+            </li>
+          </>
+        )}
+      </ul>
     </nav>
   );
 }
