@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { personalityTests } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import OceanTestForm from "@/components/OceanTestForm";
+import "../design-system.css";
 
 export const dynamic = "force-dynamic";
 
@@ -17,16 +18,19 @@ export default async function OceanTestPage() {
 
   if (questions.length === 0) {
     return (
-      <div className="container">
-        <div className="alert alert-danger mt-5">No questions available for the test.</div>
+      <div className="sm-scope container mt-3">
+        <div className="sm-flash error">No questions available for the test.</div>
       </div>
     );
   }
 
   return (
-    <div className="container">
-      <div className="top mt-5">
-        <h2 className="mb-4 fw-lighter text-center">OCEAN Personality Test</h2>
+    <div className="sm-scope container mt-3" style={{ maxWidth: 640 }}>
+      <div className="sm-page-head">
+        <div className="sm-greeting">Personality profile</div>
+        <div className="sm-sub">A couple of minutes — helps us match you with people you&rsquo;ll get on with.</div>
+      </div>
+      <div className="sm-card">
         <OceanTestForm
           questions={questions.map((q) => ({ id: q.id, question: q.question, options: q.options }))}
         />

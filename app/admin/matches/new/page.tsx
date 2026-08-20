@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { PRICE_LEVELS, SLOTS } from "@/lib/constants";
 import { createMatchAction } from "../actions";
+import "../../../design-system.css";
 
 export const dynamic = "force-dynamic";
 
@@ -14,34 +15,41 @@ export default async function NewMatchPage({
   const { error } = await searchParams;
 
   return (
-    <div className="container mt-4">
-      <h2>Create New Match</h2>
+    <div className="sm-scope container mt-3" style={{ maxWidth: 560 }}>
+      <div className="sm-page-head">
+        <div className="sm-greeting">Create new match</div>
+      </div>
 
-      {error === "failed" && <div className="alert alert-danger">Please fill in all fields.</div>}
+      {error === "failed" && <div className="sm-flash error">Please fill in all fields.</div>}
 
-      <form action={createMatchAction}>
-        <div className="form-group mb-3">
-          <label htmlFor="event_date">Event Date</label>
-          <input type="date" className="form-control" name="event_date" required />
+      <form action={createMatchAction} className="sm-card">
+        <div className="sm-field-stack">
+          <div className="sm-field">
+            <label htmlFor="event_date">Event date</label>
+            <input type="date" id="event_date" className="sm-input" name="event_date" required />
+          </div>
+          <div className="sm-field">
+            <label htmlFor="slot">Time slot</label>
+            <select id="slot" className="sm-input" name="slot" required>
+              {SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="sm-field">
+            <label htmlFor="price_point">Price point</label>
+            <select id="price_point" className="sm-input" name="price_point" required>
+              {PRICE_LEVELS.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </div>
+          <label htmlFor="approved" className="sm-chip-check" style={{ alignSelf: "flex-start" }}>
+            <input type="checkbox" id="approved" name="approved" />
+            <span>Approved</span>
+          </label>
         </div>
-        <div className="form-group mb-3">
-          <label htmlFor="slot">Time Slot</label>
-          <select className="form-control" name="slot" required>
-            {SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
+
+        <div className="sm-actions">
+          <button type="submit" className="sm-btn sm-btn-primary">Create match</button>
+          <Link href="/admin/matches" className="sm-btn sm-btn-ghost">Cancel</Link>
         </div>
-        <div className="form-group mb-3">
-          <label htmlFor="price_point">Price Point</label>
-          <select className="form-control" name="price_point" required>
-            {PRICE_LEVELS.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </div>
-        <div className="form-check mb-3">
-          <input type="checkbox" className="form-check-input" name="approved" id="approved" />
-          <label className="form-check-label" htmlFor="approved">Approved</label>
-        </div>
-        <button type="submit" className="btn btn-success">Create Match</button>{" "}
-        <Link href="/admin/matches" className="btn btn-secondary ml-2">Cancel</Link>
       </form>
     </div>
   );

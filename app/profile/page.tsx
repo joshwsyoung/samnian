@@ -5,13 +5,15 @@ import { db } from "@/lib/db";
 import { interests, matches, matchUsers, personalityScores, userInterests, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import { firstNameFrom, getGreeting } from "@/lib/greeting";
-import { CITIES, PRICE_LEVELS } from "@/lib/constants";
-import Flash from "@/components/Flash";
-import ThemeToggle from "@/components/ThemeToggle";
-import InterestPicker from "@/components/InterestPicker";
+import { CITIES } from "@/lib/constants";
+import EditPanel from "@/components/dash/EditPanel";
+import InterestChipPicker from "@/components/dash/InterestChipPicker";
+import ThemeSwitch from "@/components/dash/ThemeSwitch";
 import ConfirmButton from "@/components/ConfirmButton";
 import OceanChart from "@/components/OceanChart";
+import { updatePricePointAction } from "@/app/dashboard/actions";
 import { deleteAccountAction, updateInterestsAction, updateProfileAction } from "./actions";
+import "../design-system.css";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +28,11 @@ export default async function ProfilePage({
 
   const [user] = await db().select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) {
-    return <div className="container"><div className="alert alert-danger text-center mt-5">User not found.</div></div>;
+    return (
+      <div className="sm-scope container mt-3">
+        <div className="sm-flash error">User not found.</div>
+      </div>
+    );
   }
 
   const [scores] = await db().select().from(personalityScores).where(eq(personalityScores.userId, userId)).limit(1);
@@ -48,238 +54,197 @@ export default async function ProfilePage({
   const profileComplete = requiredFields.every((f) => f !== null && f !== undefined && f !== "");
 
   const greeting = `${getGreeting()}${firstNameFrom(user.name)}.`;
-  const maxInterestsShown = 7;
-  const moreCount = selectedInterestNames.length - maxInterestsShown;
+  const initials = (user.name ?? "?")
+    .split(/\s+/)
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
-    <div className="container py-5">
-      <div className="text-center mb-4">
-        <h2 className="display-6 mb-3 mt-3">{greeting}</h2>
-        <p className="text-muted">Here&rsquo;s what we&rsquo;ve got on file for you.</p>
+    <div className="sm-scope container mt-3">
+      <div className="sm-page-head">
+        <div className="sm-greeting">{greeting}</div>
+        <div className="sm-sub">Here&rsquo;s what we&rsquo;ve got on file for you.</div>
       </div>
 
-      <Flash success={success} error={error} />
+      {success && <div className="sm-flash success">{success}</div>}
+      {error && <div className="sm-flash error">{error}</div>}
 
-      <div className="row justify-content-center">
-        <div className="col-md-4 text-center mb-4">
-          <div className="card shadow-sm p-3">
-            {user.profileImage && (
-              <Image
-                src={user.profileImage}
-                width={120}
-                height={120}
-                className="rounded-circle mb-3 d-block mx-auto profile-image"
-                alt="Profile"
-              />
+      <div className="sm-stack">
+        {/* IDENTITY CARD */}
+        <section className="sm-card">
+          <span className={`sm-status-pill ${profileComplete ? "matched" : "unset"}`}>
+            <span className="sm-dot" />
+            {profileComplete ? "Profile complete" : "Profile incomplete"}
+          </span>
+
+          <div className="sm-identity">
+            {user.profileImage ? (
+              <Image src={user.profileImage} width={72} height={72} className="sm-avatar" alt="Profile" />
+            ) : (
+              <div className="sm-avatar-fallback">{initials || "?"}</div>
             )}
-            <h5 className="fw-semibold fs-3">{user.name}</h5>
-            <div className="row">
-              <div className="col-6">
-                <Link className="btn btn-secondary mt-3 w-100" href="/messages">
-                  <i className="bi bi-chat" /> Chats
-                </Link>
-              </div>
-              <div className="col-6">
-                <button className="btn btn-secondary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
-                  <i className="bi bi-pencil-square" /> Edit Profile
-                </button>
-              </div>
+            <div>
+              <div className="sm-identity-name">{user.name}</div>
+              <Link className="sm-btn-link" href="/messages">Open chats →</Link>
             </div>
           </div>
-        </div>
 
-        <div className="col-md-8">
-          <div className="card shadow-sm p-4">
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Phone:</strong> {user.phone}</p>
-            <p><strong>Age:</strong> {user.age}</p>
-            <p><strong>City:</strong> {user.city}</p>
-            <p><strong>Price Point:</strong> {user.priceLevel}</p>
+          <div className="sm-fact-row" style={{ marginTop: 18 }}>
+            <div className="sm-fact"><dt>Email</dt><dd>{user.email}</dd></div>
+            <div className="sm-fact"><dt>Phone</dt><dd>{user.phone || "—"}</dd></div>
+            <div className="sm-fact"><dt>Age</dt><dd>{user.age ?? "—"}</dd></div>
+            <div className="sm-fact"><dt>City</dt><dd>{user.city || "—"}</dd></div>
+          </div>
 
-            {!profileComplete && (
-              <div className="d-flex justify-content-center">
-                <button className="btn btn-secondary mt-3 w-auto" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
-                  Complete Your Profile
-                </button>
+          <div className="sm-actions">
+            <EditPanel
+              triggerLabel={profileComplete ? "Edit details" : "Complete your profile"}
+              action={updateProfileAction}
+              encType="multipart/form-data"
+            >
+              <ProfileFields user={user} />
+            </EditPanel>
+          </div>
+        </section>
+
+        {/* QUICK FACTS */}
+        <div className="sm-quick-row">
+          <section className="sm-card sm-quick-card">
+            <h3>Price point</h3>
+            <form action={updatePricePointAction}>
+              <input type="hidden" name="redirect_to" value="/profile" />
+              <div className="sm-price-chip-group" role="group" aria-label="Price point">
+                {(["£", "££", "£££"] as const).map((level) => (
+                  <button
+                    key={level}
+                    type="submit"
+                    name="price_point"
+                    value={level}
+                    aria-pressed={user.priceLevel === level}
+                  >
+                    {level}
+                  </button>
+                ))}
               </div>
+            </form>
+            <p className="sm-price-note">Tap to change — saves instantly, no confirm step.</p>
+          </section>
+
+          <section className="sm-card sm-quick-card">
+            <h3>Interests</h3>
+            {selectedInterestNames.length > 0 ? (
+              <div className="sm-tag-row">
+                {selectedInterestNames.map((name) => (
+                  <span key={name} className="sm-tag">{name}</span>
+                ))}
+              </div>
+            ) : (
+              <p className="sm-price-note" style={{ marginTop: 0 }}>You haven&rsquo;t picked any interests yet.</p>
             )}
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-md-6 mt-3">
-          <div className="card">
-            <div className="card-body fw-lighter fs-6">
-              <h5 className="card-title">My Interests</h5>
-              {selectedInterestNames.length > 0 ? (
-                <ul className="list-unstyled mb-0 small">
-                  {selectedInterestNames.slice(0, maxInterestsShown).map((name) => (
-                    <li key={name}>&bull; {name}</li>
-                  ))}
-                  {moreCount > 0 && <li className="text-muted">+ {moreCount} more</li>}
-                </ul>
-              ) : (
-                <p className="text-muted">You haven&rsquo;t selected any interests yet.</p>
-              )}
-              <button className="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#updateInterestsModal">
-                Edit Preferences
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-6 mt-3">
-          <div className="card">
-            <div className="card-body fw-lighter fs-6">
-              <h5 className="card-title">Your Match</h5>
-              {myMatch ? (
-                <p><strong>Matched Table:</strong> Event on {myMatch.eventDate} at {myMatch.slot}.</p>
-              ) : (
-                <p>No matches yet.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="card personality-card mt-3 mb-4">
-        <div className="card-body">
-          <div className="row mb-2">
-            <div className="col"><h5 className="card-title">OCEAN Personality Test</h5></div>
-            <div className="col-auto">
-              <button className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#personalSummaryModal">
-                <i className="bi bi-info-circle" />
-              </button>
-            </div>
-          </div>
-          {scores ? (
-            <OceanChart scores={scores} />
-          ) : (
-            <>
-              <p>Personality scores not available. Please take the test.</p>
-              <Link className="btn btn-secondary mt-3" href="/ocean-test">Take the test!</Link>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Update profile modal */}
-      <div className="modal fade" id="updateProfileModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content fw-lighter">
-            <div className="modal-header">
-              <h5 className="modal-title">Update Your Profile</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-            </div>
-            <div className="modal-body">
-              <form action={updateProfileAction} encType="multipart/form-data">
-                <div className="mb-3">
-                  <label htmlFor="name">Name</label>
-                  <input type="text" name="name" className="form-control" defaultValue={user.name} required />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="email">Email</label>
-                  <input type="email" className="form-control" defaultValue={user.email} disabled />
-                  <div className="form-text">Your login email — contact us to change it.</div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="phone">Phone</label>
-                  <input type="text" className="form-control" name="phone" defaultValue={user.phone ?? ""} required />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="age">Age</label>
-                  <input type="number" className="form-control" name="age" defaultValue={user.age ?? ""} required />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="city">City</label>
-                  <select className="form-select" name="city" defaultValue={user.city ?? ""} required>
-                    <option value="" disabled>Select City</option>
-                    {CITIES.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="price_point">Preferred Price Point</label>
-                  <select className="form-select" name="price_point" defaultValue={user.priceLevel ?? ""} required>
-                    {PRICE_LEVELS.map((level) => (
-                      <option key={level} value={level}>{level}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="profile_image">Profile Image</label>
-                  <input type="file" name="profile_image" className="form-control" accept="image/*" />
-                  {user.profileImage && (
-                    <Image
-                      src={user.profileImage}
-                      alt="Current profile"
-                      width={100}
-                      height={100}
-                      className="img-thumbnail mt-2"
-                    />
-                  )}
-                </div>
-                <button type="submit" className="btn btn-secondary mt-3">Save Changes</button>
-              </form>
-
-              <ThemeToggle currentTheme={user.theme} />
-
-              <hr />
-
-              <form action={deleteAccountAction}>
-                <ConfirmButton
-                  message="Are you sure you want to delete your account? This cannot be undone."
-                  className="btn btn-outline-danger"
-                >
-                  Delete Account
-                </ConfirmButton>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Personality summary modal */}
-      <div className="modal fade" id="personalSummaryModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog" role="document">
-          <div className="modal-content fw-lighter">
-            <div className="modal-header">
-              <h5 className="modal-title">Your Personality Summary</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-            </div>
-            <div className="modal-body">
-              <p><strong>Openness:</strong><br /><em>High:</em> Curious, imaginative, open to new experiences, enjoys art and ideas.<br /><em>Low:</em> Practical, prefers routine, conservative in views, uncomfortable with change.</p>
-              <p><strong>Conscientiousness:</strong><br /><em>High:</em> Organized, responsible, reliable, goal-oriented, plans ahead.<br /><em>Low:</em> Spontaneous, careless with details, disorganized, struggles with follow-through.</p>
-              <p><strong>Extraversion:</strong><br /><em>High:</em> Outgoing, energetic, talkative, enjoys social settings, assertive.<br /><em>Low:</em> Reserved, reflective, prefers solitude, quiet, finds socializing draining.</p>
-              <p><strong>Agreeableness:</strong><br /><em>High:</em> Compassionate, cooperative, trusting, empathetic, values getting along.<br /><em>Low:</em> Competitive, skeptical, blunt, more focused on self-interest.</p>
-              <p><strong>Neuroticism:</strong><br /><em>High:</em> Emotionally reactive, anxious, prone to stress, mood swings.<br /><em>Low:</em> Calm, emotionally stable, resilient, handles stress well.</p>
-              <p className="text-muted">Use the chart to interpret your scores: <br />0 = Low, 5 = High.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Interests modal */}
-      <div className="modal fade" id="updateInterestsModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content fw-lighter">
-            <div className="modal-header">
-              <h5 className="modal-title">Update Your Interests</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-            </div>
-            <div className="modal-body">
-              <form action={updateInterestsAction}>
-                <InterestPicker
+            <div className="sm-actions" style={{ marginTop: 12 }}>
+              <EditPanel triggerLabel="Edit interests" triggerClassName="sm-btn-link" action={updateInterestsAction}>
+                <InterestChipPicker
                   interests={allInterests}
                   defaultSelected={selectedInterestNames}
                   fieldName="selected_interests"
                 />
-                <button type="submit" className="btn btn-primary mt-3">Save Changes</button>
-              </form>
+              </EditPanel>
             </div>
-          </div>
+          </section>
         </div>
+
+        {/* MATCH */}
+        <section className="sm-card">
+          <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Your table</h3>
+          {myMatch ? (
+            <div className="sm-fact-row" style={{ marginBottom: 0 }}>
+              <div className="sm-fact"><dt>Date</dt><dd>{myMatch.eventDate}</dd></div>
+              <div className="sm-fact"><dt>Time</dt><dd>{myMatch.slot}</dd></div>
+              <div className="sm-fact"><dt>Price point</dt><dd>{myMatch.priceLevel}</dd></div>
+            </div>
+          ) : (
+            <p className="sm-price-note" style={{ marginTop: 0 }}>
+              No matches yet — set your availability on the <Link className="sm-btn-link" href="/dashboard">dashboard</Link>.
+            </p>
+          )}
+        </section>
+
+        {/* PERSONALITY */}
+        <section className="sm-card">
+          <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Personality profile</h3>
+          {scores ? (
+            <>
+              <OceanChart scores={scores} />
+              <details className="sm-details" style={{ marginTop: 14 }}>
+                <summary>What do these traits mean?</summary>
+                <div className="sm-details-body">
+                  <p><strong>Openness</strong> — High: curious, imaginative, open to new experiences. Low: practical, prefers routine.</p>
+                  <p><strong>Conscientiousness</strong> — High: organized, reliable, plans ahead. Low: spontaneous, disorganized.</p>
+                  <p><strong>Extraversion</strong> — High: outgoing, energetic, enjoys social settings. Low: reserved, prefers solitude.</p>
+                  <p><strong>Agreeableness</strong> — High: compassionate, cooperative, trusting. Low: competitive, skeptical.</p>
+                  <p><strong>Neuroticism</strong> — High: emotionally reactive, prone to stress. Low: calm, resilient.</p>
+                  <p>0 = Low, 5 = High.</p>
+                </div>
+              </details>
+            </>
+          ) : (
+            <>
+              <p className="sm-price-note" style={{ marginTop: 0 }}>Personality scores not available yet.</p>
+              <Link className="sm-btn sm-btn-primary" href="/ocean-test">Take the 2-minute quiz</Link>
+            </>
+          )}
+        </section>
+
+        <ThemeSwitch currentTheme={user.theme ?? "light"} />
+
+        {/* DANGER ZONE */}
+        <section className="sm-card">
+          <h3 style={{ fontSize: "0.95rem", marginBottom: 10 }}>Delete account</h3>
+          <p className="sm-price-note" style={{ marginTop: 0 }}>This permanently removes your profile, matches and chat history.</p>
+          <form action={deleteAccountAction}>
+            <ConfirmButton
+              message="Are you sure you want to delete your account? This cannot be undone."
+              className="sm-btn-danger"
+            >
+              Delete account
+            </ConfirmButton>
+          </form>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function ProfileFields({ user }: { user: typeof users.$inferSelect }) {
+  return (
+    <div className="sm-field-row">
+      <div className="sm-field">
+        <label htmlFor="name">Name</label>
+        <input type="text" id="name" name="name" className="sm-input" defaultValue={user.name} required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="phone">Phone</label>
+        <input type="text" id="phone" name="phone" className="sm-input" defaultValue={user.phone ?? ""} required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="age">Age</label>
+        <input type="number" id="age" name="age" className="sm-input" defaultValue={user.age ?? ""} required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="city">City</label>
+        <select id="city" name="city" className="sm-input" defaultValue={user.city ?? ""} required>
+          <option value="" disabled>Select city</option>
+          {CITIES.map((city) => (
+            <option key={city} value={city}>{city}</option>
+          ))}
+        </select>
+      </div>
+      <div className="sm-field">
+        <label htmlFor="profile_image">Photo</label>
+        <input type="file" id="profile_image" name="profile_image" className="sm-input" accept="image/*" />
       </div>
     </div>
   );

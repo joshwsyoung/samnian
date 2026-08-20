@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { and, asc, desc, eq, ne, notInArray, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { chatMessages, conversationUsers, conversations, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
+import EditPanel from "@/components/dash/EditPanel";
 import ConfirmButton from "@/components/ConfirmButton";
 import {
   createConversationAction,
@@ -11,8 +13,15 @@ import {
   removeUserAction,
   sendMessageAction,
 } from "./actions";
+import "../design-system.css";
 
 export const dynamic = "force-dynamic";
+
+const ERROR_COPY: Record<string, string> = {
+  not_in_conversation: "You're not part of that conversation.",
+  cant_remove_creator: "You can't remove the conversation's creator.",
+  missing_title: "Please give the conversation a title.",
+};
 
 export default async function MessagesPage({
   searchParams,
@@ -21,7 +30,7 @@ export default async function MessagesPage({
 }) {
   const session = await requireUser();
   const userId = session.id;
-  const { conversation_id, error } = await searchParams;
+  const { conversation_id, error, deleted } = await searchParams;
   const conversationId = conversation_id ? Number(conversation_id) : null;
 
   const myConversations = await db()
@@ -105,170 +114,135 @@ export default async function MessagesPage({
     }
   }
 
+  const hasSelection = Boolean(conversationId);
+  const noAccess = Boolean(conversationId) && !isMember;
+
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <button className="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#chatList">Chats</button>
-        {activeConversation && (
-          <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#conversationInfoModal">
-            <i className="bi bi-info-circle" />
-          </button>
-        )}
+    <div className="sm-scope container mt-3">
+      <div className="sm-page-head">
+        <div className="sm-greeting">Messages</div>
+        <div className="sm-sub">Chat with your matched tables.</div>
       </div>
 
-      {error === "not_in_conversation" && <div className="alert alert-danger">You&rsquo;re not part of that conversation.</div>}
-      {error === "cant_remove_creator" && <div className="alert alert-danger">You can&rsquo;t remove the conversation&rsquo;s creator.</div>}
-      {error === "missing_title" && <div className="alert alert-danger">Please give the conversation a title.</div>}
+      {deleted && <div className="sm-flash success">Chat deleted.</div>}
+      {error && ERROR_COPY[error] && <div className="sm-flash error">{ERROR_COPY[error]}</div>}
 
-      <div className="row">
-        <div className="offcanvas offcanvas-start" tabIndex={-1} id="chatList">
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title">Conversations</h5>
-            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" />
-          </div>
-          <div className="offcanvas-body">
+      <div className="sm-chat-shell">
+        <aside className="sm-conv-list" data-selected={hasSelection}>
+          <div className="sm-card">
+            <div className="sm-conv-list-head">
+              <h3>Chats</h3>
+              <EditPanel triggerLabel="New chat" triggerClassName="sm-btn-xs" action={createConversationAction}>
+                <NewConversationFields candidates={allUsers.filter((u) => u.id !== userId)} />
+              </EditPanel>
+            </div>
+
             {conversationPreviews.length === 0 ? (
-              <div className="alert alert-info">No conversations yet.</div>
+              <p className="sm-price-note" style={{ marginTop: 0 }}>No conversations yet — start one above.</p>
             ) : (
-              <div className="list-group">
+              <div className="sm-conv-items">
                 {conversationPreviews.map((c) => (
-                  <div key={c.id} className={`list-group-item ${conversationId === c.id ? "active" : ""}`}>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <a href={`/messages?conversation_id=${c.id}`} className="fw-bold text-decoration-none text-reset flex-grow-1">
-                        {c.title}
-                        {c.status === "pending" && <span className="badge bg-warning text-dark ms-2">Pending</span>}
-                      </a>
-                      <small className="text-muted">
-                        {c.lastMessage ? new Date(c.lastMessage.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
-                      </small>
-                    </div>
-                    <div className="text-truncate mb-2">{c.lastMessage?.message ?? ""}</div>
+                  <div key={c.id}>
+                    <Link
+                      href={`/messages?conversation_id=${c.id}`}
+                      className={`sm-conv-item ${conversationId === c.id ? "active" : ""}`}
+                    >
+                      <div className="sm-conv-item-top">
+                        <span className="sm-conv-item-title">{c.title}</span>
+                        <span className="sm-conv-item-time">
+                          {c.lastMessage ? new Date(c.lastMessage.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
+                        </span>
+                      </div>
+                      <div className="sm-conv-item-preview">
+                        {c.lastMessage?.message ?? (c.status === "pending" ? "Invitation pending" : "No messages yet")}
+                      </div>
+                    </Link>
                     {c.status === "pending" && (
-                      <form action={inviteDecisionAction} className="d-flex gap-2">
+                      <form action={inviteDecisionAction} className="sm-conv-item-invite">
                         <input type="hidden" name="conversation_id" value={c.id} />
-                        <button type="submit" name="decision" value="accepted" className="btn btn-sm btn-success">Accept</button>
-                        <button type="submit" name="decision" value="declined" className="btn btn-sm btn-danger">Decline</button>
+                        <button type="submit" name="decision" value="accepted" className="sm-btn-xs sm-accept">Accept</button>
+                        <button type="submit" name="decision" value="declined" className="sm-btn-xs sm-decline">Decline</button>
                       </form>
                     )}
                   </div>
                 ))}
               </div>
             )}
-            <button className="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#createConversationModal">
-              Create New Conversation
-            </button>
           </div>
-        </div>
+        </aside>
 
-        <div className="modal fade" id="createConversationModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Create a New Conversation</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-              </div>
-              <div className="modal-body">
-                <form action={createConversationAction}>
-                  <div className="mb-3">
-                    <label htmlFor="conversationTitle" className="form-label">Conversation Title</label>
-                    <input type="text" className="form-control" id="conversationTitle" name="title" required />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="users" className="form-label">Add Users</label>
-                    <select className="form-select" id="users" name="users" required>
-                      {allUsers.filter((u) => u.id !== userId).map((u) => (
-                        <option key={u.id} value={u.id}>{u.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="modal-footer">
-                    <button type="submit" className="btn btn-primary">Create Conversation</button>
-                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  </div>
-                </form>
-              </div>
+        <section className="sm-thread" data-selected={hasSelection}>
+          <Link href="/messages" className="sm-btn-link sm-back-link">← Chats</Link>
+
+          {noAccess && (
+            <div className="sm-card">
+              <p style={{ marginBottom: 0 }}>You don&rsquo;t have access to this chat.</p>
             </div>
-          </div>
-        </div>
+          )}
 
-        <div className="col-md-8">
-          {conversationId && !isMember && (
-            <div className="alert alert-info">
-              You don&rsquo;t have access to this chat. Start a new one{" "}
-              <a data-bs-toggle="modal" data-bs-target="#createConversationModal">here.</a>
+          {!activeConversation && !noAccess && (
+            <div className="sm-card">
+              <p className="sm-price-note" style={{ marginTop: 0, marginBottom: 0 }}>
+                Select a conversation, or start a new one.
+              </p>
             </div>
           )}
 
           {activeConversation && (
-            <>
-              <div className="modal fade" id="conversationInfoModal" tabIndex={-1} aria-hidden="true">
-                <div className="modal-dialog">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title">Participants</h5>
-                      <button type="button" className="btn-close" data-bs-dismiss="modal" />
-                    </div>
-                    <div className="modal-body">
-                      {participants.map((p) => (
-                        <div key={p.id} className="d-flex justify-content-between align-items-center mb-2">
-                          <span className={`badge bg-${p.status === "accepted" ? "success" : "warning text-dark"}`}>
-                            {p.name} ({p.status})
-                          </span>
-                          {p.id !== activeConversation!.userId && (
-                            <form method="POST" action={removeUserAction} className="ms-2">
-                              <input type="hidden" name="conversation_id" value={activeConversation!.id} />
-                              <input type="hidden" name="user_id" value={p.id} />
-                              <button type="submit" className="btn btn-sm btn-outline-danger">
-                                {p.id === userId ? "Leave" : "Remove"}
-                              </button>
-                            </form>
-                          )}
-                        </div>
-                      ))}
-                      {activeConversation!.userId === userId && (
-                        <button type="button" className="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
-                          Delete Chat
-                        </button>
+            <div className="sm-card">
+              <div className="sm-thread-head">
+                <h3>{activeConversation.title}</h3>
+              </div>
+
+              <details className="sm-details" style={{ marginBottom: 14 }}>
+                <summary>Participants</summary>
+                <div className="sm-details-body">
+                  {participants.map((p) => (
+                    <div key={p.id} className="sm-participant-row">
+                      <span>{p.name}{p.status !== "accepted" ? ` · ${p.status}` : ""}</span>
+                      {p.id !== activeConversation.userId && (
+                        <form action={removeUserAction}>
+                          <input type="hidden" name="conversation_id" value={activeConversation.id} />
+                          <input type="hidden" name="user_id" value={p.id} />
+                          <button type="submit" className="sm-btn-xs sm-danger">
+                            {p.id === userId ? "Leave" : "Remove"}
+                          </button>
+                        </form>
                       )}
                     </div>
-                  </div>
-                </div>
-              </div>
+                  ))}
 
-              <div className="modal fade" id="deleteConfirmationModal" tabIndex={-1} aria-hidden="true">
-                <div className="modal-dialog">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title">Confirm Deletion</h5>
-                      <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-                    </div>
-                    <div className="modal-body">Are you sure you want to delete this chat? This action cannot be undone.</div>
-                    <div className="modal-footer">
-                      <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                      <form method="POST" action={deleteConversationAction} className="d-inline">
-                        <input type="hidden" name="conversation_id" value={activeConversation!.id} />
-                        <ConfirmButton message="Are you sure you want to delete this chat? This action cannot be undone." className="btn btn-danger">
-                          Delete Chat
-                        </ConfirmButton>
-                      </form>
-                    </div>
+                  <div className="sm-actions" style={{ marginTop: 10 }}>
+                    <EditPanel triggerLabel="Invite someone" triggerClassName="sm-btn-link" action={inviteUserAction}>
+                      <input type="hidden" name="conversation_id" value={activeConversation.id} />
+                      <InviteFields candidates={inviteCandidates} />
+                    </EditPanel>
                   </div>
-                </div>
-              </div>
 
-              <div id="chat-box" className="border p-3 bg-light mb-3" style={{ height: 400, overflowY: "auto" }}>
+                  {activeConversation.userId === userId && (
+                    <form action={deleteConversationAction} style={{ marginTop: 10 }}>
+                      <input type="hidden" name="conversation_id" value={activeConversation.id} />
+                      <ConfirmButton
+                        message="Are you sure you want to delete this chat? This action cannot be undone."
+                        className="sm-btn-danger"
+                      >
+                        Delete chat
+                      </ConfirmButton>
+                    </form>
+                  )}
+                </div>
+              </details>
+
+              <div className="sm-msg-list">
                 {messages.length === 0 ? (
-                  <p className="text-muted">No messages yet. Start the conversation.</p>
+                  <p className="sm-price-note" style={{ marginTop: 0 }}>No messages yet. Start the conversation.</p>
                 ) : (
                   messages.map((m, i) => (
-                    <div key={i} className={`d-flex ${m.senderId === userId ? "justify-content-end" : "justify-content-start"}`}>
-                      <div
-                        className={`mb-2 px-3 py-2 rounded ${m.senderId === userId ? "bg-primary text-white" : "bg-white border"}`}
-                        style={{ maxWidth: "75%" }}
-                      >
-                        <div className="small fw-bold">{m.senderName}</div>
-                        <div style={{ whiteSpace: "pre-wrap" }}>{m.message}</div>
-                        <div className="small text-muted text-end">
+                    <div key={i} className={`sm-msg-row ${m.senderId === userId ? "mine" : ""}`}>
+                      <div className={`sm-bubble ${m.senderId === userId ? "mine" : "theirs"}`}>
+                        <div className="sm-msg-name">{m.senderName}</div>
+                        <div className="sm-msg-text">{m.message}</div>
+                        <div className="sm-msg-time">
                           {new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
@@ -277,45 +251,50 @@ export default async function MessagesPage({
                 )}
               </div>
 
-              <form action={sendMessageAction} className="mb-3">
+              <form action={sendMessageAction} className="sm-composer">
                 <input type="hidden" name="conversation_id" value={activeConversation.id} />
-                <div className="input-group">
-                  <input type="text" name="message" className="form-control" placeholder="Type a message..." required />
-                  <button className="btn btn-primary" type="submit">Send</button>
-                </div>
+                <input type="text" name="message" placeholder="Type a message…" required />
+                <button className="sm-btn sm-btn-primary" type="submit">Send</button>
               </form>
-
-              <button className="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#inviteModal">
-                + Invite User
-              </button>
-
-              <div className="modal fade" id="inviteModal" tabIndex={-1} aria-hidden="true">
-                <div className="modal-dialog">
-                  <form method="POST" action={inviteUserAction} className="modal-content">
-                    <input type="hidden" name="conversation_id" value={activeConversation.id} />
-                    <div className="modal-header">
-                      <h5 className="modal-title">Invite User</h5>
-                      <button type="button" className="btn-close" data-bs-dismiss="modal" />
-                    </div>
-                    <div className="modal-body">
-                      <label htmlFor="invite_user_id">Select User:</label>
-                      <select name="invite_user_id" className="form-select" required>
-                        {inviteCandidates.map((u) => (
-                          <option key={u.id} value={u.id}>{u.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="modal-footer">
-                      <button type="submit" className="btn btn-primary">Send Invite</button>
-                      <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </>
+            </div>
           )}
-        </div>
+        </section>
       </div>
+    </div>
+  );
+}
+
+function NewConversationFields({ candidates }: { candidates: { id: string; name: string | null }[] }) {
+  return (
+    <div className="sm-field-row">
+      <div className="sm-field">
+        <label htmlFor="conversationTitle">Conversation title</label>
+        <input type="text" id="conversationTitle" name="title" className="sm-input" required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="conversationUser">Add user</label>
+        <select id="conversationUser" name="users" className="sm-input" required>
+          {candidates.map((u) => (
+            <option key={u.id} value={u.id}>{u.name}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
+function InviteFields({ candidates }: { candidates: { id: string; name: string | null }[] }) {
+  if (candidates.length === 0) {
+    return <p className="sm-price-note" style={{ marginTop: 0 }}>Everyone&rsquo;s already in this chat.</p>;
+  }
+  return (
+    <div className="sm-field">
+      <label htmlFor="invite_user_id">Select user</label>
+      <select id="invite_user_id" name="invite_user_id" className="sm-input" required>
+        {candidates.map((u) => (
+          <option key={u.id} value={u.id}>{u.name}</option>
+        ))}
+      </select>
     </div>
   );
 }

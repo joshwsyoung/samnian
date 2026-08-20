@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { resendVerificationAction } from "./actions";
+import "../design-system.css";
 
 export default async function VerifyEmailPage({
   searchParams,
@@ -11,24 +12,27 @@ export default async function VerifyEmailPage({
   if (!email) redirect("/register");
 
   return (
-    <div className="container mt-5 mb-4">
-      <h2 className="display-6 mb-3">Check your email</h2>
+    <div className="sm-scope sm-auth-shell">
+      <div className="sm-page-head">
+        <div className="sm-greeting">Check your email</div>
+      </div>
 
       {success === "resent" && (
-        <div className="alert alert-success">
+        <div className="sm-flash success">
           Verification email resent to <strong>{email}</strong>.
         </div>
       )}
 
-      <p>
-        We&rsquo;ve sent a confirmation link to <strong>{email}</strong>. Click it to verify your
-        account and finish signing in.
-      </p>
-
-      <form action={resendVerificationAction} className="mt-3">
-        <input type="hidden" name="email" value={email} />
-        <button type="submit" className="btn btn-link ps-0">Resend the email</button>
-      </form>
+      <div className="sm-card" style={{ textAlign: "center" }}>
+        <p style={{ color: "var(--sm-text-muted)", marginBottom: 16 }}>
+          We&rsquo;ve sent a confirmation link to <strong style={{ color: "var(--sm-text)" }}>{email}</strong>.
+          Click it to verify your account and finish signing in.
+        </p>
+        <form action={resendVerificationAction}>
+          <input type="hidden" name="email" value={email} />
+          <button type="submit" className="sm-btn-link">Resend the email</button>
+        </form>
+      </div>
     </div>
   );
 }
