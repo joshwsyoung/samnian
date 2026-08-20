@@ -139,7 +139,14 @@ try to create `auth.users` — Supabase already owns that table.
    anything else, but Supabase itself still needs to be told which
    redirect targets it's allowed to send people to.
 4. **Vercel project**: import this repo, add the env vars from
-   `.env.example` in Project Settings → Environment Variables.
+   `.env.example` in Project Settings → Environment Variables. Note that
+   the `NEXT_PUBLIC_*` ones are inlined into the build at build time, not
+   read live — if you edit `NEXT_PUBLIC_SUPABASE_URL` or
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` after the fact, an already-built
+   deployment keeps running on the old values until you trigger a fresh
+   build (Deployments → ⋯ → Redeploy without reusing the build cache, or
+   push a new commit). `DATABASE_URL` isn't prefixed that way and *is*
+   read live, so it doesn't have this gotcha.
 5. **Blob storage**: Project → Storage → connect a Blob store — Vercel
    injects `BLOB_READ_WRITE_TOKEN` automatically, no manual copy-paste
    needed.
