@@ -45,8 +45,8 @@ export default async function UpdatePasswordPage({
       {error && error !== "nomatch" && error !== "missing" && <div className="alert alert-danger">{error}</div>}
 
       <form action={updatePasswordAction}>
-        <PasswordInput name="password" label="New Password" />
-        <PasswordInput name="confirm_password" label="Confirm New Password" enforcePattern={false} />
+        <PasswordInput name="password" label="New Password" autoComplete="new-password" />
+        <PasswordInput name="confirm_password" label="Confirm New Password" enforcePattern={false} autoComplete="new-password" />
         <button type="submit" className="btn">Reset Password</button>
       </form>
     </div>

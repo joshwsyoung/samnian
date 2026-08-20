@@ -38,7 +38,7 @@ export default async function RegisterPage({
           <input type="email" className="form-control" id="email" name="email" required />
         </div>
 
-        <PasswordInput name="password" label="Password" />
+        <PasswordInput name="password" label="Password" autoComplete="new-password" />
 
         <button type="submit" className="btn">Register</button>
       </form>

@@ -28,7 +28,7 @@ export default async function LoginPage({
           <input type="email" name="email" className="form-control" required />
         </div>
 
-        <PasswordInput name="password" label="Password" />
+        <PasswordInput name="password" label="Password" enforcePattern={false} autoComplete="current-password" />
 
         <button type="submit" className="btn">Log In</button>
       </form>

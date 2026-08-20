@@ -7,11 +7,14 @@ export default function PasswordInput({
   name,
   label,
   enforcePattern = true,
+  autoComplete,
 }: {
   name: string;
   label: string;
   /** Turn off for "confirm password" fields that just need to match, not re-validate strength. */
   enforcePattern?: boolean;
+  /** e.g. "current-password" for login, "new-password" for register/reset. */
+  autoComplete?: string;
 }) {
   const id = useId();
   const [visible, setVisible] = useState(false);
@@ -27,6 +30,7 @@ export default function PasswordInput({
           className="form-control"
           pattern={enforcePattern ? PASSWORD_PATTERN : undefined}
           title={enforcePattern ? PASSWORD_HINT : undefined}
+          autoComplete={autoComplete}
           required
         />
         <button
