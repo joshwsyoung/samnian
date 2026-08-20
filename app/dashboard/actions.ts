@@ -34,13 +34,16 @@ export async function updateAvailabilityAction(formData: FormData) {
 export async function updatePricePointAction(formData: FormData) {
   const session = await requireUser();
   const priceLevel = String(formData.get("price_point") ?? "") as PriceLevel;
+  // Shared between the dashboard and profile quick-set cards — a hidden
+  // "redirect_to" field lets each page send the user back to itself.
+  const returnTo = String(formData.get("redirect_to") ?? "/dashboard");
 
   if (!PRICE_LEVELS.includes(priceLevel)) {
-    redirect("/dashboard?error=" + encodeURIComponent("Price point is required."));
+    redirect(returnTo + "?error=" + encodeURIComponent("Price point is required."));
   }
 
   await db().update(users).set({ priceLevel }).where(eq(users.id, session.id));
-  redirect("/dashboard?success=" + encodeURIComponent("Price point updated successfully!"));
+  redirect(returnTo + "?success=" + encodeURIComponent("Price point updated successfully!"));
 }
 
 export async function updatePreferencesAction(formData: FormData) {

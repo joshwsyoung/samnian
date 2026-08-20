@@ -9,7 +9,7 @@ import EditPanel from "@/components/dash/EditPanel";
 import OceanSparkline from "@/components/dash/OceanSparkline";
 import ThemeSwitch from "@/components/dash/ThemeSwitch";
 import { updateAvailabilityAction, updatePreferencesAction, updatePricePointAction } from "./actions";
-import "./dashboard.css";
+import "../design-system.css";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +48,7 @@ export default async function DashboardPage({
   const status: "matched" | "pending" | "unset" = myMatch ? "matched" : userAvailability ? "pending" : "unset";
 
   return (
-    <div className="sm-dash container mt-3">
+    <div className="sm-scope container mt-3">
       <div className="sm-page-head">
         <div className="sm-greeting">{greeting}</div>
         <div className="sm-sub">

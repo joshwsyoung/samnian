@@ -1,14 +1,14 @@
 /*
- * New design language, starting here on the dashboard. Scoped under
- * .sm-dash so it can roll out to other pages incrementally without
- * touching the existing Bootstrap-based look everywhere else yet.
+ * New design language — started on the dashboard, now shared across any
+ * page that wraps its content in .sm-scope, so it rolls out incrementally
+ * without touching the existing Bootstrap-based look everywhere else yet.
  *
  * Tokens are lifted from the same accent as the rest of the app
  * (--bs-primary, #a2e436) so this reads as an evolution, not a
  * different product — the surfaces, radii and type scale are new.
  */
 
-.sm-dash {
+.sm-scope {
   --sm-accent: #a2e436;
   --sm-accent-ink: #415b16;
   --sm-accent-strong: #7ab52a;
@@ -33,7 +33,7 @@
   color: var(--sm-text);
 }
 
-[data-bs-theme="dark"] .sm-dash {
+[data-bs-theme="dark"] .sm-scope {
   --sm-accent: #c7ef86;
   --sm-accent-ink: #1c2a0d;
   --sm-accent-strong: #a2e436;
@@ -53,8 +53,8 @@
   --sm-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-.sm-dash * { box-sizing: border-box; }
-.sm-dash h1, .sm-dash h2, .sm-dash h3, .sm-dash h4 { font-weight: 600; text-wrap: balance; margin: 0; }
+.sm-scope * { box-sizing: border-box; }
+.sm-scope h1, .sm-scope h2, .sm-scope h3, .sm-scope h4 { font-weight: 600; text-wrap: balance; margin: 0; }
 
 .sm-page-head { padding: 4px 4px 20px; }
 .sm-page-head .sm-greeting { font-size: 1.5rem; font-weight: 600; }
@@ -157,7 +157,8 @@
   text-transform: uppercase;
   color: var(--sm-text-muted);
 }
-.sm-field input[type="date"] {
+.sm-field input[type="date"],
+.sm-field .sm-input {
   font-family: inherit;
   font-size: 0.9rem;
   color: var(--sm-text);
@@ -166,6 +167,7 @@
   border-radius: var(--sm-radius-sm);
   padding: 9px 12px;
 }
+.sm-field input[type="file"].sm-input { padding: 7px 10px; }
 
 .sm-chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
 .sm-chip {
@@ -287,3 +289,101 @@
 }
 .sm-flash.success { background: var(--sm-success-bg); color: var(--sm-success); }
 .sm-flash.error { background: var(--sm-warning-bg); color: var(--sm-warning); }
+
+.sm-btn-danger {
+  appearance: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #b5453f;
+  background: transparent;
+  border: 1px solid rgba(181, 69, 63, 0.35);
+  border-radius: 999px;
+  padding: 9px 16px;
+}
+.sm-btn-danger:hover { background: rgba(181, 69, 63, 0.08); border-color: #b5453f; }
+.sm-btn-danger:focus-visible { outline: 2px solid #b5453f; outline-offset: 2px; }
+[data-bs-theme="dark"] .sm-scope .sm-btn-danger { color: #f2a6a1; border-color: rgba(242, 166, 161, 0.4); }
+[data-bs-theme="dark"] .sm-scope .sm-btn-danger:hover { background: rgba(242, 166, 161, 0.1); border-color: #f2a6a1; }
+
+/* Identity header: photo (or initials) + name + status */
+.sm-identity { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.sm-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  background: var(--sm-surface-2);
+  border: 1px solid var(--sm-border);
+}
+.sm-avatar-fallback {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sm-accent);
+  color: var(--sm-accent-ink);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.sm-identity-name { font-size: 1.2rem; font-weight: 600; }
+
+/* Read-only chips (selected interests, etc.) */
+.sm-tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.sm-tag {
+  font-size: 0.82rem;
+  color: var(--sm-text);
+  background: var(--sm-surface-2);
+  border: 1px solid var(--sm-border);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+/* Multi-select chip (checkbox), for interests editing */
+.sm-chip-check { position: relative; display: inline-block; }
+.sm-chip-check input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.sm-chip-check span {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--sm-text);
+  background: var(--sm-surface-2);
+  border: 1px solid var(--sm-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.sm-chip-check:has(input:checked) span {
+  background: var(--sm-accent);
+  color: var(--sm-accent-ink);
+  border-color: transparent;
+  font-weight: 600;
+}
+.sm-chip-check input:focus-visible + span { outline: 2px solid var(--sm-accent-strong); outline-offset: 2px; }
+
+/* Inline reference disclosure — for "what does this mean" style lookups,
+   used instead of a modal so the page stays consistent. */
+.sm-details { font-size: 0.85rem; }
+.sm-details summary {
+  cursor: pointer;
+  color: var(--sm-accent-strong);
+  font-weight: 500;
+  list-style: none;
+}
+.sm-details summary::-webkit-details-marker { display: none; }
+.sm-details summary::before { content: "+ "; }
+.sm-details[open] summary::before { content: "\2212 "; }
+.sm-details .sm-details-body {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--sm-border);
+  color: var(--sm-text-muted);
+  display: grid;
+  gap: 10px;
+}
+.sm-details .sm-details-body strong { color: var(--sm-text); font-weight: 600; }

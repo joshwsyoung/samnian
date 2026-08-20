@@ -31,7 +31,7 @@ export default function OceanChart({
                 scores.agreeableness,
                 scores.neuroticism,
               ],
-              backgroundColor: ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"],
+              backgroundColor: ["#eaf7cf", "#d3ee9c", "#bce568", "#a2e436", "#7ab52a"],
               borderRadius: 4,
               barThickness: 25,
               barPercentage: 0.6,
