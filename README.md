@@ -131,12 +131,19 @@ try to create `auth.users` — Supabase already owns that table.
 2. Run the migration in `drizzle/0000_adorable_grim_reaper.sql` against it
    (or `npm run db:migrate` with `DATABASE_URL` pointed at it), then
    `npm run db:seed`.
-3. **Vercel project**: import this repo, add the env vars from
+3. **Supabase Auth → URL Configuration**: add your deployment's URL(s) to
+   the Redirect URLs allowlist (e.g. `https://your-app.vercel.app/**`, plus
+   `http://localhost:3000/**` for local dev). Without this, the
+   confirmation and password-reset email links Supabase sends will fail —
+   this app never uses `NEXT_PUBLIC_BASE_URL`/the request's Host header for
+   anything else, but Supabase itself still needs to be told which
+   redirect targets it's allowed to send people to.
+4. **Vercel project**: import this repo, add the env vars from
    `.env.example` in Project Settings → Environment Variables.
-4. **Blob storage**: Project → Storage → connect a Blob store — Vercel
+5. **Blob storage**: Project → Storage → connect a Blob store — Vercel
    injects `BLOB_READ_WRITE_TOKEN` automatically, no manual copy-paste
    needed.
-5. Deploy. No build-time DB or Supabase access is required — every page
+6. Deploy. No build-time DB or Supabase access is required — every page
    that touches either also reads the session cookie, so Next.js treats it
    as dynamic (rendered per-request) rather than trying to prerender it.
 
