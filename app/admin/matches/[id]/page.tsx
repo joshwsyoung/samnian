@@ -6,6 +6,7 @@ import { availability, interests, matchUsers, matches, personalityScores, userIn
 import { requireAdmin } from "@/lib/auth";
 import { PRICE_LEVELS, SLOTS, type PriceLevel } from "@/lib/constants";
 import { updateMatchAction, updateMatchUsersAction } from "../actions";
+import "../../../design-system.css";
 
 export const dynamic = "force-dynamic";
 
@@ -82,73 +83,80 @@ export default async function EditMatchPage({
   );
 
   return (
-    <div className="container mt-4">
-      <h2>Edit Match</h2>
-      <form action={updateMatchAction}>
+    <div className="sm-scope container mt-3">
+      <div className="sm-page-head">
+        <div className="sm-greeting">Edit match</div>
+        <div className="sm-sub">{match.eventDate} · {match.slot}</div>
+      </div>
+
+      <form action={updateMatchAction} className="sm-card" style={{ marginBottom: 24 }}>
         <input type="hidden" name="id" value={match.id} />
 
-        <div className="form-group mb-3">
-          <label htmlFor="event_date">Event Date</label>
-          <input type="date" className="form-control" name="event_date" defaultValue={match.eventDate} required />
-        </div>
-
-        <div className="form-group mb-3">
-          <label htmlFor="slot">Time Slot</label>
-          <select className="form-control" name="slot" defaultValue={match.slot} required>
-            {SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        <div className="form-group mb-3">
-          <label htmlFor="price_point">Price Point</label>
-          <select className="form-control" name="price_point" defaultValue={match.priceLevel} required>
-            {PRICE_LEVELS.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </div>
-
-        <div className="form-check mb-3">
-          <input type="checkbox" className="form-check-input" name="approved" id="approved" defaultChecked={match.approved} />
-          <label className="form-check-label" htmlFor="approved">Approved</label>
-        </div>
-
-        <button type="submit" className="btn btn-primary">Save Changes</button>{" "}
-        <Link href="/admin/matches" className="btn btn-secondary ml-2">Cancel</Link>
-      </form>
-
-      <h3 className="mt-5">Manage Users in This Match</h3>
-
-      <form method="get" className="mb-4">
-        <div className="row g-2">
-          <div className="col-md-3">
-            <select className="form-select" name="city" defaultValue={filters.city ?? ""}>
-              <option value="">Any City</option>
-              {cityOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+        <div className="sm-field-row">
+          <div className="sm-field">
+            <label htmlFor="event_date">Event date</label>
+            <input type="date" id="event_date" className="sm-input" name="event_date" defaultValue={match.eventDate} required />
+          </div>
+          <div className="sm-field">
+            <label htmlFor="slot">Time slot</label>
+            <select id="slot" className="sm-input" name="slot" defaultValue={match.slot} required>
+              {SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-          <div className="col-md-2">
-            <input type="number" name="age" className="form-control" placeholder="Age" defaultValue={filters.age ?? ""} />
-          </div>
-          <div className="col-md-3">
-            <select name="interest" className="form-select" defaultValue={filters.interest ?? ""}>
-              <option value="">Any Interest</option>
-              {allInterests.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
-            </select>
-          </div>
-          <div className="col-md-2">
-            <select name="price_point" className="form-select" defaultValue={filters.price_point ?? ""}>
-              <option value="">Any Price Point</option>
+          <div className="sm-field">
+            <label htmlFor="price_point">Price point</label>
+            <select id="price_point" className="sm-input" name="price_point" defaultValue={match.priceLevel} required>
               {PRICE_LEVELS.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
-          <div className="col-md-2">
-            <button className="btn btn-primary w-100" type="submit">Filter</button>
-          </div>
+          <label htmlFor="approved" className="sm-chip-check">
+            <input type="checkbox" id="approved" name="approved" defaultChecked={match.approved} />
+            <span>Approved</span>
+          </label>
+        </div>
+
+        <div className="sm-actions">
+          <button type="submit" className="sm-btn sm-btn-primary">Save changes</button>
+          <Link href="/admin/matches" className="sm-btn sm-btn-ghost">Cancel</Link>
         </div>
       </form>
 
-      <h5>Assigned Users</h5>
-      <div className="table-responsive">
-        <table className="table table-bordered mb-3">
+      <h3 style={{ fontSize: "1.05rem", marginBottom: 14 }}>Manage users in this match</h3>
+
+      <form method="get" className="sm-card" style={{ marginBottom: 24 }}>
+        <div className="sm-field-row" style={{ marginBottom: 0 }}>
+          <div className="sm-field">
+            <label htmlFor="city">City</label>
+            <select id="city" className="sm-input" name="city" defaultValue={filters.city ?? ""}>
+              <option value="">Any city</option>
+              {cityOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="sm-field">
+            <label htmlFor="age">Age</label>
+            <input type="number" id="age" className="sm-input" name="age" placeholder="Any age" defaultValue={filters.age ?? ""} />
+          </div>
+          <div className="sm-field">
+            <label htmlFor="interest">Interest</label>
+            <select id="interest" className="sm-input" name="interest" defaultValue={filters.interest ?? ""}>
+              <option value="">Any interest</option>
+              {allInterests.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+            </select>
+          </div>
+          <div className="sm-field">
+            <label htmlFor="filter_price_point">Price point</label>
+            <select id="filter_price_point" className="sm-input" name="price_point" defaultValue={filters.price_point ?? ""}>
+              <option value="">Any price point</option>
+              {PRICE_LEVELS.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </div>
+          <button className="sm-btn sm-btn-primary" type="submit">Filter</button>
+        </div>
+      </form>
+
+      <h4 style={{ fontSize: "0.92rem", marginBottom: 10 }}>Assigned users</h4>
+      <div className="sm-table-wrap" style={{ marginBottom: 24 }}>
+        <table className="sm-table">
           <thead>
             <tr>
               <th>ID</th><th>Name</th><th>Age</th><th>Location</th><th>Price</th>
@@ -168,13 +176,13 @@ export default async function EditMatchPage({
                 <td>{scores?.extraversion ?? ""}</td>
                 <td>{scores?.agreeableness ?? ""}</td>
                 <td>{scores?.neuroticism ?? ""}</td>
-                <td>{names.length > 0 ? names.join(", ") : <span className="text-muted">None</span>}</td>
+                <td>{names.length > 0 ? names.join(", ") : <span style={{ color: "var(--sm-text-muted)" }}>None</span>}</td>
                 <td>
-                  <form action={updateMatchUsersAction} className="m-0">
+                  <form action={updateMatchUsersAction}>
                     <input type="hidden" name="action" value="remove" />
                     <input type="hidden" name="match_id" value={matchId} />
                     <input type="hidden" name="user_id" value={u.id} />
-                    <button className="btn btn-sm btn-danger">Remove</button>
+                    <button className="sm-btn-xs sm-danger">Remove</button>
                   </form>
                 </td>
               </tr>
@@ -183,9 +191,9 @@ export default async function EditMatchPage({
         </table>
       </div>
 
-      <h5>Available Users</h5>
-      <div className="table-responsive">
-        <table className="table table-bordered">
+      <h4 style={{ fontSize: "0.92rem", marginBottom: 10 }}>Available users</h4>
+      <div className="sm-table-wrap">
+        <table className="sm-table">
           <thead>
             <tr>
               <th>ID</th><th>Name</th><th>Age</th><th>Location</th><th>Price</th>
@@ -205,13 +213,13 @@ export default async function EditMatchPage({
                 <td>{scores?.extraversion ?? ""}</td>
                 <td>{scores?.agreeableness ?? ""}</td>
                 <td>{scores?.neuroticism ?? ""}</td>
-                <td>{names.length > 0 ? names.join(", ") : <span className="text-muted">None</span>}</td>
+                <td>{names.length > 0 ? names.join(", ") : <span style={{ color: "var(--sm-text-muted)" }}>None</span>}</td>
                 <td>
-                  <form action={updateMatchUsersAction} className="m-0">
+                  <form action={updateMatchUsersAction}>
                     <input type="hidden" name="action" value="add" />
                     <input type="hidden" name="match_id" value={matchId} />
                     <input type="hidden" name="user_id" value={u.id} />
-                    <button className="btn btn-sm btn-success">Add</button>
+                    <button className="sm-btn-xs sm-accept">Add</button>
                   </form>
                 </td>
               </tr>

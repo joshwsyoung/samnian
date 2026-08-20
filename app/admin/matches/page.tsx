@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/auth";
 import { SLOTS } from "@/lib/constants";
 import Flash from "@/components/Flash";
 import { createConversationAction } from "@/app/messages/actions";
+import "../../design-system.css";
 
 export const dynamic = "force-dynamic";
 
@@ -30,50 +31,62 @@ export default async function AdminMatchesPage({
   );
 
   return (
-    <div className="container mt-4">
-      <h2>Matches</h2>
+    <div className="sm-scope container mt-3">
+      <div className="sm-page-head">
+        <div className="sm-greeting">Matches</div>
+      </div>
 
       <Flash success={success === "created" ? "Match created." : success === "match_updated" ? "Match updated." : undefined} />
 
-      <Link href="/admin/matches/new" className="btn btn-success mb-3">Add Match</Link>
+      <div className="sm-actions" style={{ marginBottom: 16 }}>
+        <Link href="/admin/matches/new" className="sm-btn sm-btn-primary">Add match</Link>
+      </div>
 
-      <table className="table table-bordered mt-3">
-        <thead className="thead-light">
-          <tr>
-            <th>Date</th><th>Time Slot</th><th>Price Point</th><th># Users</th><th>Approved</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((m) => (
-            <tr key={m.id}>
-              <td>{m.eventDate}</td>
-              <td>{m.slot}</td>
-              <td>{m.priceLevel}</td>
-              <td>{m.userCount}</td>
-              <td>{m.approved ? "✅" : "❌"}</td>
-              <td>
-                <Link href={`/admin/matches/${m.id}`} className="btn btn-sm btn-primary">Edit</Link>{" "}
-                {m.approved && (
-                  m.conversationId ? (
-                    <Link href={`/messages?conversation_id=${m.conversationId}`} className="btn btn-sm btn-info">
-                      Go to Conversation
-                    </Link>
-                  ) : (
-                    <form action={createConversationAction} className="d-inline">
-                      <input type="hidden" name="title" value={`Table for ${m.eventDate} at ${m.slot}`} />
-                      <input type="hidden" name="match_id" value={m.id} />
-                      {m.userIds.map((uid) => (
-                        <input key={uid} type="hidden" name="users" value={uid} />
-                      ))}
-                      <button type="submit" className="btn btn-sm btn-success mt-2">Create Conversation</button>
-                    </form>
-                  )
-                )}
-              </td>
+      <div className="sm-table-wrap">
+        <table className="sm-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Time slot</th><th>Price point</th><th># Users</th><th>Approved</th><th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((m) => (
+              <tr key={m.id}>
+                <td>{m.eventDate}</td>
+                <td>{m.slot}</td>
+                <td>{m.priceLevel}</td>
+                <td>{m.userCount}</td>
+                <td>
+                  <span className={`sm-status-pill ${m.approved ? "matched" : "unset"}`}>
+                    <span className="sm-dot" />{m.approved ? "Yes" : "No"}
+                  </span>
+                </td>
+                <td>
+                  <div className="sm-row-actions">
+                    <Link href={`/admin/matches/${m.id}`} className="sm-btn-xs">Edit</Link>
+                    {m.approved && (
+                      m.conversationId ? (
+                        <Link href={`/messages?conversation_id=${m.conversationId}`} className="sm-btn-xs sm-accept">
+                          Go to conversation
+                        </Link>
+                      ) : (
+                        <form action={createConversationAction}>
+                          <input type="hidden" name="title" value={`Table for ${m.eventDate} at ${m.slot}`} />
+                          <input type="hidden" name="match_id" value={m.id} />
+                          {m.userIds.map((uid) => (
+                            <input key={uid} type="hidden" name="users" value={uid} />
+                          ))}
+                          <button type="submit" className="sm-btn-xs sm-accept">Create conversation</button>
+                        </form>
+                      )
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

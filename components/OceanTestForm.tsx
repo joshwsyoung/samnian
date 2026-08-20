@@ -24,34 +24,29 @@ export default function OceanTestForm({ questions }: { questions: Question[] }) 
 
   return (
     <form action={submitOceanTestAction}>
-      <div id="progressBarContainer" className="mb-4">
-        <div className="progress">
-          <div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} />
-        </div>
+      <div className="sm-progress" style={{ marginBottom: 28 }}>
+        <div className="sm-progress-bar" style={{ width: `${percent}%` }} />
       </div>
 
       {questions.map((q, index) => (
-        <div
-          key={q.id}
-          className="question-block mb-5"
-          style={{ display: index === current ? "block" : "none" }}
-        >
-          <p className="lead fw-lighter text-center mb-3">{q.question}</p>
-          <div className="btn-group d-flex justify-content-center" role="group">
+        <div key={q.id} style={{ display: index === current ? "block" : "none" }}>
+          <p style={{ textAlign: "center", fontSize: "1.05rem", marginBottom: 20 }}>{q.question}</p>
+          <div className="sm-chip-group" style={{ justifyContent: "center" }} role="group">
             {q.options.map((opt) => {
               const inputId = `q${q.id}_${opt.value}`;
               return (
                 <Fragment key={opt.value}>
-                  <input
-                    type="radio"
-                    className="btn-check"
-                    name={`question_${q.id}`}
-                    id={inputId}
-                    value={opt.value}
-                    required
-                    onChange={() => onAnswer(index)}
-                  />
-                  <label className="btn" htmlFor={inputId}>{opt.label}</label>
+                  <label htmlFor={inputId} className="sm-chip-radio">
+                    <input
+                      type="radio"
+                      name={`question_${q.id}`}
+                      id={inputId}
+                      value={opt.value}
+                      required
+                      onChange={() => onAnswer(index)}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
                 </Fragment>
               );
             })}
@@ -60,8 +55,8 @@ export default function OceanTestForm({ questions }: { questions: Question[] }) 
       ))}
 
       {allAnswered && (
-        <div className="mt-4 text-center">
-          <button type="submit" className="btn btn-primary">Submit Test</button>
+        <div style={{ marginTop: 28, textAlign: "center" }}>
+          <button type="submit" className="sm-btn sm-btn-primary">Submit test</button>
         </div>
       )}
     </form>

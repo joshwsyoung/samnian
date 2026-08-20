@@ -20,26 +20,26 @@ export default function PasswordInput({
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="mb-3">
-      <label htmlFor={id} className="form-label">{label}</label>
-      <div className="input-group">
+    <div className="sm-field">
+      <label htmlFor={id}>{label}</label>
+      <div className="sm-field-password">
         <input
           type={visible ? "text" : "password"}
           id={id}
           name={name}
-          className="form-control"
+          className="sm-input"
           pattern={enforcePattern ? PASSWORD_PATTERN : undefined}
           title={enforcePattern ? PASSWORD_HINT : undefined}
           autoComplete={autoComplete}
           required
         />
         <button
-          className="toggle-btn"
+          className="sm-toggle-visibility"
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
         >
-          <i className={`bi ${visible ? "bi-eye" : "bi-eye-slash"} password-toggle`} />
+          <i className={`bi ${visible ? "bi-eye" : "bi-eye-slash"}`} />
         </button>
       </div>
     </div>

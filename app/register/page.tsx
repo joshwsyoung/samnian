@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
 import { registerAction } from "./actions";
+import "../design-system.css";
 
 export default async function RegisterPage({
   searchParams,
@@ -10,14 +11,15 @@ export default async function RegisterPage({
   const { error } = await searchParams;
 
   return (
-    <div className="container mt-5">
-      <h2>Register</h2>
+    <div className="sm-scope sm-auth-shell">
+      <div className="sm-page-head">
+        <div className="sm-greeting">Join Samnian</div>
+        <div className="sm-sub">Takes about 2 minutes.</div>
+      </div>
 
-      {error === "missing_fields" && (
-        <div className="alert alert-danger">Please fill in all fields.</div>
-      )}
+      {error === "missing_fields" && <div className="sm-flash error">Please fill in all fields.</div>}
       {error && error !== "missing_fields" && (
-        <div className="alert alert-danger">
+        <div className="sm-flash error">
           {error}
           {error.toLowerCase().includes("registered") && (
             <>
@@ -27,21 +29,24 @@ export default async function RegisterPage({
         </div>
       )}
 
-      <form action={registerAction}>
-        <div className="mb-3">
-          <label htmlFor="name" className="form-label">Name</label>
-          <input type="text" className="form-control" id="name" name="name" required />
+      <form action={registerAction} className="sm-card">
+        <div className="sm-field-stack">
+          <div className="sm-field">
+            <label htmlFor="name">Name</label>
+            <input type="text" id="name" name="name" className="sm-input" required />
+          </div>
+          <div className="sm-field">
+            <label htmlFor="email">Email</label>
+            <input type="email" id="email" name="email" className="sm-input" required />
+          </div>
+          <PasswordInput name="password" label="Password" autoComplete="new-password" />
         </div>
-
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email</label>
-          <input type="email" className="form-control" id="email" name="email" required />
-        </div>
-
-        <PasswordInput name="password" label="Password" autoComplete="new-password" />
-
-        <button type="submit" className="btn">Register</button>
+        <button type="submit" className="sm-btn sm-btn-primary" style={{ width: "100%" }}>Register</button>
       </form>
+
+      <p className="sm-auth-note">
+        Already have an account? <Link href="/login">Log in</Link>
+      </p>
     </div>
   );
 }

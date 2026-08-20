@@ -1,11 +1,19 @@
 import Link from "next/link";
+import "../../design-system.css";
 
 export default function ResetSentPage() {
   return (
-    <div className="container mt-5">
-      <h2>Reset Link Sent</h2>
-      <p>If that email is associated with an account, we&rsquo;ve sent a reset link. Please check your inbox.</p>
-      <Link href="/login" className="btn mt-3">Back to Login</Link>
+    <div className="sm-scope sm-auth-shell">
+      <div className="sm-page-head">
+        <div className="sm-greeting">Check your inbox</div>
+      </div>
+
+      <div className="sm-card" style={{ textAlign: "center" }}>
+        <p style={{ color: "var(--sm-text-muted)", marginBottom: 18 }}>
+          If that email is associated with an account, we&rsquo;ve sent a reset link. Please check your inbox.
+        </p>
+        <Link href="/login" className="sm-btn sm-btn-primary">Back to login</Link>
+      </div>
     </div>
   );
 }

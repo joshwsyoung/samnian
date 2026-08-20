@@ -17,8 +17,8 @@ export default function Flash({ success, error }: { success?: string; error?: Re
 
   return (
     <>
-      {success && <div className="alert alert-success">{success}</div>}
-      {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="sm-flash success">{success}</div>}
+      {error && <div className="sm-flash error">{error}</div>}
     </>
   );
 }
