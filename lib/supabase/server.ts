@@ -3,6 +3,13 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 function supabaseEnv() {
+  // These are NEXT_PUBLIC_* vars, so Next.js inlines their value into the
+  // compiled output at build time (server code included) — editing them in
+  // Vercel's dashboard has no effect on an already-built deployment, and a
+  // "Redeploy" that reuses cached build output can carry the stale value
+  // forward even into a nominally new deployment. A genuinely fresh build
+  // (new commit that touches a file reading these vars, or a redeploy with
+  // the build cache explicitly cleared) is required for a change to apply.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {

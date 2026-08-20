@@ -11,6 +11,9 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // See the matching comment in lib/supabase/server.ts — NEXT_PUBLIC_* vars
+  // are inlined at build time, so a dashboard edit needs a genuinely fresh
+  // build (not a cached-output redeploy) to actually take effect.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) return response;

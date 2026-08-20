@@ -7,6 +7,9 @@ import { createClient } from "@supabase/supabase-js";
  * client or its key to the browser.
  */
 export function createAdminClient() {
+  // See the matching comment in lib/supabase/server.ts — NEXT_PUBLIC_* vars
+  // are inlined at build time, so a dashboard edit needs a genuinely fresh
+  // build (not a cached-output redeploy) to actually take effect.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceRoleKey) {
