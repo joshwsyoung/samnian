@@ -138,7 +138,18 @@ try to create `auth.users` — Supabase already owns that table.
    this app never uses `NEXT_PUBLIC_BASE_URL`/the request's Host header for
    anything else, but Supabase itself still needs to be told which
    redirect targets it's allowed to send people to.
-4. **Vercel project**: import this repo, add the env vars from
+4. **Supabase Auth → Email Templates**: the default "Confirm signup" and
+   "Reset password" templates link to Supabase's own `/auth/v1/verify`
+   endpoint, which verifies (and single-use-consumes) the token on that
+   GET itself — a plain link visit, indistinguishable from an email
+   security scanner auto-fetching it to check for phishing, which then
+   burns the token before the real recipient clicks. Edit both templates
+   so the link points at this app's own confirmation page instead, which
+   requires an actual click before it verifies anything:
+   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`
+   (use `type=recovery` in the reset-password template). `{{ .SiteURL }}`
+   is set under URL Configuration in the same settings page.
+5. **Vercel project**: import this repo, add the env vars from
    `.env.example` in Project Settings → Environment Variables. Note that
    the `NEXT_PUBLIC_*` ones are inlined into the build at build time, not
    read live — if you edit `NEXT_PUBLIC_SUPABASE_URL` or
@@ -147,10 +158,10 @@ try to create `auth.users` — Supabase already owns that table.
    build (Deployments → ⋯ → Redeploy without reusing the build cache, or
    push a new commit). `DATABASE_URL` isn't prefixed that way and *is*
    read live, so it doesn't have this gotcha.
-5. **Blob storage**: Project → Storage → connect a Blob store — Vercel
+6. **Blob storage**: Project → Storage → connect a Blob store — Vercel
    injects `BLOB_READ_WRITE_TOKEN` automatically, no manual copy-paste
    needed.
-6. Deploy. No build-time DB or Supabase access is required — every page
+7. Deploy. No build-time DB or Supabase access is required — every page
    that touches either also reads the session cookie, so Next.js treats it
    as dynamic (rendered per-request) rather than trying to prerender it.
 
