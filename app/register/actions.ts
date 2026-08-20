@@ -28,6 +28,19 @@ export async function registerAction(formData: FormData) {
     redirect("/register?error=" + encodeURIComponent(error?.message ?? "Something went wrong."));
   }
 
+  // Supabase deliberately doesn't error when the email is already registered
+  // (so signup can't be used to probe which emails exist) — it returns a
+  // fake success instead, with a made-up user whose `identities` array is
+  // empty and whose id was never actually persisted. Treat that the same as
+  // a real "already registered" error, since proceeding to insert a profile
+  // row for that id would otherwise hit a spurious foreign-key violation.
+  if (data.user.identities?.length === 0) {
+    // Matches the wording Supabase's own signUp() error uses for this case
+    // ("User already registered") so the register page's existing
+    // registered → show a "log in instead" link logic picks it up here too.
+    redirect("/register?error=" + encodeURIComponent("That email is already registered."));
+  }
+
   // Create this app's profile row for the new auth user. onConflictDoNothing
   // covers re-submitting the form for an email that already has one.
   try {
