@@ -58,7 +58,15 @@ export default function NavBar({ session }: { session: Session | null }) {
                     <Link className="nav-link" href="/profile">Profile</Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link" href="/logout">Logout</Link>
+                    <form action="/logout" method="POST">
+                      <button
+                        type="submit"
+                        className="nav-link"
+                        style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }}
+                      >
+                        Logout
+                      </button>
+                    </form>
                   </li>
                 </>
               ) : (
@@ -125,9 +133,15 @@ export function MobileBottomNav({ session }: { session: Session | null }) {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" href="/logout">
-                <i className="bi bi-box-arrow-right" />Logout
-              </Link>
+              <form action="/logout" method="POST">
+                <button
+                  type="submit"
+                  className="nav-link"
+                  style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }}
+                >
+                  <i className="bi bi-box-arrow-right" />Logout
+                </button>
+              </form>
             </li>
           </>
         ) : (
