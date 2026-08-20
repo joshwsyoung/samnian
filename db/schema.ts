@@ -25,8 +25,7 @@ export const authUsers = authSchema.table("users", {
 // --- Enums -------------------------------------------------------------
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
-export const themeEnum = pgEnum("theme", ["light", "dark"]);
-export const priceLevelEnum = pgEnum("price_level", ["£", "££", "£££"]);
+export const priceTierEnum = pgEnum("price_tier", ["broke", "modest", "fun", "baller"]);
 export const slotEnum = pgEnum("slot", [
   "12:00",
   "13:00",
@@ -57,9 +56,7 @@ export const users = pgTable("users", {
   phone: text("phone"),
   age: integer("age"),
   city: text("city"),
-  priceLevel: priceLevelEnum("price_level"),
   role: roleEnum("role").notNull().default("user"),
-  theme: themeEnum("theme").notNull().default("light"),
   profileImage: text("profile_image"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
@@ -83,6 +80,8 @@ export const userInterests = pgTable("user_interests", {
 ]);
 
 // --- OCEAN personality test --------------------------------------------
+// Completing this is mandatory before a user can express interest in an
+// event — see requireCompletedOceanTest() in lib/auth.ts.
 
 export const personalityTests = pgTable("personality_tests", {
   id: serial("id").primaryKey(),
@@ -106,31 +105,60 @@ export const personalityScores = pgTable("personality_scores", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// --- Availability & matching ---------------------------------------------
+// --- Events ------------------------------------------------------------
+// A browsable dinner event tied to one restaurant. Admin-created (see
+// /admin/events); users who've completed the OCEAN test can express
+// interest in one (see eventInterest below), and the admin later curates
+// interested users into small dinner groups.
 
-export const availability = pgTable("availability", {
+export const events = pgTable("events", {
   id: serial("id").primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  restaurantName: text("restaurant_name").notNull(),
+  restaurantUrl: text("restaurant_url"),
+  imageUrl: text("image_url"),
+  address: text("address"),
+  description: text("description"),
   eventDate: date("event_date").notNull(),
   slot: slotEnum("slot").notNull(),
+  capacity: integer("capacity"),
+  // Only published events are shown to users to opt into — lets an admin
+  // stage an event (restaurant, photo, copy) before it goes live.
+  published: boolean("published").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// A user opting into a specific event, with the budget tier they're
+// comfortable with for that night out. Replaces the old single global
+// `availability` row + `users.priceLevel` — preference is per event now,
+// since someone might be up for a £0 night out one week and splashing out
+// the next.
+export const eventInterest = pgTable("event_interest", {
+  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  priceTier: priceTierEnum("price_tier").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
-  uniqueIndex("availability_user_id_idx").on(table.userId),
+  primaryKey({ columns: [table.eventId, table.userId] }),
 ]);
 
-export const matches = pgTable("matches", {
+// --- Groups (the actual dinner table) -----------------------------------
+// Admin-curated subset of an event's interested users. A chat conversation
+// only ever gets created for a group, once the admin has finished building
+// its member list — see app/messages.
+
+export const groups = pgTable("groups", {
   id: serial("id").primaryKey(),
-  eventDate: date("event_date").notNull(),
-  slot: slotEnum("slot").notNull(),
-  priceLevel: priceLevelEnum("price_level").notNull(),
+  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
   approved: boolean("approved").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const matchUsers = pgTable("match_users", {
-  matchId: integer("match_id").notNull().references(() => matches.id, { onDelete: "cascade" }),
+export const groupMembers = pgTable("group_members", {
+  groupId: integer("group_id").notNull().references(() => groups.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 }, (table) => [
-  primaryKey({ columns: [table.matchId, table.userId] }),
+  primaryKey({ columns: [table.groupId, table.userId] }),
 ]);
 
 // --- Chat ------------------------------------------------------------------
@@ -139,7 +167,7 @@ export const conversations = pgTable("conversations", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  matchId: integer("match_id").references(() => matches.id, { onDelete: "set null" }),
+  groupId: integer("group_id").references(() => groups.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

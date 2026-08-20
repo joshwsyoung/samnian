@@ -6,8 +6,13 @@ import OceanTestForm from "@/components/OceanTestForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function OceanTestPage() {
+export default async function OceanTestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ required?: string }>;
+}) {
   await requireUser();
+  const { required } = await searchParams;
 
   const questions = await db()
     .select()
@@ -27,6 +32,12 @@ export default async function OceanTestPage() {
     <div className="container">
       <div className="top mt-5">
         <h2 className="mb-4 fw-lighter text-center">OCEAN Personality Test</h2>
+        {required === "1" && (
+          <div className="alert alert-info text-center">
+            Quick one first — this helps us group you with people you&rsquo;ll actually get on with.
+            You&rsquo;ll need to finish it before you can browse and RSVP to events.
+          </div>
+        )}
         <OceanTestForm
           questions={questions.map((q) => ({ id: q.id, question: q.question, options: q.options }))}
         />

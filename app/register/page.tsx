@@ -1,16 +1,23 @@
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { registerAction } from "./actions";
 
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; src?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, src } = await searchParams;
 
   return (
     <div className="container mt-5">
+      {src === "ticket" && (
+        <div className="alert ticket-scan-banner">
+          🎟️ Scanned our ticket? Nice one — let&rsquo;s get you signed up.
+        </div>
+      )}
+
       <h2>Register</h2>
 
       {error === "missing_fields" && (
@@ -26,6 +33,10 @@ export default async function RegisterPage({
           )}
         </div>
       )}
+
+      <GoogleSignInButton />
+
+      <div className="auth-divider my-3"><span>or</span></div>
 
       <form action={registerAction}>
         <div className="mb-3">

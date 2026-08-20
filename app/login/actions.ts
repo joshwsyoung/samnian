@@ -22,5 +22,5 @@ export async function loginAction(formData: FormData) {
 
   const [profile] = await db().select().from(users).where(eq(users.id, data.user.id)).limit(1);
 
-  redirect(profile?.role === "admin" ? "/admin" : "/dashboard");
+  redirect(profile?.role === "admin" ? "/admin" : "/events");
 }

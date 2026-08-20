@@ -1,16 +1,21 @@
 /**
- * Seeds `interests` and `personality_tests`.
+ * Seeds `interests`, `personality_tests`, and a handful of dummy `events`.
  *
- * Neither table had any seed data in the legacy repo (they were populated
- * directly in the old production database, which we didn't migrate — see
- * README). These are reasonable starter sets in the same shape the app
- * expects; edit freely, this is just enough to make the app usable.
+ * `interests` and `personality_tests` had no seed data in the legacy repo
+ * (they were populated directly in the old production database, which we
+ * didn't migrate — see README). These are reasonable starter sets in the
+ * same shape the app expects; edit freely, this is just enough to make the
+ * app usable.
+ *
+ * The events are clearly-labelled placeholders — swap in real restaurants,
+ * addresses, and photos before going live. They're dated on the next few
+ * Wednesdays so they always show up as "upcoming" on /events.
  *
  * Run with: npm run db:seed
  */
 import "dotenv/config";
 import { db } from "@/lib/db";
-import { interests, personalityTests } from "./schema";
+import { events, interests, personalityTests } from "./schema";
 
 const INTERESTS = [
   "Cooking", "Hiking", "Travel", "Reading", "Live Music", "Film & TV",
@@ -60,6 +65,76 @@ const QUESTIONS: { question: string; trait: "O" | "C" | "E" | "A" | "N"; reverse
   { question: "I seldom feel blue.", trait: "N", reverse: true },
 ];
 
+/** The next 4 Wednesdays from today, as "YYYY-MM-DD" strings. */
+function nextFourWednesdays(): [string, string, string, string] {
+  const d = new Date();
+  d.setDate(d.getDate() + ((3 - d.getDay() + 7) % 7 || 7)); // next Wednesday
+  const dates = [0, 1, 2, 3].map((i) => {
+    const wed = new Date(d);
+    wed.setDate(wed.getDate() + i * 7);
+    return wed.toISOString().slice(0, 10);
+  });
+  return dates as [string, string, string, string];
+}
+
+function dummyEvents() {
+  const [w1, w2, w3, w4] = nextFourWednesdays();
+  return [
+    {
+      title: "Wednesday Supper Club",
+      restaurantName: "[Placeholder] The Riverside Table",
+      restaurantUrl: "https://example.com",
+      imageUrl: "/images/Friends-1.jpg",
+      address: "Southbank, London",
+      description:
+        "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. A relaxed riverside spot, good for a first dinner with new faces.",
+      eventDate: w1,
+      slot: "19:00" as const,
+      capacity: 6,
+      published: true,
+    },
+    {
+      title: "Midweek Meetup",
+      restaurantName: "[Placeholder] Shoreditch Kitchen",
+      restaurantUrl: "https://example.com",
+      imageUrl: "/images/Friends-2.jpg",
+      address: "Shoreditch, London",
+      description:
+        "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. Small plates, big conversations.",
+      eventDate: w2,
+      slot: "18:00" as const,
+      capacity: 6,
+      published: true,
+    },
+    {
+      title: "Long Table Dinner",
+      restaurantName: "[Placeholder] Borough Bistro",
+      restaurantUrl: "https://example.com",
+      imageUrl: "/images/Friends-3.jpg",
+      address: "Borough, London",
+      description:
+        "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. A proper sit-down dinner for people who like to linger.",
+      eventDate: w3,
+      slot: "19:00" as const,
+      capacity: 8,
+      published: true,
+    },
+    {
+      title: "Sunday-Feel Wednesday Roast",
+      restaurantName: "[Placeholder] Marylebone Roast House",
+      restaurantUrl: "https://example.com",
+      imageUrl: "/images/Friends-1.jpg",
+      address: "Marylebone, London",
+      description:
+        "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. Roast dinner energy on a Wednesday, because why not.",
+      eventDate: w4,
+      slot: "18:00" as const,
+      capacity: 6,
+      published: false,
+    },
+  ];
+}
+
 async function main() {
   const client = db();
 
@@ -87,6 +162,15 @@ async function main() {
     console.log(`Seeded ${QUESTIONS.length} OCEAN questions.`);
   } else {
     console.log("Personality test questions already seeded, skipping.");
+  }
+
+  const existingEvents = await client.select().from(events).limit(1);
+  if (existingEvents.length === 0) {
+    const toInsert = dummyEvents();
+    await client.insert(events).values(toInsert);
+    console.log(`Seeded ${toInsert.length} placeholder events — replace these with real restaurants before launch.`);
+  } else {
+    console.log("Events already seeded, skipping.");
   }
 
   process.exit(0);

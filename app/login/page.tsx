@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { loginAction } from "./actions";
 
 export default async function LoginPage({
@@ -21,6 +22,10 @@ export default async function LoginPage({
       {error && error !== "invalid_credentials" && <div className="alert alert-danger">{error}</div>}
 
       {success === "password_reset" && <div className="alert alert-success">Password reset successful! You can now log in.</div>}
+
+      <GoogleSignInButton />
+
+      <div className="auth-divider my-3"><span>or</span></div>
 
       <form action={loginAction} className="mt-4">
         <div className="mb-3">

@@ -2,7 +2,7 @@ import Link from "next/link";
 import LogoMark from "./LogoMark";
 import type { Session } from "@/lib/auth";
 
-export default function NavBar({ session }: { session: Session | null }) {
+export default function NavBar({ session, hasGroup }: { session: Session | null; hasGroup: boolean }) {
   const isAdmin = session?.role === "admin";
 
   return (
@@ -39,17 +39,19 @@ export default function NavBar({ session }: { session: Session | null }) {
                         <Link className="nav-link" href="/admin/users">User Management</Link>
                       </li>
                       <li className="nav-item">
-                        <Link className="nav-link" href="/admin/matches">Matches</Link>
+                        <Link className="nav-link" href="/admin/events">Events</Link>
                       </li>
                     </>
                   ) : (
                     <>
                       <li className="nav-item">
-                        <Link className="nav-link" href="/dashboard">Dashboard</Link>
+                        <Link className="nav-link" href="/events">Events</Link>
                       </li>
-                      <li className="nav-item">
-                        <Link className="nav-link" href="/messages">Chat</Link>
-                      </li>
+                      {hasGroup && (
+                        <li className="nav-item">
+                          <Link className="nav-link" href="/messages">Chat</Link>
+                        </li>
+                      )}
                     </>
                   )}
                   <li className="nav-item">
@@ -87,7 +89,7 @@ export default function NavBar({ session }: { session: Session | null }) {
   );
 }
 
-export function MobileBottomNav({ session }: { session: Session | null }) {
+export function MobileBottomNav({ session, hasGroup }: { session: Session | null; hasGroup: boolean }) {
   const isAdmin = session?.role === "admin";
 
   return (
@@ -109,23 +111,25 @@ export function MobileBottomNav({ session }: { session: Session | null }) {
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link text-center" href="/admin/matches">
-                      <i className="bi bi-list-check" /><br />Matches
+                    <Link className="nav-link text-center" href="/admin/events">
+                      <i className="bi bi-list-check" /><br />Events
                     </Link>
                   </li>
                 </>
               ) : (
                 <>
                   <li className="nav-item">
-                    <Link className="nav-link text-center" href="/dashboard">
-                      <i className="bi bi-house-door" /><br />Home
+                    <Link className="nav-link text-center" href="/events">
+                      <i className="bi bi-house-door" /><br />Events
                     </Link>
                   </li>
-                  <li className="nav-item">
-                    <Link className="nav-link text-center" href="/messages">
-                      <i className="bi bi-chat-dots" /><br />Chat
-                    </Link>
-                  </li>
+                  {hasGroup && (
+                    <li className="nav-item">
+                      <Link className="nav-link text-center" href="/messages">
+                        <i className="bi bi-chat-dots" /><br />Chat
+                      </Link>
+                    </li>
+                  )}
                 </>
               )}
               <li className="nav-item">

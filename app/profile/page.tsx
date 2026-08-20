@@ -2,12 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { interests, matches, matchUsers, personalityScores, userInterests, users } from "@/db/schema";
+import { events, eventInterest, interests, personalityScores, userInterests, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import { firstNameFrom, getGreeting } from "@/lib/greeting";
-import { CITIES, PRICE_LEVELS } from "@/lib/constants";
+import { CITIES, priceTierLabel } from "@/lib/constants";
+import { formatEventDate, formatSlot } from "@/lib/format";
 import Flash from "@/components/Flash";
-import ThemeToggle from "@/components/ThemeToggle";
 import InterestPicker from "@/components/InterestPicker";
 import ConfirmButton from "@/components/ConfirmButton";
 import OceanChart from "@/components/OceanChart";
@@ -39,12 +39,20 @@ export default async function ProfilePage({
     .where(eq(userInterests.userId, userId));
   const selectedInterestNames = selectedInterestRows.map((r) => r.name);
 
-  const [myMatchLink] = await db().select().from(matchUsers).where(eq(matchUsers.userId, userId)).limit(1);
-  const myMatch = myMatchLink
-    ? (await db().select().from(matches).where(eq(matches.id, myMatchLink.matchId)).limit(1))[0]
-    : undefined;
+  const myEvents = await db()
+    .select({
+      eventId: events.id,
+      title: events.title,
+      restaurantName: events.restaurantName,
+      eventDate: events.eventDate,
+      slot: events.slot,
+      priceTier: eventInterest.priceTier,
+    })
+    .from(eventInterest)
+    .innerJoin(events, eq(eventInterest.eventId, events.id))
+    .where(eq(eventInterest.userId, userId));
 
-  const requiredFields = [user.name, user.email, user.phone, user.age, user.city, user.priceLevel, user.profileImage];
+  const requiredFields = [user.name, user.email, user.phone, user.age, user.city, user.profileImage];
   const profileComplete = requiredFields.every((f) => f !== null && f !== undefined && f !== "");
 
   const greeting = `${getGreeting()}${firstNameFrom(user.name)}.`;
@@ -75,8 +83,8 @@ export default async function ProfilePage({
             <h5 className="fw-semibold fs-3">{user.name}</h5>
             <div className="row">
               <div className="col-6">
-                <Link className="btn btn-secondary mt-3 w-100" href="/messages">
-                  <i className="bi bi-chat" /> Chats
+                <Link className="btn btn-secondary mt-3 w-100" href="/events">
+                  <i className="bi bi-calendar-event" /> Events
                 </Link>
               </div>
               <div className="col-6">
@@ -94,7 +102,6 @@ export default async function ProfilePage({
             <p><strong>Phone:</strong> {user.phone}</p>
             <p><strong>Age:</strong> {user.age}</p>
             <p><strong>City:</strong> {user.city}</p>
-            <p><strong>Price Point:</strong> {user.priceLevel}</p>
 
             {!profileComplete && (
               <div className="d-flex justify-content-center">
@@ -131,11 +138,22 @@ export default async function ProfilePage({
         <div className="col-md-6 mt-3">
           <div className="card">
             <div className="card-body fw-lighter fs-6">
-              <h5 className="card-title">Your Match</h5>
-              {myMatch ? (
-                <p><strong>Matched Table:</strong> Event on {myMatch.eventDate} at {myMatch.slot}.</p>
+              <h5 className="card-title">My Events</h5>
+              {myEvents.length > 0 ? (
+                <ul className="list-unstyled mb-0 small">
+                  {myEvents.map((e) => (
+                    <li key={e.eventId} className="mb-2">
+                      <Link href={`/events/${e.eventId}`}>{e.title}</Link> — {e.restaurantName}
+                      <br />
+                      <span className="text-muted">{formatEventDate(e.eventDate)} at {formatSlot(e.slot)} · {priceTierLabel(e.priceTier)}</span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p>No matches yet.</p>
+                <>
+                  <p>You&rsquo;re not down for anything yet.</p>
+                  <Link className="btn btn-secondary" href="/events">Browse events</Link>
+                </>
               )}
             </div>
           </div>
@@ -200,14 +218,6 @@ export default async function ProfilePage({
                   </select>
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="price_point">Preferred Price Point</label>
-                  <select className="form-select" name="price_point" defaultValue={user.priceLevel ?? ""} required>
-                    {PRICE_LEVELS.map((level) => (
-                      <option key={level} value={level}>{level}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
                   <label htmlFor="profile_image">Profile Image</label>
                   <input type="file" name="profile_image" className="form-control" accept="image/*" />
                   {user.profileImage && (
@@ -222,8 +232,6 @@ export default async function ProfilePage({
                 </div>
                 <button type="submit" className="btn btn-secondary mt-3">Save Changes</button>
               </form>
-
-              <ThemeToggle currentTheme={user.theme} />
 
               <hr />
 

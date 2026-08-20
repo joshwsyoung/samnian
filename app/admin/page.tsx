@@ -19,10 +19,11 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="col-md-6">
-          <h4>Match Management</h4>
+          <h4>Event Management</h4>
           <ul className="list-group">
-            <li className="list-group-item"><Link href="/admin/matches/new">Create New Match</Link></li>
-            <li className="list-group-item"><Link href="/admin/matches">View / Edit Matches</Link></li>
+            <li className="list-group-item"><Link href="/admin/events/new">Create New Event</Link></li>
+            <li className="list-group-item"><Link href="/admin/events">View / Edit Events</Link></li>
+            <li className="list-group-item"><Link href="/ticket">Print marketing ticket</Link></li>
           </ul>
         </div>
       </div>

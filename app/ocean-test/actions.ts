@@ -54,5 +54,5 @@ export async function submitOceanTestAction(formData: FormData) {
     .values(scores)
     .onConflictDoUpdate({ target: personalityScores.userId, set: scores });
 
-  redirect("/dashboard?success=" + encodeURIComponent("Thanks — your personality results are saved!"));
+  redirect("/events?success=" + encodeURIComponent("Thanks — your personality results are saved! Take a look at what's coming up."));
 }

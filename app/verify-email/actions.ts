@@ -14,7 +14,7 @@ export async function resendVerificationAction(formData: FormData) {
   await supabase.auth.resend({
     type: "signup",
     email,
-    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=/dashboard` },
+    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=/ocean-test%3Frequired%3D1` },
   });
 
   redirect(`/verify-email?email=${encodeURIComponent(email)}&success=resent`);

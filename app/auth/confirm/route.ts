@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = searchParams.get("next") ?? "/events";
 
   if (!tokenHash || !type) {
     redirect(`/login?error=${encodeURIComponent(MALFORMED_LINK_ERROR)}`);
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const tokenHash = String(formData.get("token_hash") ?? "");
   const type = formData.get("type") as EmailOtpType | null;
-  const next = String(formData.get("next") ?? "/dashboard");
+  const next = String(formData.get("next") ?? "/events");
 
   if (!tokenHash || !type) {
     redirect(`/login?error=${encodeURIComponent(MALFORMED_LINK_ERROR)}`);

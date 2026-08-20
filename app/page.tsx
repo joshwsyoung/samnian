@@ -30,8 +30,8 @@ export default function LandingPage() {
                 className="p-4 rounded shadow-sm h-100 step-card"
                 style={{ background: "url('/images/Friends-2.jpg') center/cover no-repeat" }}
               >
-                <h3 className="fs-4 mb-2">Set Availability</h3>
-                <p className="small">Choose the Wednesdays you&rsquo;re free and your preferences like city and budget.</p>
+                <h3 className="fs-4 mb-2">Pick Your Events</h3>
+                <p className="small">Browse upcoming dinners, pick the ones you fancy, and tell us your budget for each.</p>
               </div>
             </div>
             <div className="col-12 col-md-6 col-lg-3">

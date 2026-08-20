@@ -8,7 +8,6 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ProfileImageError, uploadProfileImage } from "@/lib/blob";
-import { PRICE_LEVELS, type PriceLevel } from "@/lib/constants";
 
 export async function updateProfileAction(formData: FormData) {
   const session = await requireUser();
@@ -20,7 +19,6 @@ export async function updateProfileAction(formData: FormData) {
   const phone = String(formData.get("phone") ?? "").trim();
   const age = String(formData.get("age") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim();
-  const priceLevel = String(formData.get("price_point") ?? "") as PriceLevel;
 
   const errors: string[] = [];
   if (!name) errors.push("Name is required.");
@@ -28,7 +26,6 @@ export async function updateProfileAction(formData: FormData) {
   const ageNum = Number(age);
   if (!age || Number.isNaN(ageNum) || ageNum < 16 || ageNum > 100) errors.push("Valid age is required.");
   if (!city) errors.push("City is required.");
-  if (!PRICE_LEVELS.includes(priceLevel)) errors.push("Invalid price point selected.");
 
   let profileImageUrl: string | undefined;
   const file = formData.get("profile_image");
@@ -51,7 +48,6 @@ export async function updateProfileAction(formData: FormData) {
       phone,
       age: ageNum,
       city,
-      priceLevel,
       ...(profileImageUrl ? { profileImage: profileImageUrl } : {}),
     })
     .where(eq(users.id, userId));
@@ -96,7 +92,7 @@ export async function deleteAccountAction() {
 
   // Sign out first, while the session is still valid, then delete the auth
   // user with the admin client — Postgres cascades the rest (profile row,
-  // availability, interests, matches, chat) via the FK to auth.users.
+  // event interest, group membership, chat) via the FK to auth.users.
   const supabase = await createClient();
   await supabase.auth.signOut();
 
