@@ -256,17 +256,22 @@ Supabase SQL editor whenever's convenient.
    this app never uses `NEXT_PUBLIC_BASE_URL`/the request's Host header for
    anything else, but Supabase itself still needs to be told which
    redirect targets it's allowed to send people to.
-4. **Supabase Auth → Email Templates**: the default "Confirm signup" and
-   "Reset password" templates link to Supabase's own `/auth/v1/verify`
-   endpoint, which verifies (and single-use-consumes) the token on that
-   GET itself — a plain link visit, indistinguishable from an email
-   security scanner auto-fetching it to check for phishing, which then
-   burns the token before the real recipient clicks. Edit both templates
-   so the link points at this app's own confirmation page instead, which
-   requires an actual click before it verifies anything:
-   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`
-   (use `type=recovery` in the reset-password template). `{{ .SiteURL }}`
-   is set under URL Configuration in the same settings page.
+4. **Supabase Auth → Email Templates** (optional, no free-plan restriction
+   either way): the default "Confirm signup" and "Reset password" templates
+   link to Supabase's own `/auth/v1/verify` endpoint rather than straight to
+   `app/auth/confirm/route.ts`. `route.ts` handles both shapes: if the
+   template *does* embed `{{ .TokenHash }}`/`{{ .TokenType }}` directly (an
+   edit you can make on any plan, under Auth → Email Templates), the GET
+   there renders a confirm page requiring an actual click before it calls
+   `verifyOtp()` — protection against email security scanners
+   auto-fetching the link and silently burning the one-time token before the
+   real recipient clicks. If the template is left as Supabase's default
+   (as it always has been for this project), Supabase's own `/verify`
+   endpoint does the equivalent verification itself and redirects here
+   afterward with a session cookie already set but no token_hash left in
+   the URL — `route.ts` checks for that existing session as a fallback
+   before treating the link as dead. Either way works with zero dashboard
+   access; only the anti-scanner protection differs.
 5. **Google sign-in** (optional): follow "Enabling Google sign-in" above —
    the app works fine without it, the button just errors until it's set up.
 6. **Vercel project**: import this repo, add the env vars from
