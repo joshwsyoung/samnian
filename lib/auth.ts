@@ -14,7 +14,6 @@ export type Session = {
   email: string;
   name: string;
   role: Role;
-  theme: "light" | "dark";
 };
 
 /**
@@ -37,7 +36,6 @@ export async function getSession(): Promise<Session | null> {
     email: user.email ?? profile.email,
     name: profile.name,
     role: profile.role,
-    theme: profile.theme,
   };
 }
 

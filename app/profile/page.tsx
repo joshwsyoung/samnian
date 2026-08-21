@@ -9,7 +9,6 @@ import { CITIES, priceTierLabel } from "@/lib/constants";
 import { formatEventDate, formatSlot } from "@/lib/format";
 import EditPanel from "@/components/dash/EditPanel";
 import InterestChipPicker from "@/components/dash/InterestChipPicker";
-import ThemeSwitch from "@/components/dash/ThemeSwitch";
 import ConfirmButton from "@/components/ConfirmButton";
 import OceanChart from "@/components/OceanChart";
 import { deleteAccountAction, updateInterestsAction, updateProfileAction } from "./actions";
@@ -227,8 +226,6 @@ export default async function ProfilePage({
             </>
           )}
         </section>
-
-        <ThemeSwitch currentTheme={user.theme ?? "light"} />
 
         {/* DANGER ZONE */}
         <section className="sm-card">

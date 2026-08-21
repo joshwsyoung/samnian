@@ -15,6 +15,13 @@
       "when": 1787292111766,
       "tag": "0001_premium_morgan_stark",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787293101040,
+      "tag": "0002_deep_the_professor",
+      "breakpoints": true
     }
   ]
 }

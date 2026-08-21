@@ -25,7 +25,6 @@ export const authUsers = authSchema.table("users", {
 // --- Enums -------------------------------------------------------------
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
-export const themeEnum = pgEnum("theme", ["light", "dark"]);
 export const priceTierEnum = pgEnum("price_tier", ["broke", "modest", "fun", "baller"]);
 export const slotEnum = pgEnum("slot", [
   "12:00",
@@ -58,7 +57,6 @@ export const users = pgTable("users", {
   age: integer("age"),
   city: text("city"),
   role: roleEnum("role").notNull().default("user"),
-  theme: themeEnum("theme").notNull().default("light"),
   profileImage: text("profile_image"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
