@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Session } from "@/lib/auth";
+import NavCollapseOnClick from "./NavCollapseOnClick";
 import "../app/design-system.css";
 
 /**
@@ -107,6 +108,7 @@ export default function NavBar({ session, hasGroup }: { session: Session | null;
           </ul>
         </div>
       </div>
+      <NavCollapseOnClick />
     </nav>
   );
 }
