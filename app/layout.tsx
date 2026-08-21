@@ -5,7 +5,7 @@ import "./globals.css";
 import BootstrapClient from "@/components/BootstrapClient";
 import FadeIn from "@/components/FadeIn";
 import NavBar from "@/components/NavBar";
-import { getSession, userHasGroup } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 // New design-system typeface — a fuller weight range than the legacy
 // self-hosted Poppins-Light, kept under its own variable so pages that
@@ -25,7 +25,6 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  const hasGroup = session ? await userHasGroup(session.id) : false;
 
   return (
     <html lang="en" className={poppinsV2.variable}>
@@ -33,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <noscript>
           <style>{`body { opacity: 1 !important; }`}</style>
         </noscript>
-        <NavBar session={session} hasGroup={hasGroup} />
+        <NavBar session={session} />
         {children}
         <FadeIn />
         <BootstrapClient />
