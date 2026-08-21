@@ -21,7 +21,7 @@ export async function registerAction(formData: FormData) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=/dashboard` },
+    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=/ocean-test%3Frequired%3D1` },
   });
 
   if (error || !data.user) {
@@ -73,8 +73,9 @@ export async function registerAction(formData: FormData) {
 
   // If email confirmation is off in this Supabase project, signUp already
   // returns a live session — skip straight in instead of asking to verify.
+  // The OCEAN test is mandatory before anything else, so send them there.
   if (data.session) {
-    redirect("/dashboard");
+    redirect("/ocean-test?required=1");
   }
 
   redirect(`/verify-email?email=${encodeURIComponent(email)}`);

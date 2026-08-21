@@ -1,6 +1,6 @@
 {
-  "id": "890ecd34-a9a9-43ae-b9a6-331a074883e6",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "8ebb4be5-35b7-4f9d-8cc4-dd45e31fc9f2",
+  "prevId": "890ecd34-a9a9-43ae-b9a6-331a074883e6",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -801,6 +801,14 @@
           "notNull": true,
           "default": "'user'"
         },
+        "theme": {
+          "name": "theme",
+          "type": "theme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'light'"
+        },
         "profile_image": {
           "name": "profile_image",
           "type": "text",
@@ -901,6 +909,14 @@
         "18:00",
         "19:00",
         "20:00"
+      ]
+    },
+    "public.theme": {
+      "name": "theme",
+      "schema": "public",
+      "values": [
+        "light",
+        "dark"
       ]
     },
     "public.trait": {

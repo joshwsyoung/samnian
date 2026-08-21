@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { loginAction } from "./actions";
 import "../design-system.css";
 
@@ -26,6 +27,10 @@ export default async function LoginPage({
       {success === "password_reset" && (
         <div className="sm-flash success">Password reset successful! You can now log in.</div>
       )}
+
+      <GoogleSignInButton />
+
+      <div className="sm-auth-divider"><span>or</span></div>
 
       <form action={loginAction} className="sm-card">
         <div className="sm-field-stack">

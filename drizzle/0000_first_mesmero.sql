@@ -1,19 +1,11 @@
 CREATE TYPE "public"."answer_type" AS ENUM('single', 'multiple');--> statement-breakpoint
 CREATE TYPE "public"."invite_status" AS ENUM('pending', 'accepted', 'declined');--> statement-breakpoint
-CREATE TYPE "public"."price_level" AS ENUM('£', '££', '£££');--> statement-breakpoint
+CREATE TYPE "public"."price_tier" AS ENUM('broke', 'modest', 'fun', 'baller');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('user', 'admin');--> statement-breakpoint
 CREATE TYPE "public"."slot" AS ENUM('12:00', '13:00', '14:00', '18:00', '19:00', '20:00');--> statement-breakpoint
-CREATE TYPE "public"."theme" AS ENUM('light', 'dark');--> statement-breakpoint
 CREATE TYPE "public"."trait" AS ENUM('O', 'C', 'E', 'A', 'N');--> statement-breakpoint
--- Not creating auth.users: Supabase already owns that table (it's the real
--- one Supabase Auth writes to, with many more columns than drizzle-kit's
--- placeholder). db/schema.ts only *declares* it, for the FK below.
---> statement-breakpoint
-CREATE TABLE "availability" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" uuid NOT NULL,
-	"event_date" date NOT NULL,
-	"slot" "slot" NOT NULL
+CREATE TABLE "auth"."users" (
+	"id" uuid PRIMARY KEY NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "chat_messages" (
@@ -35,28 +27,49 @@ CREATE TABLE "conversations" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" text NOT NULL,
 	"user_id" uuid NOT NULL,
-	"match_id" integer,
+	"group_id" integer,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "samnian_event_interest" (
+	"event_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
+	"price_tier" "price_tier" NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "samnian_event_interest_event_id_user_id_pk" PRIMARY KEY("event_id","user_id")
+);
+--> statement-breakpoint
+CREATE TABLE "samnian_events" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"restaurant_name" text NOT NULL,
+	"restaurant_url" text,
+	"image_url" text,
+	"address" text,
+	"description" text,
+	"event_date" date NOT NULL,
+	"slot" "slot" NOT NULL,
+	"capacity" integer,
+	"published" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "samnian_group_members" (
+	"group_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
+	CONSTRAINT "samnian_group_members_group_id_user_id_pk" PRIMARY KEY("group_id","user_id")
+);
+--> statement-breakpoint
+CREATE TABLE "samnian_groups" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"event_id" integer NOT NULL,
+	"approved" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "interests" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "match_users" (
-	"match_id" integer NOT NULL,
-	"user_id" uuid NOT NULL,
-	CONSTRAINT "match_users_match_id_user_id_pk" PRIMARY KEY("match_id","user_id")
-);
---> statement-breakpoint
-CREATE TABLE "matches" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"event_date" date NOT NULL,
-	"slot" "slot" NOT NULL,
-	"price_level" "price_level" NOT NULL,
-	"approved" boolean DEFAULT false NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "personality_scores" (
@@ -94,26 +107,25 @@ CREATE TABLE "users" (
 	"phone" text,
 	"age" integer,
 	"city" text,
-	"price_level" "price_level",
 	"role" "role" DEFAULT 'user' NOT NULL,
-	"theme" "theme" DEFAULT 'light' NOT NULL,
 	"profile_image" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "availability" ADD CONSTRAINT "availability_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_conversation_id_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."conversations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_sender_id_users_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "conversation_users" ADD CONSTRAINT "conversation_users_conversation_id_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."conversations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "conversation_users" ADD CONSTRAINT "conversation_users_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "conversations" ADD CONSTRAINT "conversations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "conversations" ADD CONSTRAINT "conversations_match_id_matches_id_fk" FOREIGN KEY ("match_id") REFERENCES "public"."matches"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "match_users" ADD CONSTRAINT "match_users_match_id_matches_id_fk" FOREIGN KEY ("match_id") REFERENCES "public"."matches"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "match_users" ADD CONSTRAINT "match_users_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "conversations" ADD CONSTRAINT "conversations_group_id_samnian_groups_id_fk" FOREIGN KEY ("group_id") REFERENCES "public"."samnian_groups"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "samnian_event_interest" ADD CONSTRAINT "samnian_event_interest_event_id_samnian_events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."samnian_events"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "samnian_event_interest" ADD CONSTRAINT "samnian_event_interest_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "samnian_group_members" ADD CONSTRAINT "samnian_group_members_group_id_samnian_groups_id_fk" FOREIGN KEY ("group_id") REFERENCES "public"."samnian_groups"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "samnian_group_members" ADD CONSTRAINT "samnian_group_members_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "samnian_groups" ADD CONSTRAINT "samnian_groups_event_id_samnian_events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."samnian_events"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "personality_scores" ADD CONSTRAINT "personality_scores_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_interests" ADD CONSTRAINT "user_interests_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_interests" ADD CONSTRAINT "user_interests_interest_id_interests_id_fk" FOREIGN KEY ("interest_id") REFERENCES "public"."interests"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_id_users_id_fk" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE UNIQUE INDEX "availability_user_id_idx" ON "availability" USING btree ("user_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "interests_name_idx" ON "interests" USING btree ("name");--> statement-breakpoint
 CREATE UNIQUE INDEX "users_email_idx" ON "users" USING btree ("email");

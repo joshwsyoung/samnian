@@ -37,8 +37,8 @@ export default async function LandingPage({
               Great dinners start at <span className="sm-accent-word">Samnian</span>.
             </h1>
             <p>
-              We match you with a small group for a Wednesday dinner, based on your personality
-              and your plans — no swiping, no small talk over a screen.
+              Take a personality quiz, browse upcoming dinners, and tell us what you&rsquo;re up
+              for — we&rsquo;ll match you with a small table for the night, budget and all.
             </p>
             <div className="sm-hero-actions">
               <Link href="/register" className="sm-btn sm-btn-primary">Join in</Link>
@@ -67,13 +67,13 @@ export default async function LandingPage({
           </div>
           <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-diner-friends.jpg')" }}>
             <div className="sm-step-num">Step 2</div>
-            <h3>Set availability</h3>
-            <p>Choose the Wednesdays you&rsquo;re free and your preferences like city and budget.</p>
+            <h3>Pick your events</h3>
+            <p>Browse upcoming dinners, RSVP to the ones you fancy, and tell us your budget for each.</p>
           </div>
           <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-seafood-shack.jpg')" }}>
             <div className="sm-step-num">Step 3</div>
             <h3>Get matched</h3>
-            <p>We&rsquo;ll match you with a small group for a great shared meal.</p>
+            <p>We&rsquo;ll group you with a small table for a great shared meal.</p>
           </div>
           <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-cheers-riverside.jpg')" }}>
             <div className="sm-step-num">Step 4</div>

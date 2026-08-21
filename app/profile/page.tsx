@@ -2,16 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { interests, matches, matchUsers, personalityScores, userInterests, users } from "@/db/schema";
+import { events, eventInterest, groupMembers, groups, interests, personalityScores, userInterests, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import { firstNameFrom, getGreeting } from "@/lib/greeting";
-import { CITIES } from "@/lib/constants";
+import { CITIES, priceTierLabel } from "@/lib/constants";
+import { formatEventDate, formatSlot } from "@/lib/format";
 import EditPanel from "@/components/dash/EditPanel";
 import InterestChipPicker from "@/components/dash/InterestChipPicker";
 import ThemeSwitch from "@/components/dash/ThemeSwitch";
 import ConfirmButton from "@/components/ConfirmButton";
 import OceanChart from "@/components/OceanChart";
-import { updatePricePointAction } from "@/app/dashboard/actions";
 import { deleteAccountAction, updateInterestsAction, updateProfileAction } from "./actions";
 import "../design-system.css";
 
@@ -45,12 +45,36 @@ export default async function ProfilePage({
     .where(eq(userInterests.userId, userId));
   const selectedInterestNames = selectedInterestRows.map((r) => r.name);
 
-  const [myMatchLink] = await db().select().from(matchUsers).where(eq(matchUsers.userId, userId)).limit(1);
-  const myMatch = myMatchLink
-    ? (await db().select().from(matches).where(eq(matches.id, myMatchLink.matchId)).limit(1))[0]
+  const myEvents = await db()
+    .select({
+      eventId: events.id,
+      title: events.title,
+      restaurantName: events.restaurantName,
+      eventDate: events.eventDate,
+      slot: events.slot,
+      priceTier: eventInterest.priceTier,
+    })
+    .from(eventInterest)
+    .innerJoin(events, eq(eventInterest.eventId, events.id))
+    .where(eq(eventInterest.userId, userId));
+
+  const [myGroupRow] = await db()
+    .select({ groupId: groupMembers.groupId })
+    .from(groupMembers)
+    .where(eq(groupMembers.userId, userId))
+    .limit(1);
+  const myTable = myGroupRow
+    ? (
+        await db()
+          .select({ eventId: groups.eventId, title: events.title, eventDate: events.eventDate, slot: events.slot })
+          .from(groups)
+          .innerJoin(events, eq(groups.eventId, events.id))
+          .where(eq(groups.id, myGroupRow.groupId))
+          .limit(1)
+      )[0]
     : undefined;
 
-  const requiredFields = [user.name, user.email, user.phone, user.age, user.city, user.priceLevel, user.profileImage];
+  const requiredFields = [user.name, user.email, user.phone, user.age, user.city, user.profileImage];
   const profileComplete = requiredFields.every((f) => f !== null && f !== undefined && f !== "");
 
   const greeting = `${getGreeting()}${firstNameFrom(user.name)}.`;
@@ -88,7 +112,10 @@ export default async function ProfilePage({
             )}
             <div>
               <div className="sm-identity-name">{user.name}</div>
-              <Link className="sm-btn-link" href="/messages">Open chats →</Link>
+              <div className="sm-actions" style={{ marginTop: 4 }}>
+                <Link className="sm-btn-link" href="/messages">Open chats →</Link>
+                <Link className="sm-btn-link" href="/events">Browse events →</Link>
+              </div>
             </div>
           </div>
 
@@ -113,24 +140,27 @@ export default async function ProfilePage({
         {/* QUICK FACTS */}
         <div className="sm-quick-row">
           <section className="sm-card sm-quick-card">
-            <h3>Price point</h3>
-            <form action={updatePricePointAction}>
-              <input type="hidden" name="redirect_to" value="/profile" />
-              <div className="sm-price-chip-group" role="group" aria-label="Price point">
-                {(["£", "££", "£££"] as const).map((level) => (
-                  <button
-                    key={level}
-                    type="submit"
-                    name="price_point"
-                    value={level}
-                    aria-pressed={user.priceLevel === level}
-                  >
-                    {level}
-                  </button>
+            <h3>My events</h3>
+            {myEvents.length > 0 ? (
+              <ul className="sm-link-list">
+                {myEvents.map((e) => (
+                  <li key={e.eventId}>
+                    <Link href={`/events/${e.eventId}`} className="sm-link-item">
+                      {e.title} — {e.restaurantName}
+                      <br />
+                      <span className="sm-price-note" style={{ margin: 0 }}>
+                        {formatEventDate(e.eventDate)} at {formatSlot(e.slot)} · {priceTierLabel(e.priceTier)}
+                      </span>
+                    </Link>
+                  </li>
                 ))}
-              </div>
-            </form>
-            <p className="sm-price-note">Tap to change — saves instantly, no confirm step.</p>
+              </ul>
+            ) : (
+              <>
+                <p className="sm-price-note" style={{ marginTop: 0 }}>You&rsquo;re not down for anything yet.</p>
+                <Link className="sm-btn sm-btn-primary" href="/events">Browse events</Link>
+              </>
+            )}
           </section>
 
           <section className="sm-card sm-quick-card">
@@ -156,18 +186,18 @@ export default async function ProfilePage({
           </section>
         </div>
 
-        {/* MATCH */}
+        {/* TABLE */}
         <section className="sm-card">
           <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Your table</h3>
-          {myMatch ? (
+          {myTable ? (
             <div className="sm-fact-row" style={{ marginBottom: 0 }}>
-              <div className="sm-fact"><dt>Date</dt><dd>{myMatch.eventDate}</dd></div>
-              <div className="sm-fact"><dt>Time</dt><dd>{myMatch.slot}</dd></div>
-              <div className="sm-fact"><dt>Price point</dt><dd>{myMatch.priceLevel}</dd></div>
+              <div className="sm-fact"><dt>Event</dt><dd>{myTable.title}</dd></div>
+              <div className="sm-fact"><dt>Date</dt><dd>{formatEventDate(myTable.eventDate)}</dd></div>
+              <div className="sm-fact"><dt>Time</dt><dd>{formatSlot(myTable.slot)}</dd></div>
             </div>
           ) : (
             <p className="sm-price-note" style={{ marginTop: 0 }}>
-              No matches yet — set your availability on the <Link className="sm-btn-link" href="/dashboard">dashboard</Link>.
+              Not placed at a table yet — <Link className="sm-btn-link" href="/events">browse events</Link> and RSVP to one.
             </p>
           )}
         </section>
@@ -203,7 +233,7 @@ export default async function ProfilePage({
         {/* DANGER ZONE */}
         <section className="sm-card">
           <h3 style={{ fontSize: "0.95rem", marginBottom: 10 }}>Delete account</h3>
-          <p className="sm-price-note" style={{ marginTop: 0 }}>This permanently removes your profile, matches and chat history.</p>
+          <p className="sm-price-note" style={{ marginTop: 0 }}>This permanently removes your profile, event RSVPs and chat history.</p>
           <form action={deleteAccountAction}>
             <ConfirmButton
               message="Are you sure you want to delete your account? This cannot be undone."

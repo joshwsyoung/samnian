@@ -7,8 +7,13 @@ import "../design-system.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function OceanTestPage() {
+export default async function OceanTestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ required?: string }>;
+}) {
   await requireUser();
+  const { required } = await searchParams;
 
   const questions = await db()
     .select()
@@ -30,6 +35,12 @@ export default async function OceanTestPage() {
         <div className="sm-greeting">Personality profile</div>
         <div className="sm-sub">A couple of minutes — helps us match you with people you&rsquo;ll get on with.</div>
       </div>
+      {required === "1" && (
+        <div className="sm-flash info">
+          Quick one first — this helps us group you with people you&rsquo;ll actually get on with.
+          You&rsquo;ll need to finish it before you can browse and RSVP to events.
+        </div>
+      )}
       <div className="sm-card">
         <OceanTestForm
           questions={questions.map((q) => ({ id: q.id, question: q.question, options: q.options }))}

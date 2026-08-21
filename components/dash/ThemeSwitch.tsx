@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { updateThemeAction } from "@/app/dashboard/actions";
+import { updateThemeAction } from "@/app/profile/actions";
 
 export default function ThemeSwitch({ currentTheme }: { currentTheme: "light" | "dark" }) {
   const [, startTransition] = useTransition();

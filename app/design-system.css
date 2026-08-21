@@ -289,6 +289,7 @@
 }
 .sm-flash.success { background: var(--sm-success-bg); color: var(--sm-success); }
 .sm-flash.error { background: var(--sm-warning-bg); color: var(--sm-warning); }
+.sm-flash.info { background: var(--sm-accent-bg, rgba(44, 110, 107, 0.1)); color: var(--sm-accent-strong); }
 
 .sm-btn-danger {
   appearance: none;
@@ -661,6 +662,21 @@
 .sm-auth-note { font-size: 0.85rem; color: var(--sm-text-muted); margin-top: 16px; text-align: center; }
 .sm-auth-note a { color: var(--sm-accent-strong); font-weight: 500; text-decoration: none; }
 .sm-auth-note a:hover { text-decoration: underline; }
+
+.sm-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--sm-text-muted);
+  font-size: 0.8rem;
+}
+.sm-auth-divider::before, .sm-auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--sm-border);
+}
 
 .sm-field-stack { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
 

@@ -14230,3 +14230,277 @@ a {
 }
 
 /*# sourceMappingURL=bootstrap.min.css.map */
+/* ==========================================================================
+   Samnian custom additions — event cards, price tiers, auth extras, ticket.
+   Kept separate from the compiled Bootswatch styles above.
+   ========================================================================== */
+
+/* --- Airbnb-style event cards ------------------------------------------- */
+
+.event-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.event-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  height: 100%;
+}
+
+.event-card-link:hover .event-card {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.event-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #e9ecef;
+}
+
+.event-card-image-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #d9e8d4, #b7d8ac);
+}
+
+.event-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.event-card-body {
+  padding: 0.9rem 0.2rem 0.2rem;
+}
+
+.event-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.event-card-sub {
+  margin: 0.1rem 0 0.35rem;
+  color: #495057;
+}
+
+.event-card-meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* --- Event detail page ---------------------------------------------------- */
+
+.event-detail-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e9ecef;
+}
+
+.event-detail-facts li {
+  margin-bottom: 0.5rem;
+}
+
+.event-detail-description {
+  white-space: pre-wrap;
+}
+
+.event-rsvp-card {
+  border-radius: 16px;
+  position: sticky;
+  top: 1rem;
+}
+
+/* --- Price tier picker ----------------------------------------------------- */
+
+.price-tier-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.price-tier-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+}
+
+.price-tier-option:has(input:checked) {
+  background: #f2f8ef;
+  box-shadow: 3px 3px 0 0 var(--bs-border-color, #000);
+}
+
+.price-tier-option input {
+  flex-shrink: 0;
+}
+
+.price-tier-option-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-tier-option-label {
+  font-weight: 600;
+}
+
+.price-tier-option-range {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* --- Auth extras (Google button, divider, ticket banner) ------------------ */
+
+.btn-google {
+  background: #fff;
+  border: 2px solid #000;
+  color: #1c1c1c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #6c757d;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.auth-divider span {
+  padding: 0 0.75rem;
+}
+
+.ticket-scan-banner {
+  background: #fff7d6;
+  border: 2px solid #000;
+  font-weight: 600;
+}
+
+/* --- Printable ticket ------------------------------------------------------ */
+
+.ticket-print-area {
+  display: flex;
+  justify-content: center;
+}
+
+.ticket-stub {
+  display: flex;
+  width: 100%;
+  max-width: 500px;
+  border: 3px solid #000;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.ticket-stub-main {
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.ticket-stub-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.ticket-stub-name {
+  font-family: var(--bs-body-font-family);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ticket-stub-tagline {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: #6c757d;
+}
+
+.ticket-stub-copy {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.ticket-stub-perforation {
+  width: 0;
+  border-left: 3px dashed #000;
+}
+
+.ticket-stub-qr {
+  width: 140px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 0.4rem;
+}
+
+.ticket-stub-qr-code {
+  width: 100px;
+  height: 100px;
+}
+
+.ticket-stub-qr-code svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ticket-stub-scan-me {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+@media print {
+  nav,
+  .mobile-bottom-nav,
+  .d-print-none {
+    display: none !important;
+  }
+
+  body {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .ticket-stub {
+    max-width: 100%;
+    box-shadow: none;
+  }
+}

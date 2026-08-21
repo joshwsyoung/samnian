@@ -14,9 +14,7 @@ export async function updateProfileAction(formData: FormData) {
   const userId = session.id;
 
   // Login email is managed by Supabase Auth, not editable from here — see
-  // the profile page, where it's rendered read-only. Price point is its
-  // own quick-set control on the page (see updatePricePointAction, shared
-  // with the dashboard) rather than bundled into this form.
+  // the profile page, where it's rendered read-only.
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const age = String(formData.get("age") ?? "").trim();
@@ -57,6 +55,12 @@ export async function updateProfileAction(formData: FormData) {
   redirect("/profile?success=" + encodeURIComponent("Profile updated successfully!"));
 }
 
+export async function updateThemeAction(formData: FormData) {
+  const session = await requireUser();
+  const theme = formData.get("theme") === "dark" ? "dark" : "light";
+  await db().update(users).set({ theme }).where(eq(users.id, session.id));
+}
+
 export async function updateInterestsAction(formData: FormData) {
   const session = await requireUser();
   const userId = session.id;
@@ -94,7 +98,7 @@ export async function deleteAccountAction() {
 
   // Sign out first, while the session is still valid, then delete the auth
   // user with the admin client — Postgres cascades the rest (profile row,
-  // availability, interests, matches, chat) via the FK to auth.users.
+  // event interest, group membership, chat) via the FK to auth.users.
   const supabase = await createClient();
   await supabase.auth.signOut();
 

@@ -23,10 +23,11 @@ export default async function AdminDashboardPage() {
         </section>
 
         <section className="sm-card">
-          <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Match management</h3>
+          <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Event management</h3>
           <div className="sm-link-list">
-            <Link href="/admin/matches/new" className="sm-link-item">Create new match</Link>
-            <Link href="/admin/matches" className="sm-link-item">View / edit matches</Link>
+            <Link href="/admin/events/new" className="sm-link-item">Create new event</Link>
+            <Link href="/admin/events" className="sm-link-item">View / edit events</Link>
+            <Link href="/ticket" className="sm-link-item">Print marketing ticket</Link>
           </div>
         </section>
       </div>

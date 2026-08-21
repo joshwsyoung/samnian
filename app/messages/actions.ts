@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { chatMessages, conversationUsers, conversations, matchUsers } from "@/db/schema";
+import { chatMessages, conversationUsers, conversations, groupMembers } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 
 export async function createConversationAction(formData: FormData) {
@@ -12,21 +12,21 @@ export async function createConversationAction(formData: FormData) {
 
   const title = String(formData.get("title") ?? "").trim();
   const invitedUserIds = formData.getAll("users").map(String).filter(Boolean);
-  const matchIdRaw = formData.get("match_id");
-  const matchId = matchIdRaw ? Number(matchIdRaw) : null;
+  const groupIdRaw = formData.get("group_id");
+  const groupId = groupIdRaw ? Number(groupIdRaw) : null;
 
   if (!title) {
     redirect("/messages?error=missing_title");
   }
 
   let invitees = invitedUserIds;
-  if (matchId && invitees.length === 0) {
-    const rows = await db().select({ userId: matchUsers.userId }).from(matchUsers).where(eq(matchUsers.matchId, matchId));
+  if (groupId && invitees.length === 0) {
+    const rows = await db().select({ userId: groupMembers.userId }).from(groupMembers).where(eq(groupMembers.groupId, groupId));
     invitees = rows.map((r) => r.userId);
   }
 
-  if (matchId) {
-    const [existing] = await db().select().from(conversations).where(eq(conversations.matchId, matchId)).limit(1);
+  if (groupId) {
+    const [existing] = await db().select().from(conversations).where(eq(conversations.groupId, groupId)).limit(1);
     if (existing) {
       redirect(`/messages?conversation_id=${existing.id}`);
     }
@@ -34,7 +34,7 @@ export async function createConversationAction(formData: FormData) {
 
   const [conversation] = await db()
     .insert(conversations)
-    .values({ title, userId, matchId })
+    .values({ title, userId, groupId })
     .returning();
 
   if (!conversation) {

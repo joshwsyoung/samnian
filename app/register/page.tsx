@@ -1,14 +1,15 @@
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { registerAction } from "./actions";
 import "../design-system.css";
 
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; src?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, src } = await searchParams;
 
   return (
     <div className="sm-scope sm-auth-shell">
@@ -16,6 +17,12 @@ export default async function RegisterPage({
         <div className="sm-greeting">Join Samnian</div>
         <div className="sm-sub">Takes about 2 minutes.</div>
       </div>
+
+      {src === "ticket" && (
+        <div className="sm-flash info">
+          🎟️ Scanned our ticket? Nice one — let&rsquo;s get you signed up.
+        </div>
+      )}
 
       {error === "missing_fields" && <div className="sm-flash error">Please fill in all fields.</div>}
       {error && error !== "missing_fields" && (
@@ -28,6 +35,10 @@ export default async function RegisterPage({
           )}
         </div>
       )}
+
+      <GoogleSignInButton />
+
+      <div className="sm-auth-divider"><span>or</span></div>
 
       <form action={registerAction} className="sm-card">
         <div className="sm-field-stack">
