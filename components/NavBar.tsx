@@ -1,5 +1,4 @@
 import Link from "next/link";
-import LogoMark from "./LogoMark";
 import type { Session } from "@/lib/auth";
 import "../app/design-system.css";
 
@@ -12,7 +11,6 @@ export default function NavBar({ session, hasGroup }: { session: Session | null;
       <nav className="sm-scope navbar navbar-expand-md d-none d-sm-block">
         <div className="container-fluid">
           <Link className="navbar-brand sm-brand" href="/">
-            <LogoMark size={30} filterId="navVectorShadow" />
             <span className="sm-brand-word">Samnian</span>
           </Link>
 

@@ -1,5 +1,4 @@
 import QRCode from "qrcode";
-import LogoMark from "@/components/LogoMark";
 import PrintButton from "@/components/PrintButton";
 import { getBaseUrl } from "@/lib/url";
 
@@ -37,7 +36,6 @@ export default async function TicketPage() {
         <div className="ticket-stub">
           <div className="ticket-stub-main">
             <div className="ticket-stub-brand">
-              <LogoMark size={40} filterId="ticketVectorShadow" />
               <div>
                 <div className="ticket-stub-name">Samnian</div>
                 <div className="ticket-stub-tagline">GET SOCIAL</div>
