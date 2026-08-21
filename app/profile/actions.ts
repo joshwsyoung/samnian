@@ -87,6 +87,37 @@ export async function updateInterestsAction(formData: FormData) {
   redirect("/profile?success=" + encodeURIComponent("Your interests have been updated successfully!"));
 }
 
+export async function updateEmailAction(formData: FormData) {
+  await requireUser();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!email) redirect("/profile?error=" + encodeURIComponent("Please enter an email address."));
+
+  // Supabase sends a confirmation link to the new address and only swaps
+  // it over once that's clicked — this app's own users.email column (and
+  // the login email people actually use) stays as-is until then, so it's
+  // deliberately not updated optimistically here.
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ email });
+  if (error) redirect("/profile?error=" + encodeURIComponent(error.message));
+
+  redirect("/profile?success=" + encodeURIComponent(`Check ${email} for a link to confirm your new email address.`));
+}
+
+export async function updatePasswordAction(formData: FormData) {
+  await requireUser();
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirm_password") ?? "");
+
+  if (!password || !confirmPassword) redirect("/profile?error=" + encodeURIComponent("Please fill in both password fields."));
+  if (password !== confirmPassword) redirect("/profile?error=" + encodeURIComponent("Passwords do not match."));
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) redirect("/profile?error=" + encodeURIComponent(error.message));
+
+  redirect("/profile?success=" + encodeURIComponent("Password updated."));
+}
+
 export async function deleteAccountAction() {
   const session = await requireUser();
 
