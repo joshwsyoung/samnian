@@ -1,8 +1,32 @@
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import "./design-system.css";
 
-export default function LandingPage() {
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>;
+}) {
+  const { code } = await searchParams;
+
+  // Defensive fallback: Supabase Auth lands here with a bare ?code= (PKCE
+  // code exchange) instead of reaching our own /auth/confirm page whenever
+  // a confirmation/reset email's redirect_to isn't on the Redirect URLs
+  // allowlist — e.g. the form was submitted from a domain alias that isn't
+  // allow-listed there. Complete the exchange here too so that path still
+  // results in a session instead of silently doing nothing.
+  if (code) {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    redirect(
+      error
+        ? "/login?error=" + encodeURIComponent("That link is invalid or has expired.")
+        : "/dashboard"
+    );
+  }
+
   return (
     <div className="sm-scope">
       <div className="container">
