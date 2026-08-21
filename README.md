@@ -150,6 +150,16 @@ not something this app's code controls.
 - Event cards on `/events` are a new Airbnb-style grid (photo, restaurant
   name, date, address), replacing the old modal-driven dashboard.
 
+This landed alongside a separate, parallel site-wide visual redesign
+(`design/dashboard-redesign` — new type/color system, `app/design-system.css`,
+`components/dash/`). The merge of the two kept both, but dark mode came
+back along the way (the redesign branch had its own theme toggle, built
+before it knew the other branch had dropped dark mode) — it's been
+removed again, see `drizzle/0002_deep_the_professor.sql`. The redesign
+also added a separate floating pill-shaped bottom tab bar for mobile
+(`MobileBottomNav`); that's been dropped too, in favor of one ordinary
+navbar + hamburger toggler for every screen size.
+
 ## ⚠️ Rotate these credentials
 
 While porting this, three live secrets were found committed in the PHP
@@ -220,6 +230,13 @@ events-redesign branch's schema snapshot never had, showing up as a
 project will error on already-existing objects; that's expected, not
 schema drift. A genuinely fresh database can just run both files (or
 `db:push`) normally.
+
+Dark mode was then dropped for good (see "What changed" below) —
+`drizzle/0002_deep_the_professor.sql` drops that same `theme` column
+again. **This one still needs applying to the live project by hand** — it
+wasn't run as part of this change, only generated. It's a plain
+`ALTER TABLE ... DROP COLUMN` + `DROP TYPE`, safe to run directly in the
+Supabase SQL editor whenever's convenient.
 
 ## Deploying
 

@@ -543,13 +543,16 @@
 .sm-cta-band h2 { font-size: 1.5rem; margin-bottom: 18px; }
 
 /*
- * Site header + mobile tab bar. Applied via .sm-scope directly on the
- * <nav> elements (they sit in the root layout, outside any page's own
- * .sm-scope container) so every route gets the redesigned chrome even
- * before its own content is migrated. Overrides target the existing
- * Bootstrap class names at two-class specificity so they win regardless
- * of stylesheet load order, without touching the vendored rules or the
- * collapse-toggle JS that depends on those class names.
+ * Site header — one navbar for every screen size, collapsing behind the
+ * standard Bootstrap hamburger toggler below `md`. Applied via .sm-scope
+ * directly on the <nav> element (it sits in the root layout, outside any
+ * page's own .sm-scope container) so every route gets the redesigned
+ * chrome even before its own content is migrated. Overrides target the
+ * existing Bootstrap class names at two-class specificity so they win
+ * regardless of stylesheet load order, without touching the vendored
+ * rules or the collapse-toggle JS that depends on those class names.
+ * (There used to also be a separate floating pill-shaped bottom tab bar
+ * on mobile — dropped in favor of just this.)
  */
 .sm-scope.navbar {
   background: var(--sm-surface);
@@ -607,52 +610,6 @@
 }
 .sm-scope .sm-nav-cta { display: flex; align-items: center; margin-left: 4px; }
 .sm-scope .sm-nav-cta .sm-btn { padding: 8px 18px; font-size: 0.88rem; }
-
-/* Mobile tab bar: a centered floating pill, replacing the old
-   left:50%-without-transform rule that actually clipped it to the
-   right half of the viewport. */
-.sm-scope.mobile-bottom-nav {
-  position: fixed;
-  left: 50%;
-  right: auto;
-  bottom: 16px;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: calc(100vw - 24px);
-  margin: 0;
-  background: var(--sm-surface);
-  border: 1px solid var(--sm-border);
-  border-radius: 999px;
-  box-shadow: var(--sm-shadow);
-  padding: 6px;
-  z-index: 1000;
-}
-.sm-scope.mobile-bottom-nav .navbar-nav {
-  display: flex;
-  flex-direction: row;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 2px;
-}
-.sm-scope.mobile-bottom-nav .nav-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
-  font-size: 0.64rem;
-  font-weight: 600;
-  color: var(--sm-text-muted);
-  padding: 8px 13px;
-  border-radius: 999px;
-  transition: background 0.12s ease, color 0.12s ease;
-}
-.sm-scope.mobile-bottom-nav .nav-link i { font-size: 1.15rem; }
-.sm-scope.mobile-bottom-nav .nav-link:hover, .sm-scope.mobile-bottom-nav .nav-link:focus {
-  color: var(--sm-accent-strong);
-  background: var(--sm-surface-2);
-}
 
 /* Auth pages (login/register/reset/verify): a single centered card */
 .sm-auth-shell { max-width: 440px; margin: 0 auto; padding: 48px 16px; }

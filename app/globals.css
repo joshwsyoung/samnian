@@ -237,36 +237,6 @@ body.fade-out {
     background-color: var(--bs-success) !important;
 }
 
-/* FOOTER */
-.mobile-bottom-nav {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    background-color: var(--bs-secondary-bg);
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: 0.875rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    display: flex;
-    margin: 5px;
-    gap: 20px;
-    z-index: 1000;
-}
-
-.mobile-bottom-nav .nav-item {
-    text-align: center;
-    color: var(--bs-emphasis-color);
-    text-decoration: none;
-    font-size: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.mobile-bottom-nav .nav-item i {
-    font-size: 20px;
-    margin-bottom: 2px;
-}
-
 @font-face {
     font-family: 'Laries';
     src: url('/fonts/Laries-Regular.woff2') format('woff2'),
@@ -14489,7 +14459,6 @@ a {
 
 @media print {
   nav,
-  .mobile-bottom-nav,
   .d-print-none {
     display: none !important;
   }

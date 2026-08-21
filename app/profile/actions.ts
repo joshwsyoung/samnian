@@ -55,12 +55,6 @@ export async function updateProfileAction(formData: FormData) {
   redirect("/profile?success=" + encodeURIComponent("Profile updated successfully!"));
 }
 
-export async function updateThemeAction(formData: FormData) {
-  const session = await requireUser();
-  const theme = formData.get("theme") === "dark" ? "dark" : "light";
-  await db().update(users).set({ theme }).where(eq(users.id, session.id));
-}
-
 export async function updateInterestsAction(formData: FormData) {
   const session = await requireUser();
   const userId = session.id;
