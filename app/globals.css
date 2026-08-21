@@ -13722,6 +13722,16 @@ textarea.form-control-lg {
     }
 }
 
+/*
+ * Bootstrap's forced-colors (Windows High-Contrast-mode) override block.
+ * This bundle was vendored missing its `@media (forced-colors: active) {`
+ * opening line, so everything through the sourceMappingURL comment below
+ * — .navbar/.table borders, thicker button/input/card borders, etc. — was
+ * applying unconditionally to every visitor instead of only forced-colors
+ * mode. That's the stray black frame around the nav (and heavier borders
+ * site-wide). Re-wrapped here; contents below are untouched.
+ */
+@media (forced-colors: active) {
 :root {
     --bs-border-width: 2px;
     --bs-border-color: #000
@@ -14197,6 +14207,7 @@ a {
 
 [data-bs-theme=dark] .toast-header {
     --bs-toast-header-color: #fff
+}
 }
 
 /*# sourceMappingURL=bootstrap.min.css.map */
