@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { events, eventInterest, groupMembers, groups, interests, personalityScores, userInterests, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
-import { firstNameFrom, getGreeting } from "@/lib/greeting";
 import { CITIES, priceTierLabel } from "@/lib/constants";
-import { formatEventDate, formatSlot } from "@/lib/format";
+import { formatEventDate, formatFeedDate, formatMonthYear, formatSlot } from "@/lib/format";
 import EditPanel from "@/components/dash/EditPanel";
 import InterestChipPicker from "@/components/dash/InterestChipPicker";
 import ConfirmButton from "@/components/ConfirmButton";
@@ -15,6 +14,29 @@ import { deleteAccountAction, updateInterestsAction, updateProfileAction } from 
 import "../design-system.css";
 
 export const dynamic = "force-dynamic";
+
+// One entry in the profile feed — event RSVPs plus a couple of "life
+// event"-style entries (joining, completing the personality quiz), all
+// merged and sorted newest-first like a real activity feed rather than
+// grouped into separate data tables.
+type FeedItem =
+  | {
+      type: "rsvp";
+      at: Date;
+      priceTier: string;
+      confirmed: boolean;
+      event: {
+        id: number;
+        title: string;
+        restaurantName: string;
+        imageUrl: string | null;
+        address: string | null;
+        eventDate: string;
+        slot: string;
+      };
+    }
+  | { type: "ocean"; at: Date }
+  | { type: "join"; at: Date };
 
 export default async function ProfilePage({
   searchParams,
@@ -49,34 +71,30 @@ export default async function ProfilePage({
       eventId: events.id,
       title: events.title,
       restaurantName: events.restaurantName,
+      imageUrl: events.imageUrl,
+      address: events.address,
       eventDate: events.eventDate,
       slot: events.slot,
       priceTier: eventInterest.priceTier,
+      rsvpAt: eventInterest.createdAt,
     })
     .from(eventInterest)
     .innerJoin(events, eq(eventInterest.eventId, events.id))
-    .where(eq(eventInterest.userId, userId));
+    .where(eq(eventInterest.userId, userId))
+    .orderBy(desc(eventInterest.createdAt));
 
-  const [myGroupRow] = await db()
-    .select({ groupId: groupMembers.groupId })
+  // Every group this user has been placed in, across every event — used to
+  // badge individual feed entries as "confirmed", not just fetched for one.
+  const myGroupMemberships = await db()
+    .select({ eventId: groups.eventId, approved: groups.approved })
     .from(groupMembers)
-    .where(eq(groupMembers.userId, userId))
-    .limit(1);
-  const myTable = myGroupRow
-    ? (
-        await db()
-          .select({ eventId: groups.eventId, title: events.title, eventDate: events.eventDate, slot: events.slot })
-          .from(groups)
-          .innerJoin(events, eq(groups.eventId, events.id))
-          .where(eq(groups.id, myGroupRow.groupId))
-          .limit(1)
-      )[0]
-    : undefined;
+    .innerJoin(groups, eq(groupMembers.groupId, groups.id))
+    .where(eq(groupMembers.userId, userId));
+  const confirmedEventIds = new Set(myGroupMemberships.filter((g) => g.approved).map((g) => g.eventId));
 
   const requiredFields = [user.name, user.email, user.phone, user.age, user.city, user.profileImage];
   const profileComplete = requiredFields.every((f) => f !== null && f !== undefined && f !== "");
 
-  const greeting = `${getGreeting()}${firstNameFrom(user.name)}.`;
   const initials = (user.name ?? "?")
     .split(/\s+/)
     .map((s) => s[0])
@@ -85,84 +103,76 @@ export default async function ProfilePage({
     .join("")
     .toUpperCase();
 
+  const feedItems: FeedItem[] = [
+    { type: "join" as const, at: user.createdAt },
+    ...(scores ? [{ type: "ocean" as const, at: scores.updatedAt }] : []),
+    ...myEvents.map((e) => ({
+      type: "rsvp" as const,
+      at: e.rsvpAt,
+      priceTier: e.priceTier,
+      confirmed: confirmedEventIds.has(e.eventId),
+      event: {
+        id: e.eventId,
+        title: e.title,
+        restaurantName: e.restaurantName,
+        imageUrl: e.imageUrl,
+        address: e.address,
+        eventDate: e.eventDate,
+        slot: e.slot,
+      },
+    })),
+  ].sort((a, b) => b.at.getTime() - a.at.getTime());
+
+  const today = new Date().toISOString().slice(0, 10);
+
   return (
     <div className="sm-scope container mt-3">
-      <div className="sm-page-head">
-        <div className="sm-greeting">{greeting}</div>
-        <div className="sm-sub">Here&rsquo;s what we&rsquo;ve got on file for you.</div>
+      <div className="sm-profile-cover">
+        <div className="sm-profile-cover-inner">
+          {user.profileImage ? (
+            <Image src={user.profileImage} width={88} height={88} className="sm-avatar" alt="Profile" />
+          ) : (
+            <div className="sm-avatar-fallback">{initials || "?"}</div>
+          )}
+          <div>
+            <div className="sm-profile-name">{user.name}</div>
+            <div className="sm-profile-meta">
+              {user.city || "Somewhere out there"} · Joined {formatMonthYear(user.createdAt)}
+            </div>
+          </div>
+          <span className={`sm-status-pill ${profileComplete ? "matched" : "unset"}`}>
+            <span className="sm-dot" />
+            {profileComplete ? "Profile complete" : "Profile incomplete"}
+          </span>
+        </div>
       </div>
 
       {success && <div className="sm-flash success">{success}</div>}
       {error && <div className="sm-flash error">{error}</div>}
 
-      <div className="sm-stack">
-        {/* IDENTITY CARD */}
-        <section className="sm-card">
-          <span className={`sm-status-pill ${profileComplete ? "matched" : "unset"}`}>
-            <span className="sm-dot" />
-            {profileComplete ? "Profile complete" : "Profile incomplete"}
-          </span>
-
-          <div className="sm-identity">
-            {user.profileImage ? (
-              <Image src={user.profileImage} width={72} height={72} className="sm-avatar" alt="Profile" />
-            ) : (
-              <div className="sm-avatar-fallback">{initials || "?"}</div>
-            )}
-            <div>
-              <div className="sm-identity-name">{user.name}</div>
-              <div className="sm-actions" style={{ marginTop: 4 }}>
-                <Link className="sm-btn-link" href="/messages">Open chats →</Link>
-                <Link className="sm-btn-link" href="/events">Browse events →</Link>
-              </div>
+      <div className="sm-profile-layout">
+        {/* SIDEBAR */}
+        <aside className="sm-profile-sidebar">
+          <section className="sm-card">
+            <h3>About</h3>
+            <div className="sm-fact-row" style={{ marginBottom: 8 }}>
+              <div className="sm-fact"><dt>Email</dt><dd>{user.email}</dd></div>
+              <div className="sm-fact"><dt>Phone</dt><dd>{user.phone || "—"}</dd></div>
+              <div className="sm-fact"><dt>Age</dt><dd>{user.age ?? "—"}</dd></div>
+              <div className="sm-fact"><dt>City</dt><dd>{user.city || "—"}</dd></div>
             </div>
-          </div>
-
-          <div className="sm-fact-row" style={{ marginTop: 18 }}>
-            <div className="sm-fact"><dt>Email</dt><dd>{user.email}</dd></div>
-            <div className="sm-fact"><dt>Phone</dt><dd>{user.phone || "—"}</dd></div>
-            <div className="sm-fact"><dt>Age</dt><dd>{user.age ?? "—"}</dd></div>
-            <div className="sm-fact"><dt>City</dt><dd>{user.city || "—"}</dd></div>
-          </div>
-
-          <div className="sm-actions">
-            <EditPanel
-              triggerLabel={profileComplete ? "Edit details" : "Complete your profile"}
-              action={updateProfileAction}
-              encType="multipart/form-data"
-            >
-              <ProfileFields user={user} />
-            </EditPanel>
-          </div>
-        </section>
-
-        {/* QUICK FACTS */}
-        <div className="sm-quick-row">
-          <section className="sm-card sm-quick-card">
-            <h3>My events</h3>
-            {myEvents.length > 0 ? (
-              <ul className="sm-link-list">
-                {myEvents.map((e) => (
-                  <li key={e.eventId}>
-                    <Link href={`/events/${e.eventId}`} className="sm-link-item">
-                      {e.title} — {e.restaurantName}
-                      <br />
-                      <span className="sm-price-note" style={{ margin: 0 }}>
-                        {formatEventDate(e.eventDate)} at {formatSlot(e.slot)} · {priceTierLabel(e.priceTier)}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <>
-                <p className="sm-price-note" style={{ marginTop: 0 }}>You&rsquo;re not down for anything yet.</p>
-                <Link className="sm-btn sm-btn-primary" href="/events">Browse events</Link>
-              </>
-            )}
+            <div className="sm-actions">
+              <EditPanel
+                triggerLabel={profileComplete ? "Edit details" : "Complete your profile"}
+                action={updateProfileAction}
+                encType="multipart/form-data"
+              >
+                <ProfileFields user={user} />
+              </EditPanel>
+            </div>
           </section>
 
-          <section className="sm-card sm-quick-card">
+          <section className="sm-card">
             <h3>Interests</h3>
             {selectedInterestNames.length > 0 ? (
               <div className="sm-tag-row">
@@ -183,65 +193,151 @@ export default async function ProfilePage({
               </EditPanel>
             </div>
           </section>
-        </div>
 
-        {/* TABLE */}
-        <section className="sm-card">
-          <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Your table</h3>
-          {myTable ? (
-            <div className="sm-fact-row" style={{ marginBottom: 0 }}>
-              <div className="sm-fact"><dt>Event</dt><dd>{myTable.title}</dd></div>
-              <div className="sm-fact"><dt>Date</dt><dd>{formatEventDate(myTable.eventDate)}</dd></div>
-              <div className="sm-fact"><dt>Time</dt><dd>{formatSlot(myTable.slot)}</dd></div>
-            </div>
+          <section className="sm-card">
+            <h3>Personality</h3>
+            {scores ? (
+              <>
+                <OceanChart scores={scores} />
+                <details className="sm-details" style={{ marginTop: 14 }}>
+                  <summary>What do these traits mean?</summary>
+                  <div className="sm-details-body">
+                    <p><strong>Openness</strong> — High: curious, imaginative, open to new experiences. Low: practical, prefers routine.</p>
+                    <p><strong>Conscientiousness</strong> — High: organized, reliable, plans ahead. Low: spontaneous, disorganized.</p>
+                    <p><strong>Extraversion</strong> — High: outgoing, energetic, enjoys social settings. Low: reserved, prefers solitude.</p>
+                    <p><strong>Agreeableness</strong> — High: compassionate, cooperative, trusting. Low: competitive, skeptical.</p>
+                    <p><strong>Neuroticism</strong> — High: emotionally reactive, prone to stress. Low: calm, resilient.</p>
+                    <p>0 = Low, 5 = High.</p>
+                  </div>
+                </details>
+              </>
+            ) : (
+              <>
+                <p className="sm-price-note" style={{ marginTop: 0 }}>Personality scores not available yet.</p>
+                <Link className="sm-btn sm-btn-primary" href="/ocean-test">Take the 2-minute quiz</Link>
+              </>
+            )}
+          </section>
+
+          <section className="sm-card sm-danger-zone">
+            <details className="sm-details">
+              <summary>Delete account</summary>
+              <div className="sm-details-body">
+                <p className="sm-price-note" style={{ marginTop: 0 }}>This permanently removes your profile, event RSVPs and chat history.</p>
+                <form action={deleteAccountAction}>
+                  <ConfirmButton
+                    message="Are you sure you want to delete your account? This cannot be undone."
+                    className="sm-btn-danger"
+                  >
+                    Delete account
+                  </ConfirmButton>
+                </form>
+              </div>
+            </details>
+          </section>
+        </aside>
+
+        {/* FEED */}
+        <main className="sm-feed">
+          <h2 className="sm-feed-heading">Activity</h2>
+
+          {feedItems.length === 0 ? (
+            <p className="sm-feed-empty">Nothing here yet.</p>
           ) : (
-            <p className="sm-price-note" style={{ marginTop: 0 }}>
-              Not placed at a table yet — <Link className="sm-btn-link" href="/events">browse events</Link> and RSVP to one.
-            </p>
+            feedItems.map((item, i) => (
+              <FeedCard key={i} item={item} user={user} initials={initials} today={today} />
+            ))
           )}
-        </section>
-
-        {/* PERSONALITY */}
-        <section className="sm-card">
-          <h3 style={{ fontSize: "0.95rem", marginBottom: 12 }}>Personality profile</h3>
-          {scores ? (
-            <>
-              <OceanChart scores={scores} />
-              <details className="sm-details" style={{ marginTop: 14 }}>
-                <summary>What do these traits mean?</summary>
-                <div className="sm-details-body">
-                  <p><strong>Openness</strong> — High: curious, imaginative, open to new experiences. Low: practical, prefers routine.</p>
-                  <p><strong>Conscientiousness</strong> — High: organized, reliable, plans ahead. Low: spontaneous, disorganized.</p>
-                  <p><strong>Extraversion</strong> — High: outgoing, energetic, enjoys social settings. Low: reserved, prefers solitude.</p>
-                  <p><strong>Agreeableness</strong> — High: compassionate, cooperative, trusting. Low: competitive, skeptical.</p>
-                  <p><strong>Neuroticism</strong> — High: emotionally reactive, prone to stress. Low: calm, resilient.</p>
-                  <p>0 = Low, 5 = High.</p>
-                </div>
-              </details>
-            </>
-          ) : (
-            <>
-              <p className="sm-price-note" style={{ marginTop: 0 }}>Personality scores not available yet.</p>
-              <Link className="sm-btn sm-btn-primary" href="/ocean-test">Take the 2-minute quiz</Link>
-            </>
-          )}
-        </section>
-
-        {/* DANGER ZONE */}
-        <section className="sm-card">
-          <h3 style={{ fontSize: "0.95rem", marginBottom: 10 }}>Delete account</h3>
-          <p className="sm-price-note" style={{ marginTop: 0 }}>This permanently removes your profile, event RSVPs and chat history.</p>
-          <form action={deleteAccountAction}>
-            <ConfirmButton
-              message="Are you sure you want to delete your account? This cannot be undone."
-              className="sm-btn-danger"
-            >
-              Delete account
-            </ConfirmButton>
-          </form>
-        </section>
+        </main>
       </div>
     </div>
+  );
+}
+
+function FeedCard({
+  item,
+  user,
+  initials,
+  today,
+}: {
+  item: FeedItem;
+  user: typeof users.$inferSelect;
+  initials: string;
+  today: string;
+}) {
+  const avatar = user.profileImage ? (
+    <Image src={user.profileImage} width={38} height={38} className="sm-avatar sm-feed-avatar" alt="" />
+  ) : (
+    <div className="sm-avatar-fallback sm-feed-avatar-fallback">{initials || "?"}</div>
+  );
+
+  if (item.type === "join") {
+    return (
+      <article className="sm-card">
+        <div className="sm-feed-item-header">
+          {avatar}
+          <div>
+            <div className="sm-feed-item-headline"><strong>{user.name}</strong> joined Samnian 🎉</div>
+            <div className="sm-feed-item-time">{formatFeedDate(item.at)}</div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  if (item.type === "ocean") {
+    return (
+      <article className="sm-card">
+        <div className="sm-feed-item-header">
+          {avatar}
+          <div>
+            <div className="sm-feed-item-headline"><strong>{user.name}</strong> completed the OCEAN personality quiz</div>
+            <div className="sm-feed-item-time">{formatFeedDate(item.at)}</div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  const { event, priceTier, confirmed } = item;
+  const isUpcoming = event.eventDate >= today;
+
+  return (
+    <article className="sm-card">
+      <div className="sm-feed-item-header">
+        {avatar}
+        <div>
+          <div className="sm-feed-item-headline">
+            <strong>{user.name}</strong> {isUpcoming ? "is in for" : "went to"} <strong>{event.title}</strong>
+          </div>
+          <div className="sm-feed-item-time">{formatFeedDate(item.at)}</div>
+        </div>
+      </div>
+
+      <Link href={`/events/${event.id}`} className="sm-feed-event">
+        <div className="sm-feed-event-thumb">
+          {event.imageUrl && (
+            <Image src={event.imageUrl} alt={event.restaurantName} fill sizes="84px" style={{ objectFit: "cover" }} />
+          )}
+        </div>
+        <div className="sm-feed-event-body">
+          <p className="sm-feed-event-title">{event.title}</p>
+          <p className="sm-feed-event-sub">{event.restaurantName}</p>
+          <p className="sm-feed-event-meta">
+            {formatEventDate(event.eventDate)} at {formatSlot(event.slot)}
+            {event.address && <> · {event.address}</>}
+          </p>
+        </div>
+      </Link>
+
+      <div className="sm-feed-badges">
+        <span className={`sm-feed-pill ${isUpcoming ? "sm-feed-pill-upcoming" : ""}`}>
+          {isUpcoming ? "Upcoming" : "Past event"}
+        </span>
+        <span className="sm-feed-pill">{priceTierLabel(priceTier)}</span>
+        {confirmed && <span className="sm-feed-pill sm-feed-pill-confirmed">🎉 Table confirmed</span>}
+      </div>
+    </article>
   );
 }
 

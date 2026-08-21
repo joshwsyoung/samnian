@@ -7,6 +7,12 @@ import "../app/design-system.css";
  * Bootstrap hamburger toggler below the `md` breakpoint. There used to
  * also be a separate floating pill-shaped bottom tab bar on mobile
  * (MobileBottomNav); it was dropped in favor of just this.
+ *
+ * Login/Register/Logout also get a compact icon-only row next to the
+ * toggler, visible only below `md` — on mobile they'd otherwise be just
+ * more rows buried at the bottom of the hamburger dropdown; as icons they
+ * stay reachable without opening the menu. The full text versions still
+ * render inside the dropdown for desktop, where there's room to spare.
  */
 export default function NavBar({ session, hasGroup }: { session: Session | null; hasGroup: boolean }) {
   const isAdmin = session?.role === "admin";
@@ -17,6 +23,25 @@ export default function NavBar({ session, hasGroup }: { session: Session | null;
         <Link className="navbar-brand sm-brand" href="/">
           <span className="sm-brand-word">Samnian</span>
         </Link>
+
+        <div className="sm-nav-auth-icons d-flex d-md-none">
+          {session ? (
+            <form action="/logout" method="POST">
+              <button type="submit" className="sm-nav-icon-btn" aria-label="Logout">
+                <i className="bi bi-box-arrow-right" aria-hidden="true" />
+              </button>
+            </form>
+          ) : (
+            <>
+              <Link className="sm-nav-icon-btn" href="/login" aria-label="Login">
+                <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
+              </Link>
+              <Link className="sm-nav-icon-btn sm-nav-icon-btn-primary" href="/register" aria-label="Register">
+                <i className="bi bi-person-plus" aria-hidden="true" />
+              </Link>
+            </>
+          )}
+        </div>
 
         <button
           className="navbar-toggler"
@@ -61,13 +86,9 @@ export default function NavBar({ session, hasGroup }: { session: Session | null;
                 <li className="nav-item">
                   <Link className="nav-link" href="/profile">Profile</Link>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item d-none d-md-block">
                   <form action="/logout" method="POST">
-                    <button
-                      type="submit"
-                      className="nav-link"
-                      style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }}
-                    >
+                    <button type="submit" className="nav-link sm-btn-reset">
                       Logout
                     </button>
                   </form>
@@ -75,10 +96,10 @@ export default function NavBar({ session, hasGroup }: { session: Session | null;
               </>
             ) : (
               <>
-                <li className="nav-item">
+                <li className="nav-item d-none d-md-block">
                   <Link className="nav-link" href="/login">Login</Link>
                 </li>
-                <li className="nav-item sm-nav-cta">
+                <li className="nav-item sm-nav-cta d-none d-md-flex">
                   <Link className="sm-btn sm-btn-primary" href="/register">Register</Link>
                 </li>
               </>
