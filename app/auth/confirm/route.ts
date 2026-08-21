@@ -42,6 +42,25 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "/events";
 
   if (!tokenHash || !type) {
+    // We've never actually gotten dashboard access to put token_hash/type in
+    // Supabase's email templates (see README) -- these emails still use
+    // Supabase's own default template, whose link visits Supabase's own
+    // hosted /auth/v1/verify endpoint first. That endpoint does the real
+    // verification itself and sets the session cookie, then redirects here
+    // via redirectTo/emailRedirectTo -- by which point token_hash/type are
+    // long gone. So landing here with neither isn't necessarily a dead link;
+    // it's the normal shape of every email we currently send. Check for a
+    // session that verification step would have already created before
+    // assuming the link is bad -- this is what was silently broken for
+    // password reset (no template edit fixes it; there's nothing to switch
+    // back to, this is the only path these emails have ever taken).
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      redirect(next);
+    }
     redirect(`/login?error=${encodeURIComponent(MALFORMED_LINK_ERROR)}`);
   }
 

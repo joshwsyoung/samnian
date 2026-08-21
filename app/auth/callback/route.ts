@@ -10,7 +10,7 @@ const OAUTH_FAILED_ERROR = "Google sign-in didn't complete. Please try again.";
 
 /**
  * Where Supabase sends the browser back after a Google OAuth round trip
- * (see app/auth/oauth-actions.ts). Unlike email/password, there's no
+ * (see components/GoogleSignInButton.tsx). Unlike email/password, there's no
  * separate register step — the first time we see a given Google account we
  * create this app's profile row right here, same as registerAction does
  * for email/password signups.
