@@ -10,10 +10,10 @@ export const dynamic = "force-dynamic";
 export default async function OceanTestPage({
   searchParams,
 }: {
-  searchParams: Promise<{ required?: string }>;
+  searchParams: Promise<{ required?: string; next?: string }>;
 }) {
   await requireUser();
-  const { required } = await searchParams;
+  const { required, next } = await searchParams;
 
   const questions = await db()
     .select()
@@ -44,6 +44,7 @@ export default async function OceanTestPage({
       <div className="sm-card">
         <OceanTestForm
           questions={questions.map((q) => ({ id: q.id, question: q.question, options: q.options }))}
+          next={next}
         />
       </div>
     </div>

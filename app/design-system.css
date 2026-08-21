@@ -247,6 +247,7 @@
 
 .sm-settings-strip {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -255,6 +256,9 @@
   color: var(--sm-text-muted);
   font-size: 0.82rem;
 }
+/* When its EditPanel opens into a full form, drop it onto its own line
+   below the label + trigger row instead of squeezing it in beside them. */
+.sm-settings-strip .sm-edit-panel { flex-basis: 100%; margin-top: 10px; }
 
 .sm-toggle {
   position: relative;
@@ -635,6 +639,31 @@
   background: var(--sm-border);
 }
 
+/* Log in / Register toggle — one auth page, one URL either way */
+.sm-auth-tabs {
+  display: flex;
+  background: var(--sm-surface-2);
+  border: 1px solid var(--sm-border);
+  border-radius: 999px;
+  padding: 3px;
+  margin-bottom: 20px;
+}
+.sm-auth-tabs button {
+  flex: 1;
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--sm-text-muted);
+  padding: 9px 12px;
+  border-radius: 999px;
+}
+.sm-auth-tabs button.active { background: var(--sm-surface); color: var(--sm-text); box-shadow: var(--sm-shadow); }
+.sm-auth-tabs button:focus-visible { outline: 2px solid var(--sm-accent-strong); outline-offset: 2px; }
+
 .sm-field-stack { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
 
 .sm-field-password { position: relative; display: flex; align-items: stretch; }
@@ -696,3 +725,160 @@
 /* OCEAN test progress bar */
 .sm-progress { height: 6px; border-radius: 999px; background: var(--sm-surface-2); overflow: hidden; }
 .sm-progress-bar { height: 100%; background: var(--sm-accent-strong); transition: width 0.25s ease; }
+
+/* Events: Airbnb-style browsable list + detail, public (no login needed
+   to view — only to RSVP, which is where the auth/OCEAN "question flow"
+   for new users kicks in). */
+.sm-event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
+
+.sm-event-card { color: inherit; text-decoration: none; display: block; }
+.sm-event-card-img {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--sm-radius);
+  overflow: hidden;
+  background: var(--sm-surface-2);
+}
+.sm-event-card-img img { transition: transform 0.2s ease; }
+.sm-event-card:hover .sm-event-card-img img { transform: scale(1.04); }
+.sm-event-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--sm-success);
+  background: var(--sm-surface);
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: var(--sm-shadow);
+}
+.sm-event-card-body { padding-top: 10px; }
+.sm-event-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sm-event-card-title { font-size: 1rem; font-weight: 600; margin: 0; }
+.sm-event-card-sub { font-size: 0.85rem; color: var(--sm-text-muted); margin: 2px 0 0; }
+.sm-event-card-meta { font-size: 0.82rem; color: var(--sm-text-muted); margin: 4px 0 0; display: flex; align-items: center; gap: 5px; }
+
+.sm-tag-outline {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--sm-text-muted);
+  border: 1px solid var(--sm-border);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+/* Detail page: hero photo grid — one big + up to 4 small, à la Airbnb */
+.sm-event-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 130px);
+  gap: 6px;
+  border-radius: var(--sm-radius);
+  overflow: hidden;
+}
+.sm-event-gallery > div { position: relative; background: var(--sm-surface-2); }
+.sm-event-gallery > div:first-child { grid-column: span 2; grid-row: span 2; }
+@media (max-width: 640px) {
+  .sm-event-gallery { grid-template-columns: repeat(2, 1fr); grid-template-rows: 160px repeat(2, 90px); }
+  .sm-event-gallery > div:first-child { grid-column: span 2; grid-row: span 1; }
+}
+
+.sm-event-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+.sm-event-title-row h1 { font-size: 1.5rem; }
+.sm-event-restaurant { color: var(--sm-text-muted); font-size: 1rem; margin-top: 4px; }
+
+.sm-event-facts { display: grid; gap: 12px; margin: 18px 0; }
+.sm-event-fact { display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; }
+.sm-event-fact i { color: var(--sm-accent-strong); font-size: 1.05rem; width: 18px; text-align: center; flex: none; margin-top: 1px; }
+.sm-event-fact a { color: var(--sm-accent-strong); text-decoration: none; font-weight: 500; }
+.sm-event-fact a:hover { text-decoration: underline; }
+.sm-event-fact-label { color: var(--sm-text-muted); font-size: 0.78rem; display: block; }
+
+.sm-event-description { font-size: 0.94rem; line-height: 1.6; color: var(--sm-text); }
+
+.sm-price-tier-picker { display: grid; gap: 8px; }
+.sm-price-tier-option { position: relative; display: block; cursor: pointer; }
+.sm-price-tier-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.sm-price-tier-option-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--sm-border);
+  border-radius: var(--sm-radius-sm);
+  padding: 10px 14px;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.sm-price-tier-option input:checked + .sm-price-tier-option-body {
+  border-color: var(--sm-accent-strong);
+  background: var(--sm-surface-2);
+}
+.sm-price-tier-option-label { font-weight: 600; font-size: 0.88rem; }
+.sm-price-tier-option-range { font-size: 0.78rem; color: var(--sm-text-muted); }
+
+/* Printable ticket sheet (/ticket) — same A4/10-ticket-grid design as the
+   one-off flyer artifact this was modelled on, now the in-app, always-
+   up-to-date version (its QR always points at the live register URL).
+   Since dark mode doesn't exist anywhere else in the app any more either,
+   this can just use the normal tokens directly, no light-mode overrides
+   needed the way a truly theme-independent print page otherwise would. */
+.sm-ticket-toolbar { max-width: 640px; margin: 0 auto 20px; }
+
+.sm-ticket-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: var(--sm-surface);
+  padding: 8mm;
+  box-shadow: var(--sm-shadow);
+}
+.sm-ticket-sheet {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  min-height: 281mm;
+}
+.sm-ticket {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+.sm-ticket-sheet .sm-ticket:not(:nth-child(2n)) { border-right: 1pt dashed var(--sm-border); }
+.sm-ticket-sheet .sm-ticket:nth-child(n+1):not(:nth-last-child(-n+2)) { border-bottom: 1pt dashed var(--sm-border); }
+
+.sm-ticket-info {
+  flex: 1 1 auto;
+  padding: 4.2mm 4mm 4.2mm 5mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.6mm;
+  min-width: 0;
+}
+.sm-ticket-info .sm-tag { font-size: 1.9mm; padding: 0.8mm 2.2mm; width: fit-content; }
+.sm-ticket-brand { font-size: 3mm; font-weight: 700; color: var(--sm-text); }
+.sm-ticket-headline { font-size: 3.55mm; font-weight: 600; line-height: 1.18; color: var(--sm-accent-ink); margin: 0.4mm 0 0; }
+.sm-ticket-body { font-size: 2.55mm; line-height: 1.35; color: var(--sm-text-muted); margin: 0; max-width: 62mm; }
+
+.sm-ticket-stub {
+  flex: none;
+  width: 27mm;
+  border-left: 1pt dashed var(--sm-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4mm;
+  padding: 3mm 2mm;
+  background: var(--sm-surface-2);
+}
+.sm-ticket-stub svg { width: 17mm; height: 17mm; }
+.sm-ticket-stub .sm-scan-label { font-size: 1.75mm; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--sm-accent-strong); text-align: center; }
+.sm-ticket-stub .sm-scan-url { font-size: 1.9mm; font-weight: 500; color: var(--sm-text); text-align: center; }
+
+@media print {
+  .sm-ticket-toolbar { display: none; }
+  .sm-ticket-page { box-shadow: none; width: auto; min-height: 0; }
+}
+@page { size: A4; margin: 0; }

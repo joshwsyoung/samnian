@@ -9,7 +9,7 @@ type Question = {
   options: { value: number; label: string }[];
 };
 
-export default function OceanTestForm({ questions }: { questions: Question[] }) {
+export default function OceanTestForm({ questions, next }: { questions: Question[]; next?: string }) {
   const [current, setCurrent] = useState(0);
 
   const total = questions.length;
@@ -24,6 +24,7 @@ export default function OceanTestForm({ questions }: { questions: Question[] }) 
 
   return (
     <form action={submitOceanTestAction}>
+      {next && <input type="hidden" name="next" value={next} />}
       <div className="sm-progress" style={{ marginBottom: 28 }}>
         <div className="sm-progress-bar" style={{ width: `${percent}%` }} />
       </div>

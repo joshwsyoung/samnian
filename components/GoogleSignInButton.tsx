@@ -1,8 +1,9 @@
 import { signInWithGoogleAction } from "@/app/auth/oauth-actions";
 
-export default function GoogleSignInButton() {
+export default function GoogleSignInButton({ next }: { next?: string }) {
   return (
     <form action={signInWithGoogleAction}>
+      {next && <input type="hidden" name="next" value={next} />}
       <button
         type="submit"
         className="sm-btn sm-btn-ghost"

@@ -5,9 +5,9 @@ import "../design-system.css";
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ email?: string; success?: string }>;
+  searchParams: Promise<{ email?: string; success?: string; next?: string }>;
 }) {
-  const { email, success } = await searchParams;
+  const { email, success, next } = await searchParams;
 
   if (!email) redirect("/register");
 
@@ -30,6 +30,7 @@ export default async function VerifyEmailPage({
         </p>
         <form action={resendVerificationAction}>
           <input type="hidden" name="email" value={email} />
+          {next && <input type="hidden" name="next" value={next} />}
           <button type="submit" className="sm-btn-link">Resend the email</button>
         </form>
       </div>

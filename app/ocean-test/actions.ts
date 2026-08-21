@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { personalityTests, personalityScores } from "@/db/schema";
-import { requireUser } from "@/lib/auth";
+import { requireUser, safeNextPath } from "@/lib/auth";
 
 type Trait = "O" | "C" | "E" | "A" | "N";
 
@@ -54,5 +54,7 @@ export async function submitOceanTestAction(formData: FormData) {
     .values(scores)
     .onConflictDoUpdate({ target: personalityScores.userId, set: scores });
 
-  redirect("/events?success=" + encodeURIComponent("Thanks — your personality results are saved! Take a look at what's coming up."));
+  const next = safeNextPath(String(formData.get("next") ?? ""), "/events");
+  const separator = next.includes("?") ? "&" : "?";
+  redirect(`${next}${separator}success=` + encodeURIComponent("Thanks — your personality results are saved!"));
 }

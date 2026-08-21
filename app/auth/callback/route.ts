@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { personalityScores, users } from "@/db/schema";
+import { safeNextPath } from "@/lib/auth";
 
 const OAUTH_FAILED_ERROR = "Google sign-in didn't complete. Please try again.";
 
@@ -17,6 +18,7 @@ const OAUTH_FAILED_ERROR = "Google sign-in didn't complete. Please try again.";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const next = safeNextPath(searchParams.get("next") ?? undefined, "");
 
   if (!code) {
     redirect(`/login?error=${encodeURIComponent(OAUTH_FAILED_ERROR)}`);
@@ -49,5 +51,6 @@ export async function GET(request: NextRequest) {
   if (profile?.role === "admin") redirect("/admin");
 
   const [scores] = await db().select().from(personalityScores).where(eq(personalityScores.userId, authUser.id)).limit(1);
-  redirect(scores ? "/events" : "/ocean-test?required=1");
+  if (scores) redirect(safeNextPath(next, "/events"));
+  redirect(`/ocean-test?required=1${next ? `&next=${encodeURIComponent(next)}` : ""}`);
 }

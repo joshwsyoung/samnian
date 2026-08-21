@@ -39,10 +39,16 @@ export async function getSession(): Promise<Session | null> {
   };
 }
 
-/** Server Component / Server Action guard: redirects to /login if unauthenticated. */
-export async function requireUser(): Promise<Session> {
+/**
+ * Server Component / Server Action guard: redirects to /login if
+ * unauthenticated. `next` (a relative path only — never pass a full URL
+ * through here, to avoid an open redirect) is threaded onto the login
+ * link so the login/OAuth flow can send the user back to what they were
+ * doing instead of always landing on /events.
+ */
+export async function requireUser(next?: string): Promise<Session> {
   const session = await getSession();
-  if (!session) redirect("/login");
+  if (!session) redirect(`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`);
   return session;
 }
 
@@ -55,14 +61,28 @@ export async function requireAdmin(): Promise<Session> {
 
 /**
  * Server Component / Server Action guard: the OCEAN test is mandatory
- * before a user can browse or opt into events, so route handlers that need
- * a completed test call this instead of requireUser().
+ * before a user can opt into an event, so actions that need a completed
+ * test call this instead of requireUser() — it's the two-step "question
+ * flow" a brand new visitor goes through (log in/register, then the
+ * quiz) before their first RSVP goes through, threading `next` through
+ * both hops so they land back on the event they were trying to join.
  */
-export async function requireCompletedOceanTest(): Promise<Session> {
-  const session = await requireUser();
+export async function requireCompletedOceanTest(next?: string): Promise<Session> {
+  const session = await requireUser(next);
   const [scores] = await db().select().from(personalityScores).where(eq(personalityScores.userId, session.id)).limit(1);
-  if (!scores) redirect("/ocean-test?required=1");
+  if (!scores) redirect(`/ocean-test?required=1${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   return session;
+}
+
+/**
+ * Only relative, same-site paths are safe to redirect to — anything else
+ * (a bare "//evil.com", an absolute "https://…" URL) is dropped in favor
+ * of the given fallback so a crafted `next` query param can't be used to
+ * redirect through this app to somewhere else.
+ */
+export function safeNextPath(next: string | undefined, fallback: string): string {
+  if (next && next.startsWith("/") && !next.startsWith("//")) return next;
+  return fallback;
 }
 
 /** Whether this user has been placed in at least one dinner group — used to gate the Chat nav link. */

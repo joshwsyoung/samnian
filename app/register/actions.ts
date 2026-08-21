@@ -5,14 +5,20 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getBaseUrl } from "@/lib/url";
+import { safeNextPath } from "@/lib/auth";
 
 export async function registerAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
+  const next = safeNextPath(String(formData.get("next") ?? ""), "");
+  // Where the OCEAN gate should send them once it's done — either back to
+  // whatever they were trying to do (an event's RSVP), or /events by
+  // default. This is itself the `next` for the /auth/confirm link below.
+  const oceanNext = `/ocean-test?required=1${next ? `&next=${encodeURIComponent(next)}` : ""}`;
 
   if (!name || !email || !password) {
-    redirect("/register?error=missing_fields");
+    redirect(`/register?error=missing_fields${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   }
 
   const supabase = await createClient();
@@ -21,11 +27,13 @@ export async function registerAction(formData: FormData) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=/ocean-test%3Frequired%3D1` },
+    options: { emailRedirectTo: `${baseUrl}/auth/confirm?next=${encodeURIComponent(oceanNext)}` },
   });
 
   if (error || !data.user) {
-    redirect("/register?error=" + encodeURIComponent(error?.message ?? "Something went wrong."));
+    redirect(
+      `/register?error=${encodeURIComponent(error?.message ?? "Something went wrong.")}${next ? `&next=${encodeURIComponent(next)}` : ""}`
+    );
   }
 
   // Supabase deliberately doesn't error when the email is already registered
@@ -38,7 +46,9 @@ export async function registerAction(formData: FormData) {
     // Matches the wording Supabase's own signUp() error uses for this case
     // ("User already registered") so the register page's existing
     // registered → show a "log in instead" link logic picks it up here too.
-    redirect("/register?error=" + encodeURIComponent("That email is already registered."));
+    redirect(
+      `/register?error=${encodeURIComponent("That email is already registered.")}${next ? `&next=${encodeURIComponent(next)}` : ""}`
+    );
   }
 
   // Create this app's profile row for the new auth user. onConflictDoNothing
@@ -75,8 +85,8 @@ export async function registerAction(formData: FormData) {
   // returns a live session — skip straight in instead of asking to verify.
   // The OCEAN test is mandatory before anything else, so send them there.
   if (data.session) {
-    redirect("/ocean-test?required=1");
+    redirect(oceanNext);
   }
 
-  redirect(`/verify-email?email=${encodeURIComponent(email)}`);
+  redirect(`/verify-email?email=${encodeURIComponent(email)}${next ? `&next=${encodeURIComponent(next)}` : ""}`);
 }
