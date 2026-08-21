@@ -2,9 +2,9 @@
 
 export default function PrintButton() {
   return (
-    <button type="button" className="btn btn-primary d-print-none" onClick={() => window.print()}>
+    <button type="button" className="sm-btn sm-btn-primary" onClick={() => window.print()}>
       <i className="bi bi-printer me-2" />
-      Print ticket
+      Print / Save as PDF
     </button>
   );
 }

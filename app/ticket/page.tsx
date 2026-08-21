@@ -1,15 +1,18 @@
 import QRCode from "qrcode";
 import PrintButton from "@/components/PrintButton";
 import { getBaseUrl } from "@/lib/url";
+import "../design-system.css";
 
 export const dynamic = "force-dynamic";
 
 /**
- * A printable marketing asset — a small ticket stub with a QR code that
- * scans straight to /register. Designed to be printed on a home/office
- * printer, cut out, and handed out or stuck up around town (tube, cafés,
- * noticeboards). No auth required — it's meant to be visited from any
- * phone or laptop to print copies.
+ * A printable marketing asset — an A4 sheet of 10 cut-out tickets, each
+ * with a QR code that scans straight to /register. Design lifted from an
+ * earlier one-off mockup; this in-app version is the source of truth
+ * going forward since its QR always points at wherever this deployment
+ * actually lives, rather than a hardcoded URL baked into a static file.
+ * No auth required — meant to be visited from any phone or laptop to
+ * print copies.
  */
 export default async function TicketPage() {
   const baseUrl = await getBaseUrl();
@@ -18,38 +21,40 @@ export default async function TicketPage() {
   const qrSvg = await QRCode.toString(registerUrl, {
     type: "svg",
     margin: 0,
-    color: { dark: "#1c1c1c", light: "#00000000" },
+    color: { dark: "#0d3d3a", light: "#00000000" },
   });
 
   return (
-    <div className="container py-4">
-      <div className="d-print-none mb-4">
-        <h2 className="mb-1">Print a ticket</h2>
-        <p className="text-muted">
-          A small paper flyer people can scan to jump straight into registration.
-          Print on plain paper or card, cut along the edge, and hand them out.
-        </p>
+    <div className="sm-scope container mt-3 mb-5">
+      <div className="sm-ticket-toolbar">
+        <div className="sm-page-head">
+          <div className="sm-greeting">Print a ticket sheet</div>
+          <div className="sm-sub">
+            10 cut-out tickets on one A4 page — print at 100% (no &ldquo;fit to page&rdquo;), then cut along the dashed lines.
+          </div>
+        </div>
         <PrintButton />
       </div>
 
-      <div className="ticket-print-area">
-        <div className="ticket-stub">
-          <div className="ticket-stub-main">
-            <div className="ticket-stub-brand">
-              <div>
-                <div className="ticket-stub-name">Samnian</div>
-                <div className="ticket-stub-tagline">GET SOCIAL</div>
+      <div className="sm-ticket-page">
+        <div className="sm-ticket-sheet">
+          {Array.from({ length: 10 }, (_, i) => (
+            <div className="sm-ticket" key={i}>
+              <div className="sm-ticket-info">
+                <span className="sm-tag">Get social</span>
+                <div className="sm-ticket-brand">Samnian</div>
+                <p className="sm-ticket-headline">Dinner with new people, every Wednesday.</p>
+                <p className="sm-ticket-body">
+                  We match small groups for a dinner based on your personality — no swiping, no small talk over a screen.
+                </p>
+              </div>
+              <div className="sm-ticket-stub">
+                <div dangerouslySetInnerHTML={{ __html: qrSvg }} />
+                <span className="sm-scan-label">Scan to join</span>
+                <span className="sm-scan-url">{baseUrl.replace(/^https?:\/\//, "")}</span>
               </div>
             </div>
-            <p className="ticket-stub-copy">
-              Scan. Register. Get matched with a small group for a great dinner.
-            </p>
-          </div>
-          <div className="ticket-stub-perforation" aria-hidden="true" />
-          <div className="ticket-stub-qr">
-            <div className="ticket-stub-qr-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
-            <div className="ticket-stub-scan-me">SCAN ME</div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
