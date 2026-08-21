@@ -77,6 +77,21 @@ function nextFourWednesdays(): [string, string, string, string] {
   return dates as [string, string, string, string];
 }
 
+// The site's five real dinner photos (see app/page.tsx) — reused across
+// events' galleries since there aren't real per-restaurant photos yet.
+const STOCK_PHOTOS = [
+  "/images/dinner-cheers-riverside.jpg",
+  "/images/dinner-diner-friends.jpg",
+  "/images/dinner-fine-dining.jpg",
+  "/images/dinner-seafood-shack.jpg",
+  "/images/dinner-group-toast.jpg",
+];
+
+/** A 3-photo gallery for an event, starting at `offset` in STOCK_PHOTOS and wrapping. */
+function galleryFrom(offset: number): string[] {
+  return [0, 1, 2].map((i) => STOCK_PHOTOS[(offset + i) % STOCK_PHOTOS.length]!);
+}
+
 function dummyEvents() {
   const [w1, w2, w3, w4] = nextFourWednesdays();
   return [
@@ -85,6 +100,8 @@ function dummyEvents() {
       restaurantName: "[Placeholder] The Riverside Table",
       restaurantUrl: "https://example.com",
       imageUrl: "/images/dinner-cheers-riverside.jpg",
+      images: galleryFrom(0),
+      cuisine: "Modern British",
       address: "Southbank, London",
       description:
         "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. A relaxed riverside spot, good for a first dinner with new faces.",
@@ -98,6 +115,8 @@ function dummyEvents() {
       restaurantName: "[Placeholder] Shoreditch Kitchen",
       restaurantUrl: "https://example.com",
       imageUrl: "/images/dinner-diner-friends.jpg",
+      images: galleryFrom(1),
+      cuisine: "Small Plates",
       address: "Shoreditch, London",
       description:
         "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. Small plates, big conversations.",
@@ -111,6 +130,8 @@ function dummyEvents() {
       restaurantName: "[Placeholder] Borough Bistro",
       restaurantUrl: "https://example.com",
       imageUrl: "/images/dinner-fine-dining.jpg",
+      images: galleryFrom(2),
+      cuisine: "French",
       address: "Borough, London",
       description:
         "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. A proper sit-down dinner for people who like to linger.",
@@ -124,6 +145,8 @@ function dummyEvents() {
       restaurantName: "[Placeholder] Marylebone Roast House",
       restaurantUrl: "https://example.com",
       imageUrl: "/images/dinner-seafood-shack.jpg",
+      images: galleryFrom(3),
+      cuisine: "Sunday Roast",
       address: "Marylebone, London",
       description:
         "PLACEHOLDER EVENT — swap in a real restaurant, address, and photo before this goes live. Roast dinner energy on a Wednesday, because why not.",

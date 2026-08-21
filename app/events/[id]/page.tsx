@@ -3,11 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { events, eventInterest } from "@/db/schema";
-import { requireCompletedOceanTest } from "@/lib/auth";
+import { events, eventInterest, personalityScores } from "@/db/schema";
+import { getSession } from "@/lib/auth";
 import { formatEventDate, formatSlot } from "@/lib/format";
 import { PRICE_TIERS } from "@/lib/constants";
-import Flash from "@/components/Flash";
+import "../../design-system.css";
 import { setEventInterestAction, withdrawEventInterestAction } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,7 @@ export default async function EventDetailPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ success?: string; error?: string }>;
 }) {
-  const session = await requireCompletedOceanTest();
+  const session = await getSession();
   const { id } = await params;
   const { success, error } = await searchParams;
   const eventId = Number(id);
@@ -27,87 +27,171 @@ export default async function EventDetailPage({
   const [event] = await db().select().from(events).where(eq(events.id, eventId)).limit(1);
   if (!event) notFound();
 
-  const [mine] = await db()
-    .select()
-    .from(eventInterest)
-    .where(and(eq(eventInterest.eventId, eventId), eq(eventInterest.userId, session.id)))
-    .limit(1);
-
   const interestCount = (await db().select({ userId: eventInterest.userId }).from(eventInterest).where(eq(eventInterest.eventId, eventId))).length;
 
+  let mine: { priceTier: string } | undefined;
+  let hasOceanScores = false;
+  if (session) {
+    [mine] = await db()
+      .select({ priceTier: eventInterest.priceTier })
+      .from(eventInterest)
+      .where(and(eq(eventInterest.eventId, eventId), eq(eventInterest.userId, session.id)))
+      .limit(1);
+    const [scores] = await db().select({ userId: personalityScores.userId }).from(personalityScores).where(eq(personalityScores.userId, session.id)).limit(1);
+    hasOceanScores = Boolean(scores);
+  }
+
+  const next = `/events/${eventId}`;
+  const galleryPhotos = [event.imageUrl, ...event.images].filter((src): src is string => Boolean(src)).slice(0, 5);
+  const mapsUrl = event.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.restaurantName}, ${event.address}`)}`
+    : undefined;
+
   return (
-    <div className="container py-4">
-      <Link href="/events" className="btn btn-link px-0 mb-3">&larr; Back to events</Link>
+    <div className="sm-scope container mt-3 mb-5" style={{ maxWidth: 900 }}>
+      <Link href="/events" className="sm-btn-link" style={{ display: "inline-block", marginBottom: 14 }}>
+        ← Back to events
+      </Link>
 
-      <Flash success={success} error={error} />
+      {success && <div className="sm-flash success">{success}</div>}
+      {error && <div className="sm-flash error">{error}</div>}
 
-      <div className="event-detail">
-        <div className="event-detail-image">
-          {event.imageUrl ? (
-            <Image src={event.imageUrl} alt={event.restaurantName} fill sizes="100vw" style={{ objectFit: "cover" }} priority />
-          ) : (
-            <div className="event-card-image-fallback" />
-          )}
+      {galleryPhotos.length > 0 && (
+        <div className="sm-event-gallery">
+          {galleryPhotos.map((src, i) => (
+            <div key={i}>
+              <Image src={src} alt={event.restaurantName} fill sizes="(max-width: 640px) 50vw, 40vw" style={{ objectFit: "cover" }} priority={i === 0} />
+            </div>
+          ))}
         </div>
+      )}
 
-        <div className="row mt-4 g-4">
-          <div className="col-lg-7">
-            <h1 className="fs-2 mb-1">{event.title}</h1>
-            <p className="text-muted fs-5 mb-3">
-              {event.restaurantName}
-              {event.restaurantUrl && (
-                <>
-                  {" "}
-                  <a href={event.restaurantUrl} target="_blank" rel="noopener noreferrer" className="ms-1">
-                    view restaurant <i className="bi bi-box-arrow-up-right" />
-                  </a>
-                </>
-              )}
-            </p>
+      <div className="sm-event-title-row">
+        <div>
+          <h1>{event.title}</h1>
+          <p className="sm-event-restaurant">
+            {event.restaurantName}
+            {event.restaurantUrl && (
+              <>
+                {" "}
+                <a href={event.restaurantUrl} target="_blank" rel="noopener noreferrer" className="sm-btn-link" style={{ marginLeft: 4 }}>
+                  visit website <i className="bi bi-box-arrow-up-right" />
+                </a>
+              </>
+            )}
+          </p>
+        </div>
+        {event.cuisine && <span className="sm-tag-outline">{event.cuisine}</span>}
+      </div>
 
-            <ul className="list-unstyled event-detail-facts mb-4">
-              <li><i className="bi bi-calendar-event me-2" />{formatEventDate(event.eventDate)} at {formatSlot(event.slot)}</li>
-              {event.address && <li><i className="bi bi-geo-alt me-2" />{event.address}</li>}
-              {event.capacity && <li><i className="bi bi-people me-2" />Small group, up to {event.capacity} per table</li>}
-              <li><i className="bi bi-check2-circle me-2" />{interestCount} {interestCount === 1 ? "person is" : "people are"} interested so far</li>
-            </ul>
-
-            {event.description && <p className="event-detail-description">{event.description}</p>}
-          </div>
-
-          <div className="col-lg-5">
-            <div className="card shadow-sm event-rsvp-card">
-              <div className="card-body">
-                {mine ? (
-                  <>
-                    <h5 className="card-title">You&rsquo;re in</h5>
-                    <p className="text-muted">Budget: {PRICE_TIERS.find((t) => t.value === mine.priceTier)?.label} ({PRICE_TIERS.find((t) => t.value === mine.priceTier)?.range})</p>
-                    <details className="mb-3">
-                      <summary className="text-muted small">Change your budget</summary>
-                      <form action={setEventInterestAction} className="mt-2">
-                        <input type="hidden" name="event_id" value={event.id} />
-                        <PriceTierRadios defaultValue={mine.priceTier} />
-                        <button type="submit" className="btn btn-secondary btn-sm mt-2">Update</button>
-                      </form>
-                    </details>
-                    <form action={withdrawEventInterestAction}>
-                      <input type="hidden" name="event_id" value={event.id} />
-                      <button type="submit" className="btn btn-outline-danger btn-sm">I can&rsquo;t make it</button>
-                    </form>
-                  </>
-                ) : (
-                  <>
-                    <h5 className="card-title">I&rsquo;m in — how much do you want to spend?</h5>
-                    <form action={setEventInterestAction}>
-                      <input type="hidden" name="event_id" value={event.id} />
-                      <PriceTierRadios />
-                      <button type="submit" className="btn btn-primary mt-3 w-100">Count me in</button>
-                    </form>
-                  </>
-                )}
+      <div className="sm-quick-row" style={{ alignItems: "start", marginTop: 18 }}>
+        <div>
+          <div className="sm-event-facts">
+            <div className="sm-event-fact">
+              <i className="bi bi-calendar-event" />
+              <div>
+                <span className="sm-event-fact-label">Date</span>
+                {formatEventDate(event.eventDate)}
+              </div>
+            </div>
+            <div className="sm-event-fact">
+              <i className="bi bi-clock" />
+              <div>
+                <span className="sm-event-fact-label">Arrival time</span>
+                {formatSlot(event.slot)}
+              </div>
+            </div>
+            {event.address && (
+              <div className="sm-event-fact">
+                <i className="bi bi-geo-alt" />
+                <div>
+                  <span className="sm-event-fact-label">Location</span>
+                  {event.address}
+                  {mapsUrl && (
+                    <>
+                      {" "}
+                      <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+                        Open in Google Maps <i className="bi bi-box-arrow-up-right" />
+                      </a>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+            {event.capacity && (
+              <div className="sm-event-fact">
+                <i className="bi bi-people" />
+                <div>
+                  <span className="sm-event-fact-label">Table size</span>
+                  Small group, up to {event.capacity} per table
+                </div>
+              </div>
+            )}
+            <div className="sm-event-fact">
+              <i className="bi bi-check2-circle" />
+              <div>
+                <span className="sm-event-fact-label">Interest so far</span>
+                {interestCount} {interestCount === 1 ? "person is" : "people are"} in
               </div>
             </div>
           </div>
+
+          {event.description && <p className="sm-event-description">{event.description}</p>}
+        </div>
+
+        <div className="sm-card">
+          {!session ? (
+            <>
+              <h3 style={{ fontSize: "1rem", marginBottom: 8 }}>Want in?</h3>
+              <p className="sm-price-note" style={{ marginTop: 0 }}>
+                Log in or register to RSVP — it&rsquo;s quick, and Google sign-in handles new or existing accounts either way.
+              </p>
+              <Link className="sm-btn sm-btn-primary" style={{ width: "100%" }} href={`/login?next=${encodeURIComponent(next)}`}>
+                Log in to RSVP
+              </Link>
+            </>
+          ) : !hasOceanScores ? (
+            <>
+              <h3 style={{ fontSize: "1rem", marginBottom: 8 }}>Almost there</h3>
+              <p className="sm-price-note" style={{ marginTop: 0 }}>
+                A 2-minute personality quiz helps us group you with people you&rsquo;ll actually get on with —
+                one more step before you can RSVP.
+              </p>
+              <Link className="sm-btn sm-btn-primary" style={{ width: "100%" }} href={`/ocean-test?required=1&next=${encodeURIComponent(next)}`}>
+                Take the quiz
+              </Link>
+            </>
+          ) : mine ? (
+            <>
+              <h3 style={{ fontSize: "1rem", marginBottom: 4 }}>You&rsquo;re in</h3>
+              <p className="sm-price-note" style={{ marginTop: 0 }}>
+                Budget: {PRICE_TIERS.find((t) => t.value === mine!.priceTier)?.label} ({PRICE_TIERS.find((t) => t.value === mine!.priceTier)?.range})
+              </p>
+              <details className="sm-details" style={{ marginTop: 12, marginBottom: 12 }}>
+                <summary>Change your budget</summary>
+                <div className="sm-details-body">
+                  <form action={setEventInterestAction}>
+                    <input type="hidden" name="event_id" value={event.id} />
+                    <PriceTierRadios defaultValue={mine.priceTier} />
+                    <button type="submit" className="sm-btn sm-btn-primary" style={{ marginTop: 12 }}>Update</button>
+                  </form>
+                </div>
+              </details>
+              <form action={withdrawEventInterestAction}>
+                <input type="hidden" name="event_id" value={event.id} />
+                <button type="submit" className="sm-btn-danger">I can&rsquo;t make it</button>
+              </form>
+            </>
+          ) : (
+            <>
+              <h3 style={{ fontSize: "1rem", marginBottom: 12 }}>I&rsquo;m in — how much do you want to spend?</h3>
+              <form action={setEventInterestAction}>
+                <input type="hidden" name="event_id" value={event.id} />
+                <PriceTierRadios />
+                <button type="submit" className="sm-btn sm-btn-primary" style={{ width: "100%", marginTop: 14 }}>Count me in</button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -116,13 +200,13 @@ export default async function EventDetailPage({
 
 function PriceTierRadios({ defaultValue }: { defaultValue?: string }) {
   return (
-    <div className="price-tier-picker">
+    <div className="sm-price-tier-picker">
       {PRICE_TIERS.map((tier) => (
-        <label key={tier.value} className="price-tier-option">
+        <label key={tier.value} className="sm-price-tier-option">
           <input type="radio" name="price_tier" value={tier.value} defaultChecked={defaultValue === tier.value} required />
-          <span className="price-tier-option-body">
-            <span className="price-tier-option-label">{tier.label}</span>
-            <span className="price-tier-option-range">{tier.range}</span>
+          <span className="sm-price-tier-option-body">
+            <span className="sm-price-tier-option-label">{tier.label}</span>
+            <span className="sm-price-tier-option-range">{tier.range}</span>
           </span>
         </label>
       ))}

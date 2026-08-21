@@ -8,11 +8,18 @@ import { requireAdmin } from "@/lib/auth";
 import { SLOTS, type Slot } from "@/lib/constants";
 
 function readEventFields(formData: FormData) {
+  const images = String(formData.get("images") ?? "")
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   return {
     title: String(formData.get("title") ?? "").trim(),
     restaurantName: String(formData.get("restaurant_name") ?? "").trim(),
     restaurantUrl: String(formData.get("restaurant_url") ?? "").trim() || null,
     imageUrl: String(formData.get("image_url") ?? "").trim() || null,
+    images,
+    cuisine: String(formData.get("cuisine") ?? "").trim() || null,
     address: String(formData.get("address") ?? "").trim() || null,
     description: String(formData.get("description") ?? "").trim() || null,
     eventDate: String(formData.get("event_date") ?? ""),

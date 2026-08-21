@@ -71,6 +71,8 @@ export default async function EditEventPage({
             restaurantName: event.restaurantName,
             restaurantUrl: event.restaurantUrl,
             imageUrl: event.imageUrl,
+            images: event.images,
+            cuisine: event.cuisine,
             address: event.address,
             description: event.description,
             eventDate: event.eventDate,

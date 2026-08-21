@@ -121,6 +121,10 @@ export const events = pgTable("samnian_events", {
   restaurantName: text("restaurant_name").notNull(),
   restaurantUrl: text("restaurant_url"),
   imageUrl: text("image_url"),
+  // Extra gallery photos for the detail page, beyond imageUrl (which stays
+  // the card/hero image so existing events with only that set still work).
+  images: jsonb("images").$type<string[]>().notNull().default([]),
+  cuisine: text("cuisine"),
   address: text("address"),
   description: text("description"),
   eventDate: date("event_date").notNull(),

@@ -8,9 +8,9 @@ import { requireCompletedOceanTest } from "@/lib/auth";
 import { PRICE_TIER_VALUES, type PriceTier } from "@/lib/constants";
 
 export async function setEventInterestAction(formData: FormData) {
-  const session = await requireCompletedOceanTest();
-
   const eventId = Number(formData.get("event_id"));
+  const session = await requireCompletedOceanTest(eventId ? `/events/${eventId}` : undefined);
+
   const priceTier = String(formData.get("price_tier") ?? "") as PriceTier;
 
   if (!eventId || !PRICE_TIER_VALUES.includes(priceTier)) {
@@ -26,8 +26,8 @@ export async function setEventInterestAction(formData: FormData) {
 }
 
 export async function withdrawEventInterestAction(formData: FormData) {
-  const session = await requireCompletedOceanTest();
   const eventId = Number(formData.get("event_id"));
+  const session = await requireCompletedOceanTest(eventId ? `/events/${eventId}` : undefined);
   if (!eventId) redirect("/events");
 
   await db()

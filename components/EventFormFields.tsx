@@ -5,6 +5,8 @@ type EventDefaults = {
   restaurantName?: string;
   restaurantUrl?: string | null;
   imageUrl?: string | null;
+  images?: string[];
+  cuisine?: string | null;
   address?: string | null;
   description?: string | null;
   eventDate?: string;
@@ -34,14 +36,38 @@ export default function EventFormFields({ defaults = {} }: { defaults?: EventDef
       </div>
 
       <div className="mb-3">
-        <label htmlFor="image_url" className="form-label">Photo URL</label>
+        <label htmlFor="image_url" className="form-label">Cover photo URL</label>
         <input type="url" className="form-control" id="image_url" name="image_url" placeholder="https://…" defaultValue={defaults.imageUrl ?? ""} />
-        <div className="form-text">A wide restaurant/food photo — shown on the event card.</div>
+        <div className="form-text">The main wide photo — shown on the event card and top of the gallery.</div>
       </div>
 
       <div className="mb-3">
-        <label htmlFor="address" className="form-label">Address</label>
-        <input type="text" className="form-control" id="address" name="address" defaultValue={defaults.address ?? ""} />
+        <label htmlFor="images" className="form-label">More gallery photos</label>
+        <textarea
+          className="form-control"
+          id="images"
+          name="images"
+          rows={3}
+          placeholder={"One URL per line — https://…\nhttps://…"}
+          defaultValue={(defaults.images ?? []).join("\n")}
+        />
+        <div className="form-text">
+          Shown on the event&rsquo;s detail page alongside the cover photo. If there aren&rsquo;t enough real
+          photos yet, reusing a couple of the site&rsquo;s existing dinner photos (e.g. /images/dinner-diner-friends.jpg)
+          is fine as a placeholder.
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-md-6 mb-3">
+          <label htmlFor="cuisine" className="form-label">Cuisine</label>
+          <input type="text" className="form-control" id="cuisine" name="cuisine" placeholder="e.g. Italian, Modern British" defaultValue={defaults.cuisine ?? ""} />
+        </div>
+        <div className="col-md-6 mb-3">
+          <label htmlFor="address" className="form-label">Address</label>
+          <input type="text" className="form-control" id="address" name="address" defaultValue={defaults.address ?? ""} />
+          <div className="form-text">Also used to build the &ldquo;Open in Google Maps&rdquo; link on the detail page.</div>
+        </div>
       </div>
 
       <div className="mb-3">
