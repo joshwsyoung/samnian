@@ -21,7 +21,7 @@ export default async function TicketPage() {
   const qrSvg = await QRCode.toString(registerUrl, {
     type: "svg",
     margin: 0,
-    color: { dark: "#0d3d3a", light: "#00000000" },
+    color: { dark: "#2b2a26", light: "#00000000" },
   });
 
   return (

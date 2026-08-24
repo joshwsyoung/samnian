@@ -1,60 +1,58 @@
 /*
- * New design language — started on the dashboard, now shared across any
- * page that wraps its content in .sm-scope, so it rolls out incrementally
- * without touching the existing Bootstrap-based look everywhere else yet.
- *
- * Palette is a calm blue-green ("Neptune") teal, anchored on #2c6e6b — the
- * accent color from the earlier Neptune-themed exploration of this same
- * redesign — swapped in for the lime green this system started with.
+ * Re-themed onto the editorial palette/type (app/editorial.css) so every
+ * .sm-scope page reads as the same site as the new landing page and
+ * header, rather than a leftover teal-and-Poppins system sitting next to
+ * it. Tokens/component structure are otherwise unchanged — this is a
+ * surgical recolor + refont + reshape of the existing component library
+ * (buttons, cards, forms, chips, tables), not a rebuild of every page's
+ * markup. --sm-radius/-sm are sharper than before (was 16px/10px) to
+ * match the editorial cards' hairline-border, small-radius look; pill
+ * shapes on buttons/chips/tags are kept (999px) — those still read fine
+ * in the new palette and a wholesale switch to square chips would be a
+ * much bigger, riskier change for the same visual payoff.
  */
 
 .sm-scope {
-  --sm-accent: #cfeae6;
-  --sm-accent-ink: #0d3d3a;
-  --sm-accent-strong: #2c6e6b;
+  /* --sm-accent is a solid fill (matches .ed-ticket's button treatment on
+     the landing page) with --sm-on-accent as the text/icon color that
+     goes on top of it. --sm-accent-ink stays a plain dark ink — it's used
+     where accent-flavored text sits on a *light* surface instead (e.g.
+     the printable ticket's headline on paper), which needs to stay dark
+     regardless of what the filled-button color is doing. */
+  --sm-accent: #6b7a5e;
+  --sm-on-accent: #fbf8f1;
+  --sm-accent-ink: #2b2a26;
+  --sm-accent-strong: #6b7a5e;
 
-  --sm-surface: #ffffff;
-  --sm-surface-2: #eaf3f2;
-  --sm-border: #dbe7e5;
-  --sm-text: #1b2b2a;
-  --sm-text-muted: #5c7573;
+  --sm-surface: #f7f4ec;
+  --sm-surface-2: #ece7da;
+  --sm-border: rgba(43, 42, 38, 0.16);
+  --sm-text: #2b2a26;
+  --sm-text-muted: rgba(43, 42, 38, 0.62);
 
-  --sm-success: #2f9e63;
-  --sm-success-bg: #e6f6ec;
-  --sm-warning: #a67c00;
-  --sm-warning-bg: #fff6dd;
-  --sm-neutral-bg: #e7eeed;
+  --sm-success: #4f7a4a;
+  --sm-success-bg: #e3ebdd;
+  --sm-warning: #9c6b1f;
+  --sm-warning-bg: #f3e8d2;
+  --sm-neutral-bg: #ece7da;
 
-  --sm-shadow: 0 1px 2px rgba(20, 45, 43, 0.05), 0 6px 20px rgba(20, 45, 43, 0.08);
-  --sm-radius: 16px;
-  --sm-radius-sm: 10px;
+  --sm-shadow: 0 1px 2px rgba(43, 42, 38, 0.06);
+  --sm-radius: 4px;
+  --sm-radius-sm: 3px;
 
-  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
+  background: #ded8cc;
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
   color: var(--sm-text);
 }
 
-[data-bs-theme="dark"] .sm-scope {
-  --sm-accent: #5fcabd;
-  --sm-accent-ink: #062b28;
-  --sm-accent-strong: #7fd9cd;
-
-  --sm-surface: #1d2726;
-  --sm-surface-2: #24302f;
-  --sm-border: #33403e;
-  --sm-text: #e7f1ef;
-  --sm-text-muted: #93a6a3;
-
-  --sm-success: #7fd9a6;
-  --sm-success-bg: #16301f;
-  --sm-warning: #ffdd66;
-  --sm-warning-bg: #332800;
-  --sm-neutral-bg: #263230;
-
-  --sm-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.35);
-}
-
 .sm-scope * { box-sizing: border-box; }
-.sm-scope h1, .sm-scope h2, .sm-scope h3, .sm-scope h4 { font-weight: 600; text-wrap: balance; margin: 0; }
+.sm-scope h1, .sm-scope h2, .sm-scope h3, .sm-scope h4 {
+  font-family: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  font-variation-settings: "opsz" 48, "SOFT" 20, "WONK" 0;
+  font-weight: 500;
+  text-wrap: balance;
+  margin: 0;
+}
 
 .sm-page-head { padding: 4px 4px 20px; }
 .sm-page-head .sm-greeting { font-size: 1.5rem; font-weight: 600; }
@@ -107,11 +105,12 @@
 .sm-btn {
   appearance: none;
   cursor: pointer;
-  font-family: inherit;
-  font-size: 0.88rem;
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
   font-weight: 500;
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: var(--sm-radius-sm);
   text-align: center;
   border: none;
   transition: transform 0.1s ease, filter 0.15s ease;
@@ -121,7 +120,7 @@
 .sm-btn:active { transform: scale(0.98); }
 .sm-btn:focus-visible { outline: 2px solid var(--sm-accent-strong); outline-offset: 2px; }
 
-.sm-btn-primary { background: var(--sm-accent); color: var(--sm-accent-ink); font-weight: 600; }
+.sm-btn-primary { background: var(--sm-accent); color: var(--sm-on-accent); font-weight: 600; }
 .sm-btn-primary:hover { filter: brightness(1.05); }
 .sm-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -183,7 +182,7 @@
 }
 .sm-chip[aria-pressed="true"], .sm-chip.is-selected {
   background: var(--sm-accent);
-  color: var(--sm-accent-ink);
+  color: var(--sm-on-accent);
   border-color: transparent;
   font-weight: 600;
 }
@@ -211,7 +210,7 @@
 }
 .sm-chip-radio:has(input:checked) span {
   background: var(--sm-accent);
-  color: var(--sm-accent-ink);
+  color: var(--sm-on-accent);
   border-color: transparent;
   font-weight: 600;
 }
@@ -309,8 +308,6 @@
 }
 .sm-btn-danger:hover { background: rgba(181, 69, 63, 0.08); border-color: #b5453f; }
 .sm-btn-danger:focus-visible { outline: 2px solid #b5453f; outline-offset: 2px; }
-[data-bs-theme="dark"] .sm-scope .sm-btn-danger { color: #f2a6a1; border-color: rgba(242, 166, 161, 0.4); }
-[data-bs-theme="dark"] .sm-scope .sm-btn-danger:hover { background: rgba(242, 166, 161, 0.1); border-color: #f2a6a1; }
 
 /* Identity header: photo (or initials) + name + status */
 .sm-identity { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -332,7 +329,7 @@
   align-items: center;
   justify-content: center;
   background: var(--sm-accent);
-  color: var(--sm-accent-ink);
+  color: var(--sm-on-accent);
   font-size: 1.5rem;
   font-weight: 600;
 }
@@ -365,7 +362,7 @@
 }
 .sm-chip-check:has(input:checked) span {
   background: var(--sm-accent);
-  color: var(--sm-accent-ink);
+  color: var(--sm-on-accent);
   border-color: transparent;
   font-weight: 600;
 }
@@ -410,7 +407,6 @@
 .sm-btn-xs.sm-accept { background: var(--sm-success-bg); color: var(--sm-success); border-color: transparent; }
 .sm-btn-xs.sm-decline { background: var(--sm-warning-bg); color: var(--sm-warning); border-color: transparent; }
 .sm-btn-xs.sm-danger { color: #b5453f; border-color: rgba(181, 69, 63, 0.35); background: transparent; }
-[data-bs-theme="dark"] .sm-scope .sm-btn-xs.sm-danger { color: #f2a6a1; border-color: rgba(242, 166, 161, 0.4); }
 
 /* Chat: two-pane shell (conversation list + thread), one pane at a time on mobile */
 .sm-chat-shell { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: start; }
@@ -460,7 +456,7 @@
 .sm-msg-row.mine { justify-content: flex-end; }
 .sm-bubble { max-width: 75%; border-radius: var(--sm-radius-sm); padding: 9px 13px; }
 .sm-bubble.theirs { background: var(--sm-surface-2); border: 1px solid var(--sm-border); }
-.sm-bubble.mine { background: var(--sm-accent); color: var(--sm-accent-ink); }
+.sm-bubble.mine { background: var(--sm-accent); color: var(--sm-on-accent); }
 .sm-msg-name { font-size: 0.72rem; font-weight: 600; opacity: 0.75; margin-bottom: 2px; }
 .sm-msg-text { white-space: pre-wrap; font-size: 0.9rem; }
 .sm-msg-time { font-size: 0.68rem; opacity: 0.65; text-align: right; margin-top: 3px; }
@@ -545,75 +541,6 @@
 
 .sm-cta-band { text-align: center; padding: 8px 16px 56px; }
 .sm-cta-band h2 { font-size: 1.5rem; margin-bottom: 18px; }
-
-/*
- * Site header — one navbar for every screen size, collapsing behind the
- * standard Bootstrap hamburger toggler below `md`. Applied via .sm-scope
- * directly on the <nav> element (it sits in the root layout, outside any
- * page's own .sm-scope container) so every route gets the redesigned
- * chrome even before its own content is migrated. Overrides target the
- * existing Bootstrap class names at two-class specificity so they win
- * regardless of stylesheet load order, without touching the vendored
- * rules or the collapse-toggle JS that depends on those class names.
- * (There used to also be a separate floating pill-shaped bottom tab bar
- * on mobile — dropped in favor of just this.)
- */
-.sm-scope.navbar {
-  background: var(--sm-surface);
-  border-bottom: 1px solid var(--sm-border);
-  box-shadow: none;
-  padding: 4px 0;
-}
-
-.sm-scope .sm-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--sm-accent-strong);
-}
-.sm-scope .sm-brand:hover, .sm-scope .sm-brand:focus { color: var(--sm-accent-strong); }
-.sm-scope .sm-brand-word {
-  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: var(--sm-text);
-}
-
-.sm-scope .navbar-toggler {
-  border: none;
-  padding: 6px;
-  border-radius: 999px;
-  box-shadow: none;
-}
-.sm-scope .navbar-toggler:hover { background: var(--sm-surface-2); }
-.sm-scope .navbar-toggler:focus { box-shadow: 0 0 0 2px var(--sm-accent-strong); }
-.sm-scope .navbar-toggler-icon {
-  width: 20px;
-  height: 20px;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%231b2b2a' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-[data-bs-theme="dark"] .sm-scope .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23e7f1ef' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-
-/* .sm-scope.navbar (compound, not descendant) so this beats the vendored
-   .navbar-expand-md .navbar-nav .nav-link rule, which sets horizontal
-   padding at the same descendant-selector specificity. */
-.sm-scope.navbar .navbar-nav .nav-link {
-  font-family: var(--font-poppins-v2), "Poppins", system-ui, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--sm-text-muted);
-  padding: 8px 14px;
-  border-radius: 999px;
-  transition: background 0.12s ease, color 0.12s ease;
-}
-.sm-scope.navbar .navbar-nav .nav-link:hover, .sm-scope.navbar .navbar-nav .nav-link:focus {
-  color: var(--sm-text);
-  background: var(--sm-surface-2);
-}
-.sm-scope .sm-nav-cta { display: flex; align-items: center; margin-left: 4px; }
-.sm-scope .sm-nav-cta .sm-btn { padding: 8px 18px; font-size: 0.88rem; }
 
 /* Auth pages (login/register/reset/verify): a single centered card */
 .sm-auth-shell { max-width: 440px; margin: 0 auto; padding: 48px 16px; }

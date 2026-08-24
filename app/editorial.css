@@ -287,8 +287,11 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
   position: sticky; top: 0; z-index: 110;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1rem clamp(1.25rem, 4vw, 3rem);
-  background: rgba(251, 248, 241, 0.78);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  /* Same plaster as every page's own background (.ed-scope's --ed-bg,
+     .sm-scope's --sm-scope background) — solid, not a translucent tint of
+     it, so the bar reads as part of the page rather than a strip of its
+     own color sitting on top. */
+  background: #ded8cc;
   border-bottom: 1px solid rgba(43, 42, 38, 0.1);
 }
 

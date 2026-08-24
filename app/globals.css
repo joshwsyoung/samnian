@@ -38,6 +38,14 @@
 }
 
 body {
+    /* Matches .sm-scope/.ed-scope's own background — belt-and-braces so
+       there's no flash of white at the edges (overscroll bounce, a page
+       taller than its scope wrapper) rather than relying on every page
+       filling the viewport exactly. !important because the vendored
+       Bootstrap reset further down this same file has its own bare
+       `body { background-color: var(--bs-body-bg) }` at identical
+       specificity, which otherwise wins on source order alone. */
+    background: #ded8cc !important;
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
     font-family: 'Poppins';
