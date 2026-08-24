@@ -1,8 +1,82 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Fraunces, Newsreader } from "next/font/google";
+import { and, eq, gte } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
-import "./design-system.css";
+import { db } from "@/lib/db";
+import { events } from "@/db/schema";
+import { formatEventDate, formatSlot } from "@/lib/format";
+import LandingReveal from "@/components/LandingReveal";
+import "./editorial.css";
+
+export const dynamic = "force-dynamic";
+
+// Both are variable fonts on Google Fonts with axes beyond the standard
+// weight/italic (Fraunces also ships SOFT/WONK) — `weight: "variable"`
+// pulls the full variable file so editorial.css's own
+// `font-variation-settings` rules can still reach those axes, rather than
+// pinning a handful of static instances the way `weight: [...]` would.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+const WORD = "samnian".split("");
+
+// Editorial-style copy for the "how it works" band — describes the
+// product itself rather than any one event, so it isn't DB-driven.
+const HOW_STEPS = [
+  {
+    season: "First",
+    title: "Take the test",
+    when: "About ten minutes",
+    body: "The Big Five — openness, conscientiousness, extraversion, agreeableness, neuroticism. It is the personality model psychologists actually use, and it tells us far more about who you'll enjoy an evening with than your job title does.",
+    seatsLabel: "Five traits",
+    seatsValue: "No wrong answers",
+    take: "Start yours",
+    href: "/ocean-test",
+  },
+  {
+    season: "Then",
+    title: "Meet your match",
+    when: "Six at the table, including you",
+    body: "We put together a group who score close enough to get on and far enough apart to stay interesting. You see the evenings on offer and choose the ones you fancy. Nothing is ever assigned to you.",
+    seatsLabel: "Six seats",
+    seatsValue: "You pick the night",
+    take: "See the tables",
+    href: "/events",
+  },
+  {
+    season: "Finally",
+    title: "Just turn up",
+    when: "From seven, most evenings",
+    body: "We book the restaurant and message the group a few days before, with a handful of ice breakers so nobody is left doing the weather. Everything after that is up to the six of you.",
+    seatsLabel: "Booked for you",
+    seatsValue: "Bring nothing",
+    take: "Join in",
+    href: "/register",
+  },
+];
+
+// Falls back to one of the site's stock dinner photos when an event has no
+// photo of its own yet — same "reuse if you don't have enough" approach
+// the events pages already use.
+const FALLBACK_SHOTS = [
+  "/images/dinner-fine-dining.jpg",
+  "/images/dinner-diner-friends.jpg",
+  "/images/dinner-seafood-shack.jpg",
+];
 
 export default async function LandingPage({
   searchParams,
@@ -27,65 +101,171 @@ export default async function LandingPage({
     );
   }
 
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = (
+    await db()
+      .select()
+      .from(events)
+      .where(and(eq(events.published, true), gte(events.eventDate, today)))
+  )
+    .sort((a, b) => a.eventDate.localeCompare(b.eventDate))
+    .slice(0, 3);
+
   return (
-    <div className="sm-scope">
-      <div className="container">
-        <section className="sm-hero-split">
-          <div className="sm-hero-copy">
-            <div className="sm-kicker">Get social</div>
-            <h1>
-              Great dinners start at <span className="sm-accent-word">Samnian</span>.
+    <div className={`ed-scope ${fraunces.variable} ${newsreader.variable}`}>
+      <div className="ed-wash" />
+      <div className="ed-grain" />
+
+      <LandingReveal />
+
+      <div className="ed-page">
+        <div className="ed-shell">
+          <main className="ed-entry">
+            <h1 className="ed-word" aria-label="Samnian">
+              {WORD.map((letter, i) => (
+                <span key={i}>{letter}</span>
+              ))}
             </h1>
-            <p>
-              Take a personality quiz, browse upcoming dinners, and tell us what you&rsquo;re up
-              for — we&rsquo;ll match you with a small table for the night, budget and all.
+
+            <p className="ed-meta ed-fade">
+              <span className="ed-ipa">/ˈsɑm·ni·ən/</span>
+              <span className="ed-dot">·</span>
+              <span className="ed-pos">verb</span>
+              <span className="ed-dot">·</span>
+              <span className="ed-lang">Old English</span>
             </p>
-            <div className="sm-hero-actions">
-              <Link href="/register" className="sm-btn sm-btn-primary">Join in</Link>
-              <Link href="/login" className="sm-btn sm-btn-ghost">Already a member? Log in</Link>
+
+            <hr className="ed-rule ed-fade" />
+
+            <ol className="ed-senses ed-fade">
+              <li>To gather, to collect, to assemble — to bring people together in one place.</li>
+              <li>To draw together; to join, to unite.</li>
+            </ol>
+
+            <div className="ed-actions ed-fade">
+              <Link href="/register" className="ed-ticket">
+                Scan my ticket
+              </Link>
+              <Link href="/register" className="ed-join">
+                Join the list
+              </Link>
             </div>
-          </div>
-          <div className="sm-hero-photo">
-            <Image
-              src="/images/dinner-group-toast.jpg"
-              alt="A group of friends raising a toast together at a restaurant table"
-              fill
-              sizes="(max-width: 860px) 100vw, 480px"
-              priority
-            />
-          </div>
-        </section>
-
-        <div className="sm-steps-head">
-          <h2>How it works</h2>
-        </div>
-        <div className="sm-steps">
-          <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-fine-dining.jpg')" }}>
-            <div className="sm-step-num">Step 1</div>
-            <h3>Take the test</h3>
-            <p>Complete our quick personality quiz (OCEAN model) to help us understand you.</p>
-          </div>
-          <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-diner-friends.jpg')" }}>
-            <div className="sm-step-num">Step 2</div>
-            <h3>Pick your events</h3>
-            <p>Browse upcoming dinners, RSVP to the ones you fancy, and tell us your budget for each.</p>
-          </div>
-          <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-seafood-shack.jpg')" }}>
-            <div className="sm-step-num">Step 3</div>
-            <h3>Get matched</h3>
-            <p>We&rsquo;ll group you with a small table for a great shared meal.</p>
-          </div>
-          <div className="sm-step-card" style={{ backgroundImage: "url('/images/dinner-cheers-riverside.jpg')" }}>
-            <div className="sm-step-num">Step 4</div>
-            <h3>Enjoy dinner</h3>
-            <p>Meet new people and enjoy good food and great conversation.</p>
-          </div>
+          </main>
         </div>
 
-        <div className="sm-cta-band">
-          <h2>Ready to meet your table?</h2>
-          <Link href="/register" className="sm-btn sm-btn-primary">Register &amp; take the test</Link>
+        <footer className="ed-hero-foot ed-fade">
+          <p>
+            Kin to <em>samnón</em> (Old Saxon) · <em>samena</em> (Old Frisian) · <em>samanón</em> (Old High
+            German) · <em>samna</em> (Icelandic)
+          </p>
+          <p>
+            <a href="https://bosworthtoller.com/26354" target="_blank" rel="noopener">
+              Bosworth-Toller, <em>An Anglo-Saxon Dictionary</em>
+            </a>
+          </p>
+        </footer>
+      </div>
+
+      <section className="ed-band ed-statement">
+        <p className="ed-lift">
+          Dinner on Wednesday and Thursday evenings with five people you haven&rsquo;t met, matched on
+          how you&rsquo;re actually wired. We book the restaurant. <em>You just turn up hungry.</em>
+        </p>
+      </section>
+
+      <section className="ed-band" id="how">
+        <div className="ed-band-head ed-lift">
+          <h2>How a table comes together</h2>
+          <span className="ed-aside">Three steps, one evening</span>
         </div>
+
+        <div className="ed-cards">
+          {HOW_STEPS.map((step, i) => (
+            <Link
+              href={step.href}
+              className="ed-card ed-lift"
+              style={{ transitionDelay: `${0.06 + i * 0.08}s` }}
+              key={step.title}
+            >
+              <span className="ed-season">{step.season}</span>
+              <h3>{step.title}</h3>
+              <p className="ed-when">{step.when}</p>
+              <p>{step.body}</p>
+              <span className="ed-seats">
+                <span>
+                  {step.seatsLabel} · <b>{step.seatsValue}</b>
+                </span>
+                <span className="ed-take">{step.take}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="ed-band" id="tables">
+        <div className="ed-band-head ed-lift">
+          <h2>Tables this month</h2>
+          <span className="ed-aside">Wednesdays &amp; Thursdays</span>
+        </div>
+
+        {upcoming.length === 0 ? (
+          <p className="ed-lift" style={{ color: "var(--ed-fg-soft)" }}>
+            Nothing on the books quite yet —{" "}
+            <Link href="/events" style={{ color: "var(--ed-accent)" }}>
+              check the full list
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="ed-cards">
+            {upcoming.map((e, i) => {
+              const day = new Date(`${e.eventDate}T00:00:00`).toLocaleDateString("en-GB", {
+                weekday: "long",
+              });
+              const shot = e.imageUrl || FALLBACK_SHOTS[i % FALLBACK_SHOTS.length]!;
+              return (
+                <Link
+                  href={`/events/${e.id}`}
+                  className="ed-card ed-lift"
+                  style={{ transitionDelay: `${0.06 + i * 0.08}s` }}
+                  key={e.id}
+                >
+                  <div className="ed-shot">
+                    <Image src={shot} alt={e.restaurantName} fill sizes="(max-width: 900px) 100vw, 33vw" />
+                  </div>
+                  <span className="ed-season">{day}</span>
+                  <h3>{e.title}</h3>
+                  <p className="ed-when">
+                    {formatEventDate(e.eventDate)}
+                    {e.address && `, ${e.address}`}, {formatSlot(e.slot)}
+                  </p>
+                  {e.description && <p>{e.description}</p>}
+                  <span className="ed-seats">
+                    <span>
+                      Six seats · <b>{e.cuisine || "Open"}</b>
+                    </span>
+                    <span className="ed-take">Scan my ticket</span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="ed-band ed-closing ed-lift">
+        <p className="ed-stmt">
+          Five strangers who probably would have got on anyway, and a table someone else booked. That is
+          the whole idea — <em>samnian</em>, and then dinner.
+        </p>
+        <Link href="/register" className="ed-ticket">
+          Join the list
+        </Link>
+      </section>
+
+      <div className="ed-pagefoot">
+        <p>London · Wednesday and Thursday evenings</p>
+        <p>Matched on the Big Five</p>
       </div>
     </div>
   );
