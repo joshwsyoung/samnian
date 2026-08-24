@@ -274,3 +274,89 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
   .ed-lift.ed-in { transition: none; }
   .ed-card, .ed-card .ed-shot img { transition: none; }
 }
+
+/* =====================================================================
+ * Site chrome — header + full-page menu (components/SiteHeader.tsx)
+ * Replaces the old NavBar everywhere, on both .sm-scope and .ed-scope
+ * pages alike, so it deliberately doesn't lean on either scope's own
+ * tokens — its own small, self-contained palette instead (same values
+ * as .ed-scope's, since this is the template going forward).
+ * ===================================================================== */
+
+.ed-chrome-bar {
+  position: sticky; top: 0; z-index: 110;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem clamp(1.25rem, 4vw, 3rem);
+  background: rgba(251, 248, 241, 0.78);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(43, 42, 38, 0.1);
+}
+
+.ed-chrome-brand {
+  font-family: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  font-variation-settings: "opsz" 24, "SOFT" 20, "WONK" 0;
+  font-size: 1.15rem; font-weight: 500; letter-spacing: 0.01em;
+  color: #2b2a26; text-decoration: none;
+}
+.ed-chrome-brand:hover { color: #6b7a5e; }
+
+.ed-chrome-toggle {
+  display: flex; align-items: center; justify-content: center;
+  width: 2.4rem; height: 2.4rem;
+  background: none; border: 0; padding: 0; cursor: pointer;
+}
+
+.ed-hamburger { position: relative; width: 20px; height: 14px; display: block; }
+.ed-hamburger span {
+  position: absolute; left: 0; width: 100%; height: 1.5px;
+  background: #2b2a26; border-radius: 1px;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.28, 1), opacity 0.2s ease, top 0.28s ease;
+}
+.ed-hamburger span:nth-child(1) { top: 0; }
+.ed-hamburger span:nth-child(2) { top: 6px; }
+.ed-hamburger span:nth-child(3) { top: 12px; }
+.ed-hamburger-open span:nth-child(1) { top: 6px; transform: rotate(45deg); }
+.ed-hamburger-open span:nth-child(2) { opacity: 0; }
+.ed-hamburger-open span:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+
+.ed-menu-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(2.5rem, 6vh, 4rem);
+  background: #2b2a26; color: #fbf8f1;
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity 0.32s cubic-bezier(0.2, 0.8, 0.28, 1), visibility 0.32s, transform 0.32s cubic-bezier(0.2, 0.8, 0.28, 1);
+}
+.ed-menu-overlay.ed-menu-open { opacity: 1; visibility: visible; transform: none; }
+
+.ed-menu-links {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(0.9rem, 2.4vh, 1.4rem);
+}
+.ed-menu-links a {
+  font-family: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  font-variation-settings: "opsz" 72, "SOFT" 24, "WONK" 0;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 6vw, 3.4rem); line-height: 1.15;
+  color: #fbf8f1; text-decoration: none;
+  transition: color 0.2s ease;
+}
+.ed-menu-links a:hover, .ed-menu-links a:focus-visible { color: #a9b89b; }
+
+.ed-menu-logout {
+  position: absolute; bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+.ed-menu-logout button {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: 0.9rem; letter-spacing: 0.03em; color: rgba(251, 248, 241, 0.55);
+  background: none; border: 0; border-bottom: 1px solid rgba(251, 248, 241, 0.25);
+  padding-bottom: 0.15rem; cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.ed-menu-logout button:hover { color: #fbf8f1; border-color: #6b7a5e; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-menu-overlay { transition: opacity 0.15s ease, visibility 0.15s; transform: none; }
+  .ed-hamburger span { transition: none; }
+}

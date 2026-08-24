@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Fraunces, Newsreader } from "next/font/google";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
-import BootstrapClient from "@/components/BootstrapClient";
+import "./editorial.css";
 import FadeIn from "@/components/FadeIn";
-import NavBar from "@/components/NavBar";
+import SiteHeader from "@/components/SiteHeader";
 import { getSession } from "@/lib/auth";
 
 // New design-system typeface — a fuller weight range than the legacy
@@ -18,6 +18,26 @@ const poppinsV2 = Poppins({
   display: "swap",
 });
 
+// The editorial design's type pair — loaded site-wide (not just on the
+// pages already rewritten onto it) because SiteHeader's full-page menu
+// uses Fraunces too. Both are variable fonts with axes beyond weight/
+// italic (Fraunces also ships SOFT/WONK), so `weight: "variable"` pulls
+// the full variable file rather than pinning a few static instances.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Samnian",
   description: "A small team helping connect everyone for a great dinner!",
@@ -27,15 +47,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const session = await getSession();
 
   return (
-    <html lang="en" className={poppinsV2.variable}>
+    <html lang="en" className={`${poppinsV2.variable} ${fraunces.variable} ${newsreader.variable}`}>
       <body>
         <noscript>
           <style>{`body { opacity: 1 !important; }`}</style>
         </noscript>
-        <NavBar session={session} />
+        <SiteHeader session={session} />
         {children}
         <FadeIn />
-        <BootstrapClient />
       </body>
     </html>
   );

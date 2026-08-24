@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Fraunces, Newsreader } from "next/font/google";
 import { and, eq, gte } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
@@ -12,25 +11,9 @@ import "./editorial.css";
 
 export const dynamic = "force-dynamic";
 
-// Both are variable fonts on Google Fonts with axes beyond the standard
-// weight/italic (Fraunces also ships SOFT/WONK) — `weight: "variable"`
-// pulls the full variable file so editorial.css's own
-// `font-variation-settings` rules can still reach those axes, rather than
-// pinning a handful of static instances the way `weight: [...]` would.
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  variable: "--font-newsreader",
-  display: "swap",
-});
+// Fraunces/Newsreader are loaded once, site-wide, in app/layout.tsx (as
+// CSS variables on <html>) since SiteHeader's full-page menu needs them
+// too — no need to load them again here.
 
 const WORD = "samnian".split("");
 
@@ -112,7 +95,7 @@ export default async function LandingPage({
     .slice(0, 3);
 
   return (
-    <div className={`ed-scope ${fraunces.variable} ${newsreader.variable}`}>
+    <div className="ed-scope">
       <div className="ed-wash" />
       <div className="ed-grain" />
 
