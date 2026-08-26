@@ -363,3 +363,167 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
   .ed-menu-overlay { transition: opacity 0.15s ease, visibility 0.15s; transform: none; }
   .ed-hamburger span { transition: none; }
 }
+
+/* =====================================================================
+ * Dashboard — the post-login landing page (app/dashboard/page.tsx).
+ * A member "dossier" (who you are) beside a "table plan" (what's next),
+ * so logging in goes straight to something personal instead of the same
+ * public events grid every visitor sees. Prefixed .ed-dash- rather than
+ * reusing .ed-card/.ed-cards etc., since those already mean something
+ * different (the landing page's dinner cards) and editorial.css is
+ * loaded site-wide.
+ * ===================================================================== */
+
+.ed-dash-head {
+  padding: clamp(1.5rem, 4vw, 2.25rem) 0 0;
+}
+.ed-dash-head .ed-lang { display: block; margin-bottom: 0.5rem; }
+.ed-dash-head h1 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
+
+.ed-dash-notice {
+  margin: 0.9rem 0 0;
+  font-size: 0.88rem;
+  color: var(--ed-fg-soft);
+}
+.ed-dash-notice a { color: var(--ed-accent); text-decoration: none; border-bottom: 1px solid var(--ed-accent); }
+.ed-dash-notice a:hover { color: var(--ed-fg); border-color: var(--ed-fg); }
+
+.ed-dash-grid {
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+  padding-bottom: clamp(3rem, 8vh, 5rem);
+  display: grid;
+  grid-template-columns: 20rem 1fr;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+/* ---- dossier (left) ------------------------------------------------ */
+.ed-dash-card {
+  position: sticky; top: 1.25rem;
+  background: color-mix(in srgb, var(--ed-fg) 4%, transparent);
+  border: 1px solid var(--ed-rule);
+  border-radius: 3px;
+  padding: 1.6rem 1.5rem;
+}
+
+.ed-dash-top { display: flex; align-items: center; gap: 1rem; }
+.ed-dash-avatar {
+  width: 64px; height: 64px; flex: none; border-radius: 50%;
+  object-fit: cover;
+  background: var(--ed-accent); color: var(--ed-on-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ed-display); font-weight: 500; font-size: 1.35rem;
+  font-variation-settings: "opsz" 30, "SOFT" 22;
+}
+.ed-dash-name { font-family: var(--ed-display); font-variation-settings: "opsz" 40, "SOFT" 22; font-weight: 500; font-size: 1.2rem; }
+.ed-dash-loc { font-size: 0.85rem; color: var(--ed-fg-soft); margin-top: 0.2rem; }
+
+.ed-dash-quick { display: none; font-size: 0.85rem; color: var(--ed-fg-soft); margin-top: 0.85rem; }
+
+.ed-dash-rule { height: 1px; background: var(--ed-rule); margin: 1.3rem 0; border: 0; }
+
+.ed-dash-facts { margin: 0 0 1rem; display: grid; gap: 0.65rem; }
+.ed-dash-frow { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.75rem; font-size: 0.88rem; }
+.ed-dash-frow dt { font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ed-fg-faint); padding-top: 0.15rem; }
+.ed-dash-frow dd { margin: 0; font-weight: 500; }
+
+.ed-dash-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ed-dash-tags span {
+  font-size: 0.76rem; padding: 0.3rem 0.65rem; border-radius: 2px;
+  background: color-mix(in srgb, var(--ed-fg) 6%, transparent);
+  border: 1px solid var(--ed-rule); color: var(--ed-fg-soft);
+}
+.ed-dash-empty-note { font-size: 0.85rem; color: var(--ed-fg-faint); margin: 0; }
+.ed-dash-empty-note a { color: var(--ed-accent); }
+
+.ed-dash-traits { display: grid; gap: 0.5rem; }
+.ed-dash-trait-row { display: grid; grid-template-columns: 6.5rem 1fr; align-items: center; gap: 0.6rem; }
+.ed-dash-trait-row span { font-size: 0.74rem; color: var(--ed-fg-soft); }
+.ed-dash-trait-track { height: 5px; background: color-mix(in srgb, var(--ed-fg) 8%, transparent); border-radius: 3px; overflow: hidden; }
+.ed-dash-trait-fill { height: 100%; background: var(--ed-accent); border-radius: 3px; }
+
+.ed-dash-quiz-cta p { margin: 0 0 0.6rem; font-size: 0.88rem; color: var(--ed-fg-soft); }
+.ed-dash-quiz-cta a { font-size: 0.85rem; color: var(--ed-accent); text-decoration: none; border-bottom: 1px solid var(--ed-accent); }
+.ed-dash-quiz-cta a:hover { color: var(--ed-fg); border-color: var(--ed-fg); }
+
+.ed-dash-edit {
+  display: block; text-align: center; margin-top: 1.4rem;
+  font-size: 0.8rem; color: var(--ed-accent); text-decoration: none;
+  border: 1px solid var(--ed-rule); border-radius: 999px; padding: 0.6rem;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.ed-dash-edit:hover { border-color: var(--ed-accent); color: var(--ed-fg); }
+
+/* ---- table plan (right) --------------------------------------------- */
+.ed-dash-plan-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  padding-bottom: 0.85rem; margin-bottom: 0.1rem; border-bottom: 1px solid var(--ed-rule);
+}
+.ed-dash-plan-head h2 { font-size: 1.35rem; }
+.ed-dash-plan-aside { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ed-fg-faint); }
+
+.ed-dash-entry {
+  display: grid; grid-template-columns: 4rem 1fr auto; gap: 1.1rem; align-items: start;
+  padding: 1.3rem 0; border-bottom: 1px solid var(--ed-rule);
+}
+
+.ed-dash-entry-num {
+  font-family: var(--ed-display); font-weight: 500; font-size: 2.1rem; line-height: 0.9;
+  color: var(--ed-fg-faint); font-variation-settings: "opsz" 50, "SOFT" 22;
+}
+.ed-dash-entry-num small {
+  display: block; font-family: var(--ed-body); font-size: 0.65rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ed-fg-faint); margin-top: 0.3rem;
+}
+
+.ed-dash-entry-title { font-size: 1.15rem; text-decoration: none; color: var(--ed-fg); }
+.ed-dash-entry-title:hover { color: var(--ed-accent); }
+.ed-dash-entry-sub { font-size: 0.88rem; color: var(--ed-fg-soft); font-style: italic; margin-top: 0.2rem; }
+.ed-dash-entry-meta { margin-top: 0.5rem; font-size: 0.8rem; color: var(--ed-fg-faint); letter-spacing: 0.02em; }
+.ed-dash-entry-meta b { color: var(--ed-fg-soft); font-weight: 500; }
+
+.ed-dash-entry-action { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
+.ed-dash-pill {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.03em;
+  border-radius: 999px; padding: 0.32rem 0.75rem; white-space: nowrap;
+  color: var(--ed-accent); border: 1px solid var(--ed-accent);
+}
+.ed-dash-pill.is-going { background: var(--ed-accent); color: var(--ed-on-accent); border-color: transparent; }
+.ed-dash-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ed-dash-rsvp {
+  display: inline-block; font-size: 0.82rem; color: var(--ed-accent);
+  text-decoration: none; border-bottom: 1px solid var(--ed-accent);
+  padding-bottom: 0.15rem; white-space: nowrap;
+}
+.ed-dash-rsvp:hover { color: var(--ed-fg); border-color: var(--ed-fg); }
+.ed-dash-chat-link { font-size: 0.76rem; color: var(--ed-fg-soft); text-decoration: none; }
+.ed-dash-chat-link:hover { color: var(--ed-fg); }
+
+.ed-dash-plan-foot { margin-top: 1.5rem; text-align: right; }
+.ed-dash-plan-foot a { font-size: 0.82rem; color: var(--ed-accent); text-decoration: none; border-bottom: 1px solid var(--ed-rule); padding-bottom: 0.15rem; }
+.ed-dash-plan-foot a:hover { border-color: var(--ed-accent); }
+
+.ed-dash-empty {
+  padding: 2rem 1.5rem; text-align: center;
+  border: 1px dashed var(--ed-rule); border-radius: 3px;
+  color: var(--ed-fg-soft); font-size: 0.92rem;
+}
+
+/* ---- mobile: condense the dossier hard, so the table plan starts
+   within the fold instead of several screens down. The full facts/tags/
+   trait-bar block collapses to a single summary line + a link to the
+   full profile; the sticky positioning drops too, since a short block
+   pinned above a long list has nothing to stick against. ---- */
+@media (max-width: 760px) {
+  .ed-dash-grid { grid-template-columns: 1fr; margin-top: 1.1rem; gap: 1.1rem; }
+  .ed-dash-card { position: static; padding: 1.1rem 1.2rem; }
+  .ed-dash-avatar { width: 52px; height: 52px; font-size: 1.05rem; }
+  .ed-dash-quick { display: block; }
+  .ed-dash-more { display: none; }
+  .ed-dash-edit { margin-top: 0.9rem; }
+
+  .ed-dash-entry { grid-template-columns: 3rem 1fr; row-gap: 0.5rem; padding: 1.1rem 0; }
+  .ed-dash-entry-num { font-size: 1.7rem; }
+  .ed-dash-entry-action { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: flex-start; gap: 0.7rem; }
+}
