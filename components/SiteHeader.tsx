@@ -74,8 +74,8 @@ export default function SiteHeader({ session }: { session: Session | null }) {
           </li>
           {session ? (
             <li>
-              <Link href="/profile" onClick={close}>
-                Profile
+              <Link href="/dashboard" onClick={close}>
+                Dashboard
               </Link>
             </li>
           ) : (

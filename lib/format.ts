@@ -12,3 +12,12 @@ export function formatSlot(slot: string): string {
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return m === "00" ? `${h12}${period}` : `${h12}:${m}${period}`;
 }
+
+/** Splits a `date` column string into the day/month pair the dashboard's date tiles show (e.g. "26" / "Aug"). */
+export function formatEventDayMonth(isoDate: string): { day: string; month: string } {
+  const d = new Date(`${isoDate}T00:00:00`);
+  return {
+    day: String(d.getDate()).padStart(2, "0"),
+    month: d.toLocaleDateString("en-GB", { month: "short" }),
+  };
+}

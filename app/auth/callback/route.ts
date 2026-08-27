@@ -51,6 +51,6 @@ export async function GET(request: NextRequest) {
   if (profile?.role === "admin") redirect("/admin");
 
   const [scores] = await db().select().from(personalityScores).where(eq(personalityScores.userId, authUser.id)).limit(1);
-  if (scores) redirect(safeNextPath(next, "/events"));
+  if (scores) redirect(safeNextPath(next, "/dashboard"));
   redirect(`/ocean-test?required=1${next ? `&next=${encodeURIComponent(next)}` : ""}`);
 }

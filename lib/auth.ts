@@ -55,7 +55,7 @@ export async function requireUser(next?: string): Promise<Session> {
 /** Server Component / Server Action guard: redirects unless the user is an admin. */
 export async function requireAdmin(): Promise<Session> {
   const session = await requireUser();
-  if (session.role !== "admin") redirect("/events");
+  if (session.role !== "admin") redirect("/dashboard");
   return session;
 }
 

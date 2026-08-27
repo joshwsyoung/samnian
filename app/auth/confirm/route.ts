@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/events";
+  const next = searchParams.get("next") ?? "/dashboard";
 
   if (!tokenHash || !type) {
     // We've never actually gotten dashboard access to put token_hash/type in
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const tokenHash = String(formData.get("token_hash") ?? "");
   const type = formData.get("type") as EmailOtpType | null;
-  const next = String(formData.get("next") ?? "/events");
+  const next = String(formData.get("next") ?? "/dashboard");
 
   if (!tokenHash || !type) {
     redirect(`/login?error=${encodeURIComponent(MALFORMED_LINK_ERROR)}`);
