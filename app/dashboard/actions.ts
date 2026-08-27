@@ -14,7 +14,7 @@ export async function updateProfileAction(formData: FormData) {
   const userId = session.id;
 
   // Login email is managed by Supabase Auth, not editable from here — see
-  // the profile page, where it's rendered read-only.
+  // the account settings pop-up, where it's its own form.
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const age = String(formData.get("age") ?? "").trim();
@@ -38,7 +38,7 @@ export async function updateProfileAction(formData: FormData) {
   }
 
   if (errors.length > 0) {
-    redirect("/profile?error=" + encodeURIComponent(errors.join(" ")));
+    redirect("/dashboard?error=" + encodeURIComponent(errors.join(" ")));
   }
 
   await db()
@@ -52,7 +52,7 @@ export async function updateProfileAction(formData: FormData) {
     })
     .where(eq(users.id, userId));
 
-  redirect("/profile?success=" + encodeURIComponent("Profile updated successfully!"));
+  redirect("/dashboard?success=" + encodeURIComponent("Profile updated successfully!"));
 }
 
 export async function updateInterestsAction(formData: FormData) {
@@ -65,7 +65,7 @@ export async function updateInterestsAction(formData: FormData) {
     .filter(Boolean);
 
   if (selectedNames.length === 0) {
-    redirect("/profile?error=" + encodeURIComponent("Please select at least one interest."));
+    redirect("/dashboard?error=" + encodeURIComponent("Please select at least one interest."));
   }
 
   await db().transaction(async (tx) => {
@@ -84,13 +84,13 @@ export async function updateInterestsAction(formData: FormData) {
     }
   });
 
-  redirect("/profile?success=" + encodeURIComponent("Your interests have been updated successfully!"));
+  redirect("/dashboard?success=" + encodeURIComponent("Your interests have been updated successfully!"));
 }
 
 export async function updateEmailAction(formData: FormData) {
   await requireUser();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (!email) redirect("/profile?error=" + encodeURIComponent("Please enter an email address."));
+  if (!email) redirect("/dashboard?error=" + encodeURIComponent("Please enter an email address."));
 
   // Supabase sends a confirmation link to the new address and only swaps
   // it over once that's clicked — this app's own users.email column (and
@@ -98,9 +98,9 @@ export async function updateEmailAction(formData: FormData) {
   // deliberately not updated optimistically here.
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ email });
-  if (error) redirect("/profile?error=" + encodeURIComponent(error.message));
+  if (error) redirect("/dashboard?error=" + encodeURIComponent(error.message));
 
-  redirect("/profile?success=" + encodeURIComponent(`Check ${email} for a link to confirm your new email address.`));
+  redirect("/dashboard?success=" + encodeURIComponent(`Check ${email} for a link to confirm your new email address.`));
 }
 
 export async function updatePasswordAction(formData: FormData) {
@@ -108,14 +108,14 @@ export async function updatePasswordAction(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(formData.get("confirm_password") ?? "");
 
-  if (!password || !confirmPassword) redirect("/profile?error=" + encodeURIComponent("Please fill in both password fields."));
-  if (password !== confirmPassword) redirect("/profile?error=" + encodeURIComponent("Passwords do not match."));
+  if (!password || !confirmPassword) redirect("/dashboard?error=" + encodeURIComponent("Please fill in both password fields."));
+  if (password !== confirmPassword) redirect("/dashboard?error=" + encodeURIComponent("Passwords do not match."));
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) redirect("/profile?error=" + encodeURIComponent(error.message));
+  if (error) redirect("/dashboard?error=" + encodeURIComponent(error.message));
 
-  redirect("/profile?success=" + encodeURIComponent("Password updated."));
+  redirect("/dashboard?success=" + encodeURIComponent("Password updated."));
 }
 
 export async function deleteAccountAction() {

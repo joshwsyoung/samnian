@@ -436,6 +436,27 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
 .ed-dash-empty-note { font-size: 0.85rem; color: var(--ed-fg-faint); margin: 0; }
 .ed-dash-empty-note a { color: var(--ed-accent); }
 
+/* A button styled to read as inline text — "finish it" / "add some" /
+   "what do these mean" triggers that live inside a sentence rather than
+   standing alone as their own control. */
+.ed-dash-inline-trigger {
+  appearance: none; background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; cursor: pointer; color: var(--ed-accent);
+  border-bottom: 1px solid var(--ed-accent);
+}
+.ed-dash-inline-trigger:hover { color: var(--ed-fg); border-color: var(--ed-fg); }
+
+.ed-dash-details { margin-top: 0.7rem; font-size: 0.8rem; }
+.ed-dash-details summary { cursor: pointer; color: var(--ed-accent); list-style: none; }
+.ed-dash-details summary::-webkit-details-marker { display: none; }
+.ed-dash-details summary::before { content: "+ "; }
+.ed-dash-details[open] summary::before { content: "\2212 "; }
+.ed-dash-details-body {
+  margin-top: 0.7rem; padding-top: 0.7rem; border-top: 1px dashed var(--ed-rule);
+  color: var(--ed-fg-soft); display: grid; gap: 0.5rem;
+}
+.ed-dash-details-body strong { color: var(--ed-fg); font-weight: 600; }
+
 .ed-dash-traits { display: grid; gap: 0.5rem; }
 .ed-dash-trait-row { display: grid; grid-template-columns: 6.5rem 1fr; align-items: center; gap: 0.6rem; }
 .ed-dash-trait-row span { font-size: 0.74rem; color: var(--ed-fg-soft); }
@@ -446,13 +467,38 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
 .ed-dash-quiz-cta a { font-size: 0.85rem; color: var(--ed-accent); text-decoration: none; border-bottom: 1px solid var(--ed-accent); }
 .ed-dash-quiz-cta a:hover { color: var(--ed-fg); border-color: var(--ed-fg); }
 
+.ed-dash-actions { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.4rem; }
+
+/* Doubles as a plain <Link> (profile completion prompts) and a <button>
+   that opens a DashModal — appearance/font/background reset so both read
+   identically. */
 .ed-dash-edit {
-  display: block; text-align: center; margin-top: 1.4rem;
+  appearance: none; width: 100%;
+  display: block; text-align: center;
+  font: inherit; background: none; cursor: pointer;
   font-size: 0.8rem; color: var(--ed-accent); text-decoration: none;
   border: 1px solid var(--ed-rule); border-radius: 999px; padding: 0.6rem;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 .ed-dash-edit:hover { border-color: var(--ed-accent); color: var(--ed-fg); }
+
+/* ---- pop-up modals (components/dash/DashModal.tsx) ------------------- */
+dialog.ed-modal {
+  border: 1px solid var(--ed-rule); border-radius: 4px; padding: 0;
+  width: min(30rem, calc(100vw - 2.5rem));
+  max-height: min(85vh, 44rem);
+  color: var(--ed-fg); background: var(--ed-bg);
+}
+dialog.ed-modal::backdrop { background: rgba(43, 42, 38, 0.45); }
+.ed-modal-inner { padding: 1.5rem 1.6rem; overflow-y: auto; max-height: inherit; }
+.ed-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }
+.ed-modal-head h3 { font-size: 1.1rem; }
+.ed-modal-close {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  font-size: 1.4rem; line-height: 1; padding: 0 0.2rem;
+  color: var(--sm-text-muted, var(--ed-fg-faint));
+}
+.ed-modal-close:hover { color: var(--sm-text, var(--ed-fg)); }
 
 /* ---- table plan (right) --------------------------------------------- */
 .ed-dash-plan-head {
@@ -521,7 +567,7 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
   .ed-dash-avatar { width: 52px; height: 52px; font-size: 1.05rem; }
   .ed-dash-quick { display: block; }
   .ed-dash-more { display: none; }
-  .ed-dash-edit { margin-top: 0.9rem; }
+  .ed-dash-actions { margin-top: 0.9rem; }
 
   .ed-dash-entry { grid-template-columns: 3rem 1fr; row-gap: 0.5rem; padding: 1.1rem 0; }
   .ed-dash-entry-num { font-size: 1.7rem; }

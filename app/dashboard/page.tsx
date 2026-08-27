@@ -16,6 +16,18 @@ import {
 import { requireUser } from "@/lib/auth";
 import { firstNameFrom, getGreeting } from "@/lib/greeting";
 import { formatEventDayMonth, formatSlot } from "@/lib/format";
+import { CITIES } from "@/lib/constants";
+import ConfirmButton from "@/components/ConfirmButton";
+import PasswordInput from "@/components/PasswordInput";
+import DashModal from "@/components/dash/DashModal";
+import InterestChipPicker from "@/components/dash/InterestChipPicker";
+import {
+  deleteAccountAction,
+  updateEmailAction,
+  updateInterestsAction,
+  updatePasswordAction,
+  updateProfileAction,
+} from "./actions";
 import "../editorial.css";
 
 export const dynamic = "force-dynamic";
@@ -31,11 +43,16 @@ const TRAITS = [
 // Post-login landing: a member "dossier" (who you are) next to a "table
 // plan" (what's next) — replaces the old bare redirect to /events, so
 // logging in lands somewhere personal instead of the same public grid
-// every visitor sees. /profile is still where every detail gets edited;
-// this page is the glanceable summary + edit link into it.
-export default async function DashboardPage() {
+// every visitor sees. Everything /profile used to manage lives here now
+// too, behind pop-up modals rather than its own page.
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string; error?: string }>;
+}) {
   const session = await requireUser();
   const userId = session.id;
+  const { success, error } = await searchParams;
 
   const [user] = await db().select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) {
@@ -50,13 +67,13 @@ export default async function DashboardPage() {
 
   const [scores] = await db().select().from(personalityScores).where(eq(personalityScores.userId, userId)).limit(1);
 
-  const selectedInterestNames = (
-    await db()
-      .select({ name: interests.name })
-      .from(userInterests)
-      .innerJoin(interests, eq(userInterests.interestId, interests.id))
-      .where(eq(userInterests.userId, userId))
-  ).map((r) => r.name);
+  const allInterests = await db().select().from(interests);
+  const selectedInterestRows = await db()
+    .select({ name: interests.name })
+    .from(userInterests)
+    .innerJoin(interests, eq(userInterests.interestId, interests.id))
+    .where(eq(userInterests.userId, userId));
+  const selectedInterestNames = selectedInterestRows.map((r) => r.name);
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -101,8 +118,8 @@ export default async function DashboardPage() {
       .where(and(eq(events.published, true), gte(events.eventDate, today)))
   ).sort((a, b) => a.eventDate.localeCompare(b.eventDate));
 
-  // Same definition of "complete" as /profile uses, so the two pages never
-  // disagree about it.
+  // Same definition of "complete" /profile used to, so nothing changes
+  // meaning by moving here.
   const requiredFields = [user.name, user.email, user.phone, user.age, user.city, user.profileImage];
   const profileComplete = requiredFields.every((f) => f !== null && f !== undefined && f !== "");
 
@@ -126,9 +143,22 @@ export default async function DashboardPage() {
           <h1>{greeting}</h1>
           {!profileComplete && (
             <p className="ed-dash-notice">
-              Your profile&rsquo;s missing a few details &mdash; <Link href="/profile">finish it</Link> so we can match your table well.
+              Your profile&rsquo;s missing a few details &mdash;{" "}
+              <DashModal
+                triggerLabel="finish it"
+                triggerClassName="ed-dash-inline-trigger"
+                title="Edit profile"
+                action={updateProfileAction}
+                encType="multipart/form-data"
+                saveLabel="Save changes"
+              >
+                <ProfileFields user={user} />
+              </DashModal>{" "}
+              so we can match your table well.
             </p>
           )}
+          {success && <div className="sm-scope sm-flash success" style={{ marginTop: 12, maxWidth: 480 }}>{success}</div>}
+          {error && <div className="sm-scope sm-flash error" style={{ marginTop: 12, maxWidth: 480 }}>{error}</div>}
         </div>
 
         <div className="ed-dash-grid">
@@ -165,22 +195,46 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="ed-dash-empty-note">No interests picked yet &mdash; <Link href="/profile">add some</Link>.</p>
+                <p className="ed-dash-empty-note">
+                  No interests picked yet &mdash;{" "}
+                  <DashModal
+                    triggerLabel="add some"
+                    triggerClassName="ed-dash-inline-trigger"
+                    title="Edit interests"
+                    action={updateInterestsAction}
+                    saveLabel="Save interests"
+                  >
+                    <InterestChipPicker interests={allInterests} defaultSelected={selectedInterestNames} fieldName="selected_interests" />
+                  </DashModal>
+                  .
+                </p>
               )}
 
               <hr className="ed-dash-rule" />
 
               {scores ? (
-                <div className="ed-dash-traits">
-                  {TRAITS.map((t) => (
-                    <div className="ed-dash-trait-row" key={t.key}>
-                      <span>{t.label}</span>
-                      <div className="ed-dash-trait-track">
-                        <div className="ed-dash-trait-fill" style={{ width: `${(scores[t.key] / 5) * 100}%` }} />
+                <>
+                  <div className="ed-dash-traits">
+                    {TRAITS.map((t) => (
+                      <div className="ed-dash-trait-row" key={t.key}>
+                        <span>{t.label}</span>
+                        <div className="ed-dash-trait-track">
+                          <div className="ed-dash-trait-fill" style={{ width: `${(scores[t.key] / 5) * 100}%` }} />
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                  <details className="ed-dash-details">
+                    <summary>What do these mean?</summary>
+                    <div className="ed-dash-details-body">
+                      <p><strong>Openness</strong> — curious and imaginative vs. practical and routine-loving.</p>
+                      <p><strong>Conscientiousness</strong> — organized and plans ahead vs. spontaneous and loose.</p>
+                      <p><strong>Extraversion</strong> — outgoing and energized by people vs. reserved.</p>
+                      <p><strong>Agreeableness</strong> — compassionate and trusting vs. competitive and skeptical.</p>
+                      <p><strong>Neuroticism</strong> — emotionally reactive vs. calm and resilient.</p>
                     </div>
-                  ))}
-                </div>
+                  </details>
+                </>
               ) : (
                 <div className="ed-dash-quiz-cta">
                   <p>Take the two-minute quiz so we can match your table.</p>
@@ -189,7 +243,28 @@ export default async function DashboardPage() {
               )}
             </div>
 
-            <Link className="ed-dash-edit" href="/profile">Edit profile &amp; interests</Link>
+            <div className="ed-dash-actions">
+              <DashModal
+                triggerLabel="Edit profile"
+                title="Edit profile"
+                action={updateProfileAction}
+                encType="multipart/form-data"
+                saveLabel="Save changes"
+              >
+                <ProfileFields user={user} />
+              </DashModal>
+              <DashModal
+                triggerLabel="Edit interests"
+                title="Edit interests"
+                action={updateInterestsAction}
+                saveLabel="Save interests"
+              >
+                <InterestChipPicker interests={allInterests} defaultSelected={selectedInterestNames} fieldName="selected_interests" />
+              </DashModal>
+              <DashModal triggerLabel="Account settings" title="Account settings">
+                <AccountSettingsFields email={user.email} isAdmin={session.role === "admin"} />
+              </DashModal>
+            </div>
           </aside>
 
           <div>
@@ -250,6 +325,84 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileFields({ user }: { user: typeof users.$inferSelect }) {
+  return (
+    <div className="sm-field-row">
+      <div className="sm-field">
+        <label htmlFor="name">Name</label>
+        <input type="text" id="name" name="name" className="sm-input" defaultValue={user.name} required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="phone">Phone</label>
+        <input type="text" id="phone" name="phone" className="sm-input" defaultValue={user.phone ?? ""} required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="age">Age</label>
+        <input type="number" id="age" name="age" className="sm-input" defaultValue={user.age ?? ""} required />
+      </div>
+      <div className="sm-field">
+        <label htmlFor="city">City</label>
+        <select id="city" name="city" className="sm-input" defaultValue={user.city ?? ""} required>
+          <option value="" disabled>Select city</option>
+          {CITIES.map((city) => (
+            <option key={city} value={city}>{city}</option>
+          ))}
+        </select>
+      </div>
+      <div className="sm-field">
+        <label htmlFor="profile_image">Photo</label>
+        <input type="file" id="profile_image" name="profile_image" className="sm-input" accept="image/*" />
+      </div>
+    </div>
+  );
+}
+
+// The "Account settings" modal has no single action of its own — it holds
+// three independent forms (email, password, delete) side by side, each
+// with its own submit button, plus a plain link out to /admin.
+function AccountSettingsFields({ email, isAdmin }: { email: string; isAdmin: boolean }) {
+  return (
+    <div>
+      <form action={updateEmailAction} className="sm-field-row" style={{ alignItems: "flex-end", marginBottom: 4 }}>
+        <div className="sm-field" style={{ flex: 1, minWidth: 180 }}>
+          <label htmlFor="dash-email">Email</label>
+          <input type="email" id="dash-email" name="email" className="sm-input" defaultValue={email} required />
+        </div>
+        <button type="submit" className="sm-btn sm-btn-primary">Update</button>
+      </form>
+
+      <hr style={{ border: 0, borderTop: "1px dashed var(--sm-border)", margin: "18px 0" }} />
+
+      <form action={updatePasswordAction}>
+        <div className="sm-field-stack" style={{ marginBottom: 12 }}>
+          <PasswordInput name="password" label="New password" autoComplete="new-password" />
+          <PasswordInput name="confirm_password" label="Confirm new password" enforcePattern={false} autoComplete="new-password" />
+        </div>
+        <button type="submit" className="sm-btn sm-btn-primary">Update password</button>
+      </form>
+
+      {isAdmin && (
+        <div className="sm-settings-strip" style={{ marginTop: 18 }}>
+          <span>Admin</span>
+          <Link className="sm-btn-link" href="/admin">Admin dashboard &rarr;</Link>
+        </div>
+      )}
+
+      <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px dashed var(--sm-border)" }}>
+        <p className="sm-price-note" style={{ marginTop: 0 }}>Deleting your account removes your profile, RSVPs, and chat history for good.</p>
+        <form action={deleteAccountAction}>
+          <ConfirmButton
+            message="Are you sure you want to delete your account? This cannot be undone."
+            className="sm-btn-danger"
+          >
+            Delete account
+          </ConfirmButton>
+        </form>
       </div>
     </div>
   );
