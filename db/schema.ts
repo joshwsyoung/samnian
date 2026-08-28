@@ -58,6 +58,11 @@ export const users = pgTable("users", {
   city: text("city"),
   role: roleEnum("role").notNull().default("user"),
   profileImage: text("profile_image"),
+  // Purely a badge — the number printed on a physical launch ticket,
+  // self-claimed via /founder (usually by scanning the ticket's QR code).
+  // Unrelated to auth/login; nullable since most members never had a
+  // ticket. Unique so two people can't end up claiming the same one.
+  foundersNumber: integer("founders_number").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   uniqueIndex("users_email_idx").on(table.email),

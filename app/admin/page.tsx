@@ -27,7 +27,7 @@ export default async function AdminDashboardPage() {
           <div className="sm-link-list">
             <Link href="/admin/events/new" className="sm-link-item">Create new event</Link>
             <Link href="/admin/events" className="sm-link-item">View / edit events</Link>
-            <Link href="/ticket" className="sm-link-item">Print marketing ticket</Link>
+            <Link href="/ticket" className="sm-link-item">Print founder tickets</Link>
           </div>
         </section>
       </div>

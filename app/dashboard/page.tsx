@@ -21,6 +21,7 @@ import ConfirmButton from "@/components/ConfirmButton";
 import PasswordInput from "@/components/PasswordInput";
 import DashModal from "@/components/dash/DashModal";
 import InterestChipPicker from "@/components/dash/InterestChipPicker";
+import { claimFounderNumberAction } from "../founder/actions";
 import {
   deleteAccountAction,
   updateEmailAction,
@@ -170,7 +171,10 @@ export default async function DashboardPage({
                 <div className="ed-dash-avatar">{initials || "?"}</div>
               )}
               <div>
-                <div className="ed-dash-name">{user.name}</div>
+                <div className="ed-dash-name">
+                  {user.name}
+                  {user.foundersNumber && <span className="ed-dash-founder-badge">Founder #{user.foundersNumber}</span>}
+                </div>
                 <div className="ed-dash-loc">{user.city || "Location not set"} &middot; joined {memberSince}</div>
               </div>
             </div>
@@ -262,7 +266,7 @@ export default async function DashboardPage({
                 <InterestChipPicker interests={allInterests} defaultSelected={selectedInterestNames} fieldName="selected_interests" />
               </DashModal>
               <DashModal triggerLabel="Account settings" title="Account settings">
-                <AccountSettingsFields email={user.email} isAdmin={session.role === "admin"} />
+                <AccountSettingsFields email={user.email} foundersNumber={user.foundersNumber} isAdmin={session.role === "admin"} />
               </DashModal>
             </div>
           </aside>
@@ -365,7 +369,15 @@ function ProfileFields({ user }: { user: typeof users.$inferSelect }) {
 // The "Account settings" modal has no single action of its own — it holds
 // three independent forms (email, password, delete) side by side, each
 // with its own submit button, plus a plain link out to /admin.
-function AccountSettingsFields({ email, isAdmin }: { email: string; isAdmin: boolean }) {
+function AccountSettingsFields({
+  email,
+  foundersNumber,
+  isAdmin,
+}: {
+  email: string;
+  foundersNumber: number | null;
+  isAdmin: boolean;
+}) {
   return (
     <div>
       <form action={updateEmailAction} className="sm-field-row" style={{ alignItems: "flex-end", marginBottom: 4 }}>
@@ -374,6 +386,25 @@ function AccountSettingsFields({ email, isAdmin }: { email: string; isAdmin: boo
           <input type="email" id="dash-email" name="email" className="sm-input" defaultValue={email} required />
         </div>
         <button type="submit" className="sm-btn sm-btn-primary">Update</button>
+      </form>
+
+      <hr style={{ border: 0, borderTop: "1px dashed var(--sm-border)", margin: "18px 0" }} />
+
+      <form action={claimFounderNumberAction} className="sm-field-row" style={{ alignItems: "flex-end", marginBottom: 4 }}>
+        <div className="sm-field" style={{ flex: 1, minWidth: 180 }}>
+          <label htmlFor="dash-founder-number">Founder member number</label>
+          <input
+            type="number"
+            id="dash-founder-number"
+            name="number"
+            className="sm-input"
+            min={1}
+            step={1}
+            placeholder="Not set"
+            defaultValue={foundersNumber ?? ""}
+          />
+        </div>
+        <button type="submit" className="sm-btn sm-btn-primary">Save</button>
       </form>
 
       <hr style={{ border: 0, borderTop: "1px dashed var(--sm-border)", margin: "18px 0" }} />

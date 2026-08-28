@@ -416,6 +416,12 @@ a.ed-join:hover, button.ed-join:hover { color: var(--ed-fg); border-color: var(-
   font-variation-settings: "opsz" 30, "SOFT" 22;
 }
 .ed-dash-name { font-family: var(--ed-display); font-variation-settings: "opsz" 40, "SOFT" 22; font-weight: 500; font-size: 1.2rem; }
+.ed-dash-founder-badge {
+  display: inline-block; margin-left: 0.55rem; vertical-align: middle;
+  font-family: var(--ed-body); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--ed-accent); border: 1px solid var(--ed-accent); border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
 .ed-dash-loc { font-size: 0.85rem; color: var(--ed-fg-soft); margin-top: 0.2rem; }
 
 .ed-dash-quick { display: none; font-size: 0.85rem; color: var(--ed-fg-soft); margin-top: 0.85rem; }
@@ -573,3 +579,28 @@ dialog.ed-modal::backdrop { background: rgba(43, 42, 38, 0.45); }
   .ed-dash-entry-num { font-size: 1.7rem; }
   .ed-dash-entry-action { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: flex-start; gap: 0.7rem; }
 }
+
+/* =====================================================================
+ * Founder ticket claim (app/founder/page.tsx) — landing point for a
+ * printed ticket's QR code.
+ * ===================================================================== */
+.ed-founder-shell {
+  max-width: 30rem; margin: 0 auto;
+  padding: clamp(3rem, 10vh, 5rem) 1.25rem;
+  position: relative; z-index: 2;
+}
+.ed-founder-number {
+  font-family: var(--ed-display); font-weight: 400;
+  font-variation-settings: "opsz" 96, "SOFT" 24, "WONK" 0;
+  font-size: clamp(2.6rem, 8vw, 3.8rem); color: var(--ed-accent);
+  margin-bottom: 0.6rem;
+}
+.ed-founder-copy { color: var(--ed-fg-soft); font-size: 0.98rem; line-height: 1.5; margin: 0 auto 1.6rem; max-width: 26rem; }
+.ed-founder-actions { display: flex; align-items: center; justify-content: center; gap: 1.25rem; flex-wrap: wrap; }
+.ed-founder-form { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+.ed-founder-form input[type="number"] {
+  font-family: var(--ed-body); font-size: 1rem; width: 8rem; text-align: center;
+  padding: 0.75rem 1rem; border: 1px solid var(--ed-rule); border-radius: 2px;
+  background: color-mix(in srgb, var(--ed-fg) 4%, transparent); color: var(--ed-fg);
+}
+.ed-founder-form input[type="number"]:focus-visible { outline: 2px solid var(--ed-accent); outline-offset: 2px; }
